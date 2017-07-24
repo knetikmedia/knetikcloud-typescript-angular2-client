@@ -1,6 +1,6 @@
 /**
  * Knetik Platform API Documentation latest 
- * This is the spec for the Knetik API.  Use this in conjunction with the documentation found at https://knetikcloud.com
+ * This is the spec for the Knetik API.  Use this in conjunction with the documentation found at https://knetikcloud.com.
  *
  * OpenAPI spec version: latest 
  * Contact: support@knetik.com
@@ -9,6 +9,8 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
+
+/* tslint:disable:no-unused-variable member-ordering */
 
 import { Inject, Injectable, Optional }                      from '@angular/core';
 import { Http, Headers, URLSearchParams }                    from '@angular/http';
@@ -22,11 +24,10 @@ import * as models                                           from '../model/mode
 import { BASE_PATH, COLLECTION_FORMATS }                     from '../variables';
 import { Configuration }                                     from '../configuration';
 
-/* tslint:disable:no-unused-variable member-ordering */
-
 
 @Injectable()
 export class UsersSubscriptionsApi {
+
     protected basePath = 'https://sandbox.knetikcloud.com';
     public defaultHeaders: Headers = new Headers();
     public configuration: Configuration = new Configuration();
@@ -41,8 +42,8 @@ export class UsersSubscriptionsApi {
     }
 
     /**
-     * Get details about a user&#39;s subscription
      * 
+     * @summary Get details about a user's subscription
      * @param userId The id of the user
      * @param inventoryId The id of the user&#39;s inventory
      */
@@ -52,14 +53,14 @@ export class UsersSubscriptionsApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Get details about a user&#39;s subscriptions
      * 
+     * @summary Get details about a user's subscriptions
      * @param userId The id of the user
      */
     public getUsersSubscriptionDetails(userId: number, extraHttpRequestParams?: any): Observable<Array<models.InventorySubscriptionResource>> {
@@ -68,14 +69,14 @@ export class UsersSubscriptionsApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Reactivate a subscription and charge fee
      * 
+     * @summary Reactivate a subscription and charge fee
      * @param userId The id of the user
      * @param inventoryId The id of the user&#39;s inventory
      * @param reactivateSubscriptionRequest The reactivate subscription request object inventory
@@ -86,14 +87,14 @@ export class UsersSubscriptionsApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Set a new date to bill a subscription on
      * 
+     * @summary Set a new date to bill a subscription on
      * @param userId The id of the user
      * @param inventoryId The id of the user&#39;s inventory
      * @param billDate The new bill date. Unix timestamp in seconds
@@ -104,14 +105,14 @@ export class UsersSubscriptionsApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Set the payment method to use for a subscription
      * May send null to use floating default
+     * @summary Set the payment method to use for a subscription
      * @param userId The id of the user
      * @param inventoryId The id of the user&#39;s inventory
      * @param paymentMethodId The id of the payment method
@@ -122,14 +123,14 @@ export class UsersSubscriptionsApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Set the status of a subscription
      * The body is a json string (put in quotes) that should match a desired invoice status type. Note that the new status may be blocked if the system is not configured to allow the current status to be changed to the new, to enforce proper flow. The default options for statuses are shown below but may be altered for special use cases
+     * @summary Set the status of a subscription
      * @param userId The id of the user
      * @param inventoryId The id of the user&#39;s inventory
      * @param status The new status for the subscription. Actual options may differ from the indicated set if the invoice status type data has been altered.  Allowable values: (&#39;current&#39;, &#39;canceled&#39;, &#39;stopped&#39;, &#39;payment_failed&#39;, &#39;suspended&#39;)
@@ -140,14 +141,14 @@ export class UsersSubscriptionsApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Set a new subscription plan for a user
      * 
+     * @summary Set a new subscription plan for a user
      * @param userId The id of the user
      * @param inventoryId The id of the user&#39;s inventory
      * @param planId The id of the new plan. Must be from the same subscription
@@ -158,7 +159,25 @@ export class UsersSubscriptionsApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
+                }
+            });
+    }
+
+    /**
+     * This new price will be what the user is charged at the begining of each new period. This override is specific to the current subscription and will not carry over if they end and later re-subscribe. It will persist if the plan is changed using the setUserSubscriptionPlan endpoint.
+     * @summary Set a new subscription price for a user
+     * @param userId The id of the user
+     * @param inventoryId The id of the user&#39;s inventory
+     * @param the override details override
+     */
+    public setUserSubscriptionPrice(userId: number, inventoryId: number, the override details?: models.SubscriptionPriceOverrideRequest, extraHttpRequestParams?: any): Observable<{}> {
+        return this.setUserSubscriptionPriceWithHttpInfo(userId, inventoryId, the override details, extraHttpRequestParams)
+            .map((response: Response) => {
+                if (response.status === 204) {
+                    return undefined;
+                } else {
+                    return response.json() || {};
                 }
             });
     }
@@ -207,9 +226,9 @@ export class UsersSubscriptionsApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Get,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -255,9 +274,9 @@ export class UsersSubscriptionsApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Get,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -313,9 +332,9 @@ export class UsersSubscriptionsApi {
             method: RequestMethod.Post,
             headers: headers,
             body: reactivateSubscriptionRequest == null ? '' : JSON.stringify(reactivateSubscriptionRequest), // https://github.com/angular/angular/issues/10612
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -375,9 +394,9 @@ export class UsersSubscriptionsApi {
             method: RequestMethod.Put,
             headers: headers,
             body: billDate == null ? '' : JSON.stringify(billDate), // https://github.com/angular/angular/issues/10612
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -433,9 +452,9 @@ export class UsersSubscriptionsApi {
             method: RequestMethod.Put,
             headers: headers,
             body: paymentMethodId == null ? '' : JSON.stringify(paymentMethodId), // https://github.com/angular/angular/issues/10612
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -495,9 +514,9 @@ export class UsersSubscriptionsApi {
             method: RequestMethod.Put,
             headers: headers,
             body: status == null ? '' : JSON.stringify(status), // https://github.com/angular/angular/issues/10612
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -553,9 +572,67 @@ export class UsersSubscriptionsApi {
             method: RequestMethod.Put,
             headers: headers,
             body: planId == null ? '' : JSON.stringify(planId), // https://github.com/angular/angular/issues/10612
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
+        // https://github.com/swagger-api/swagger-codegen/issues/4037
+        if (extraHttpRequestParams) {
+            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
+        }
 
+        return this.http.request(path, requestOptions);
+    }
+
+    /**
+     * Set a new subscription price for a user
+     * This new price will be what the user is charged at the begining of each new period. This override is specific to the current subscription and will not carry over if they end and later re-subscribe. It will persist if the plan is changed using the setUserSubscriptionPlan endpoint.
+     * @param userId The id of the user
+     * @param inventoryId The id of the user&#39;s inventory
+     * @param the override details override
+     */
+    public setUserSubscriptionPriceWithHttpInfo(userId: number, inventoryId: number, the override details?: models.SubscriptionPriceOverrideRequest, extraHttpRequestParams?: any): Observable<Response> {
+        const path = this.basePath + '/users/${user_id}/subscriptions/${inventory_id}/price-override'
+                    .replace('${' + 'user_id' + '}', String(userId))
+                    .replace('${' + 'inventory_id' + '}', String(inventoryId));
+
+        let queryParameters = new URLSearchParams();
+        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+        // verify required parameter 'userId' is not null or undefined
+        if (userId === null || userId === undefined) {
+            throw new Error('Required parameter userId was null or undefined when calling setUserSubscriptionPrice.');
+        }
+        // verify required parameter 'inventoryId' is not null or undefined
+        if (inventoryId === null || inventoryId === undefined) {
+            throw new Error('Required parameter inventoryId was null or undefined when calling setUserSubscriptionPrice.');
+        }
+        // to determine the Content-Type header
+        let consumes: string[] = [
+            'application/json'
+        ];
+
+        // to determine the Accept header
+        let produces: string[] = [
+            'application/json'
+        ];
+
+        // authentication (OAuth2) required
+        // oauth required
+        if (this.configuration.accessToken) {
+            let accessToken = typeof this.configuration.accessToken === 'function'
+                ? this.configuration.accessToken()
+                : this.configuration.accessToken;
+            headers.set('Authorization', 'Bearer ' + accessToken);
+        }
+
+        headers.set('Content-Type', 'application/json');
+
+        let requestOptions: RequestOptionsArgs = new RequestOptions({
+            method: RequestMethod.Put,
+            headers: headers,
+            body: the override details == null ? '' : JSON.stringify(the override details), // https://github.com/angular/angular/issues/10612
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
+        });
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);

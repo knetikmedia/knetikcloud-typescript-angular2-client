@@ -1,6 +1,6 @@
 /**
  * Knetik Platform API Documentation latest 
- * This is the spec for the Knetik API.  Use this in conjunction with the documentation found at https://knetikcloud.com
+ * This is the spec for the Knetik API.  Use this in conjunction with the documentation found at https://knetikcloud.com.
  *
  * OpenAPI spec version: latest 
  * Contact: support@knetik.com
@@ -54,12 +54,22 @@ export interface InventorySubscriptionResource {
     paymentMethod?: models.PaymentMethodResource;
 
     /**
-     * The recurring price
+     * The recurring price that has been set to override the base price. Null if not overriding
+     */
+    priceOverride?: number;
+
+    /**
+     * An explanation for the reason the price is being overridden
+     */
+    priceOverrideReason?: string;
+
+    /**
+     * The default recurring price
      */
     recurringPrice?: number;
 
     /**
-     * The sku of the subscription
+     * The recurring sku of the subscription
      */
     sku?: string;
 

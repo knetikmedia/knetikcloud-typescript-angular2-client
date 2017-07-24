@@ -1,6 +1,6 @@
 /**
  * Knetik Platform API Documentation latest 
- * This is the spec for the Knetik API.  Use this in conjunction with the documentation found at https://knetikcloud.com
+ * This is the spec for the Knetik API.  Use this in conjunction with the documentation found at https://knetikcloud.com.
  *
  * OpenAPI spec version: latest 
  * Contact: support@knetik.com
@@ -9,6 +9,8 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
+
+/* tslint:disable:no-unused-variable member-ordering */
 
 import { Inject, Injectable, Optional }                      from '@angular/core';
 import { Http, Headers, URLSearchParams }                    from '@angular/http';
@@ -22,11 +24,10 @@ import * as models                                           from '../model/mode
 import { BASE_PATH, COLLECTION_FORMATS }                     from '../variables';
 import { Configuration }                                     from '../configuration';
 
-/* tslint:disable:no-unused-variable member-ordering */
-
 
 @Injectable()
 export class PaymentsPayPalClassicApi {
+
     protected basePath = 'https://sandbox.knetikcloud.com';
     public defaultHeaders: Headers = new Headers();
     public configuration: Configuration = new Configuration();
@@ -41,8 +42,8 @@ export class PaymentsPayPalClassicApi {
     }
 
     /**
-     * Create a PayPal Classic billing agreement for the user
      * Returns the token that should be used to forward the user to PayPal so they can accept the agreement.
+     * @summary Create a PayPal Classic billing agreement for the user
      * @param request The request to create a PayPal billing agreement
      */
     public createPayPalBillingAgreementUrl(request?: models.CreateBillingAgreementRequest, extraHttpRequestParams?: any): Observable<string> {
@@ -51,14 +52,14 @@ export class PaymentsPayPalClassicApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Create a payment token for PayPal express checkout
      * Returns the token that should be used to forward the user to PayPal so they can complete the checkout.
+     * @summary Create a payment token for PayPal express checkout
      * @param request The request to create a PayPal payment token
      */
     public createPayPalExpressCheckout(request?: models.CreatePayPalPaymentRequest, extraHttpRequestParams?: any): Observable<string> {
@@ -67,14 +68,14 @@ export class PaymentsPayPalClassicApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Finalizes a billing agreement after the user has accepted through PayPal
      * Returns the ID of the new payment method created for the user for the billing agreement.
+     * @summary Finalizes a billing agreement after the user has accepted through PayPal
      * @param request The request to finalize a PayPal billing agreement
      */
     public finalizePayPalBillingAgreement(request?: models.FinalizeBillingAgreementRequest, extraHttpRequestParams?: any): Observable<number> {
@@ -83,14 +84,14 @@ export class PaymentsPayPalClassicApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Finalizes a payment after the user has completed checkout with PayPal
      * The invoice will be marked paid/failed by asynchronous IPN callback.
+     * @summary Finalizes a payment after the user has completed checkout with PayPal
      * @param request The request to finalize the payment
      */
     public finalizePayPalCheckout(request?: models.FinalizePayPalPaymentRequest, extraHttpRequestParams?: any): Observable<{}> {
@@ -99,7 +100,7 @@ export class PaymentsPayPalClassicApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
@@ -140,9 +141,9 @@ export class PaymentsPayPalClassicApi {
             method: RequestMethod.Post,
             headers: headers,
             body: request == null ? '' : JSON.stringify(request), // https://github.com/angular/angular/issues/10612
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -186,9 +187,9 @@ export class PaymentsPayPalClassicApi {
             method: RequestMethod.Post,
             headers: headers,
             body: request == null ? '' : JSON.stringify(request), // https://github.com/angular/angular/issues/10612
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -232,9 +233,9 @@ export class PaymentsPayPalClassicApi {
             method: RequestMethod.Post,
             headers: headers,
             body: request == null ? '' : JSON.stringify(request), // https://github.com/angular/angular/issues/10612
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -278,9 +279,9 @@ export class PaymentsPayPalClassicApi {
             method: RequestMethod.Post,
             headers: headers,
             body: request == null ? '' : JSON.stringify(request), // https://github.com/angular/angular/issues/10612
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);

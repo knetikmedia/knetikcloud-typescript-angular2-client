@@ -1,6 +1,6 @@
 /**
  * Knetik Platform API Documentation latest 
- * This is the spec for the Knetik API.  Use this in conjunction with the documentation found at https://knetikcloud.com
+ * This is the spec for the Knetik API.  Use this in conjunction with the documentation found at https://knetikcloud.com.
  *
  * OpenAPI spec version: latest 
  * Contact: support@knetik.com
@@ -9,6 +9,8 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
+
+/* tslint:disable:no-unused-variable member-ordering */
 
 import { Inject, Injectable, Optional }                      from '@angular/core';
 import { Http, Headers, URLSearchParams }                    from '@angular/http';
@@ -22,11 +24,10 @@ import * as models                                           from '../model/mode
 import { BASE_PATH, COLLECTION_FORMATS }                     from '../variables';
 import { Configuration }                                     from '../configuration';
 
-/* tslint:disable:no-unused-variable member-ordering */
-
 
 @Injectable()
 export class ActivitiesApi {
+
     protected basePath = 'https://sandbox.knetikcloud.com';
     public defaultHeaders: Headers = new Headers();
     public configuration: Configuration = new Configuration();
@@ -41,41 +42,41 @@ export class ActivitiesApi {
     }
 
     /**
-     * Create an activity
      * 
+     * @summary Create an activity
      * @param activityResource The activity resource object
      */
-    public createActivity(activityResource?: models.RepresentsAnActivityThatCanBeParameterizedAndTrackedThroughMetricsScoresEtc, extraHttpRequestParams?: any): Observable<models.RepresentsAnActivityThatCanBeParameterizedAndTrackedThroughMetricsScoresEtc> {
+    public createActivity(activityResource?: models.ActivityResource, extraHttpRequestParams?: any): Observable<models.ActivityResource> {
         return this.createActivityWithHttpInfo(activityResource, extraHttpRequestParams)
             .map((response: Response) => {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Create a new activity occurrence. Ex: start a game
      * Has to enforce extra rules if not used as an admin
+     * @summary Create a new activity occurrence. Ex: start a game
      * @param test if true, indicates that the occurrence should NOT be created. This can be used to test for eligibility and valid settings
      * @param activityOccurrenceResource The activity occurrence object
      */
-    public createActivityOccurrence(test?: boolean, activityOccurrenceResource?: models.AOccurrenceOfAnActivityTheActualGameForExampleUsedToTrackScoresParticipantsAndProvideSettings, extraHttpRequestParams?: any): Observable<models.AOccurrenceOfAnActivityTheActualGameForExampleUsedToTrackScoresParticipantsAndProvideSettings> {
+    public createActivityOccurrence(test?: boolean, activityOccurrenceResource?: models.ActivityOccurrenceResource, extraHttpRequestParams?: any): Observable<models.ActivityOccurrenceResource> {
         return this.createActivityOccurrenceWithHttpInfo(test, activityOccurrenceResource, extraHttpRequestParams)
             .map((response: Response) => {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Create a activity template
      * Activity Templates define a type of activity and the properties they have
+     * @summary Create a activity template
      * @param activityTemplateResource The activity template resource object
      */
     public createActivityTemplate(activityTemplateResource?: models.TemplateResource, extraHttpRequestParams?: any): Observable<models.TemplateResource> {
@@ -84,14 +85,14 @@ export class ActivitiesApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Delete an activity
      * 
+     * @summary Delete an activity
      * @param id The id of the activity
      */
     public deleteActivity(id: number, extraHttpRequestParams?: any): Observable<{}> {
@@ -100,14 +101,14 @@ export class ActivitiesApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Delete a activity template
-     * If cascade &#x3D; &#39;detach&#39;, it will force delete the template even if it&#39;s attached to other objects
+     * If cascade = 'detach', it will force delete the template even if it's attached to other objects
+     * @summary Delete a activity template
      * @param id The id of the template
      * @param cascade The value needed to delete used templates
      */
@@ -117,14 +118,14 @@ export class ActivitiesApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * List activity definitions
      * 
+     * @summary List activity definitions
      * @param filterTemplate Filter for activities that are templates, or specifically not if false
      * @param filterName Filter for activities that have a name starting with specified string
      * @param filterId Filter for activities with an id in the given comma separated list of ids
@@ -132,36 +133,36 @@ export class ActivitiesApi {
      * @param page The number of the page returned, starting with 1
      * @param order A comma separated list of sorting requirements in priority order, each entry matching PROPERTY_NAME:[ASC|DESC]
      */
-    public getActivities(filterTemplate?: boolean, filterName?: string, filterId?: models.models.ModelObject, size?: number, page?: number, order?: string, extraHttpRequestParams?: any): Observable<models.PageResourceBareActivityResource> {
+    public getActivities(filterTemplate?: boolean, filterName?: string, filterId?: string, size?: number, page?: number, order?: string, extraHttpRequestParams?: any): Observable<models.PageResourceBareActivityResource> {
         return this.getActivitiesWithHttpInfo(filterTemplate, filterName, filterId, size, page, order, extraHttpRequestParams)
             .map((response: Response) => {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Get a single activity
      * 
+     * @summary Get a single activity
      * @param id The id of the activity
      */
-    public getActivity(id: number, extraHttpRequestParams?: any): Observable<models.RepresentsAnActivityThatCanBeParameterizedAndTrackedThroughMetricsScoresEtc> {
+    public getActivity(id: number, extraHttpRequestParams?: any): Observable<models.ActivityResource> {
         return this.getActivityWithHttpInfo(id, extraHttpRequestParams)
             .map((response: Response) => {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Get a single activity template
      * 
+     * @summary Get a single activity template
      * @param id The id of the template
      */
     public getActivityTemplate(id: string, extraHttpRequestParams?: any): Observable<models.TemplateResource> {
@@ -170,14 +171,14 @@ export class ActivitiesApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * List and search activity templates
      * 
+     * @summary List and search activity templates
      * @param size The number of objects returned per page
      * @param page The number of the page returned, starting with 1
      * @param order A comma separated list of sorting requirements in priority order, each entry matching PROPERTY_NAME:[ASC|DESC]
@@ -188,48 +189,48 @@ export class ActivitiesApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Sets the status of an activity occurrence to FINISHED and logs metrics
      * 
+     * @summary Sets the status of an activity occurrence to FINISHED and logs metrics
      * @param activityOccurrenceId The id of the activity occurrence
      * @param activityOccurrenceResults The activity occurrence object
      */
-    public setActivityOccurrenceResults(activityOccurrenceId: number, activityOccurrenceResults?: models.ActivityOccurrenceResults, extraHttpRequestParams?: any): Observable<models.ActivityOccurrenceResults> {
+    public setActivityOccurrenceResults(activityOccurrenceId: number, activityOccurrenceResults?: models.ActivityOccurrenceResultsResource, extraHttpRequestParams?: any): Observable<models.ActivityOccurrenceResults> {
         return this.setActivityOccurrenceResultsWithHttpInfo(activityOccurrenceId, activityOccurrenceResults, extraHttpRequestParams)
             .map((response: Response) => {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Update an activity
      * 
+     * @summary Update an activity
      * @param id The id of the activity
      * @param activityResource The activity resource object
      */
-    public updateActivity(id: number, activityResource?: models.RepresentsAnActivityThatCanBeParameterizedAndTrackedThroughMetricsScoresEtc, extraHttpRequestParams?: any): Observable<models.RepresentsAnActivityThatCanBeParameterizedAndTrackedThroughMetricsScoresEtc> {
+    public updateActivity(id: number, activityResource?: models.ActivityResource, extraHttpRequestParams?: any): Observable<models.ActivityResource> {
         return this.updateActivityWithHttpInfo(id, activityResource, extraHttpRequestParams)
             .map((response: Response) => {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Updated the status of an activity occurrence
-     * If setting to &#39;FINISHED&#39; you must POST to /results instead to record the metrics and get synchronous reward results
+     * If setting to 'FINISHED' you must POST to /results instead to record the metrics and get synchronous reward results
+     * @summary Updated the status of an activity occurrence
      * @param activityOccurrenceId The id of the activity occurrence
      * @param activityCccurrenceStatus The activity occurrence status object
      */
@@ -239,14 +240,14 @@ export class ActivitiesApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Update an activity template
      * 
+     * @summary Update an activity template
      * @param id The id of the template
      * @param activityTemplateResource The activity template resource object
      */
@@ -256,7 +257,7 @@ export class ActivitiesApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
@@ -267,7 +268,7 @@ export class ActivitiesApi {
      * 
      * @param activityResource The activity resource object
      */
-    public createActivityWithHttpInfo(activityResource?: models.RepresentsAnActivityThatCanBeParameterizedAndTrackedThroughMetricsScoresEtc, extraHttpRequestParams?: any): Observable<Response> {
+    public createActivityWithHttpInfo(activityResource?: models.ActivityResource, extraHttpRequestParams?: any): Observable<Response> {
         const path = this.basePath + '/activities';
 
         let queryParameters = new URLSearchParams();
@@ -297,9 +298,9 @@ export class ActivitiesApi {
             method: RequestMethod.Post,
             headers: headers,
             body: activityResource == null ? '' : JSON.stringify(activityResource), // https://github.com/angular/angular/issues/10612
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -314,7 +315,7 @@ export class ActivitiesApi {
      * @param test if true, indicates that the occurrence should NOT be created. This can be used to test for eligibility and valid settings
      * @param activityOccurrenceResource The activity occurrence object
      */
-    public createActivityOccurrenceWithHttpInfo(test?: boolean, activityOccurrenceResource?: models.AOccurrenceOfAnActivityTheActualGameForExampleUsedToTrackScoresParticipantsAndProvideSettings, extraHttpRequestParams?: any): Observable<Response> {
+    public createActivityOccurrenceWithHttpInfo(test?: boolean, activityOccurrenceResource?: models.ActivityOccurrenceResource, extraHttpRequestParams?: any): Observable<Response> {
         const path = this.basePath + '/activity-occurrences';
 
         let queryParameters = new URLSearchParams();
@@ -348,9 +349,9 @@ export class ActivitiesApi {
             method: RequestMethod.Post,
             headers: headers,
             body: activityOccurrenceResource == null ? '' : JSON.stringify(activityOccurrenceResource), // https://github.com/angular/angular/issues/10612
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -394,9 +395,9 @@ export class ActivitiesApi {
             method: RequestMethod.Post,
             headers: headers,
             body: activityTemplateResource == null ? '' : JSON.stringify(activityTemplateResource), // https://github.com/angular/angular/issues/10612
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -442,9 +443,9 @@ export class ActivitiesApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Delete,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -495,9 +496,9 @@ export class ActivitiesApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Delete,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -516,7 +517,7 @@ export class ActivitiesApi {
      * @param page The number of the page returned, starting with 1
      * @param order A comma separated list of sorting requirements in priority order, each entry matching PROPERTY_NAME:[ASC|DESC]
      */
-    public getActivitiesWithHttpInfo(filterTemplate?: boolean, filterName?: string, filterId?: models.models.ModelObject, size?: number, page?: number, order?: string, extraHttpRequestParams?: any): Observable<Response> {
+    public getActivitiesWithHttpInfo(filterTemplate?: boolean, filterName?: string, filterId?: string, size?: number, page?: number, order?: string, extraHttpRequestParams?: any): Observable<Response> {
         const path = this.basePath + '/activities';
 
         let queryParameters = new URLSearchParams();
@@ -558,9 +559,9 @@ export class ActivitiesApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Get,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -597,9 +598,9 @@ export class ActivitiesApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Get,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -645,9 +646,9 @@ export class ActivitiesApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Get,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -702,9 +703,9 @@ export class ActivitiesApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Get,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -719,7 +720,7 @@ export class ActivitiesApi {
      * @param activityOccurrenceId The id of the activity occurrence
      * @param activityOccurrenceResults The activity occurrence object
      */
-    public setActivityOccurrenceResultsWithHttpInfo(activityOccurrenceId: number, activityOccurrenceResults?: models.ActivityOccurrenceResults, extraHttpRequestParams?: any): Observable<Response> {
+    public setActivityOccurrenceResultsWithHttpInfo(activityOccurrenceId: number, activityOccurrenceResults?: models.ActivityOccurrenceResultsResource, extraHttpRequestParams?: any): Observable<Response> {
         const path = this.basePath + '/activity-occurrences/${activity_occurrence_id}/results'
                     .replace('${' + 'activity_occurrence_id' + '}', String(activityOccurrenceId));
 
@@ -754,9 +755,9 @@ export class ActivitiesApi {
             method: RequestMethod.Post,
             headers: headers,
             body: activityOccurrenceResults == null ? '' : JSON.stringify(activityOccurrenceResults), // https://github.com/angular/angular/issues/10612
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -771,7 +772,7 @@ export class ActivitiesApi {
      * @param id The id of the activity
      * @param activityResource The activity resource object
      */
-    public updateActivityWithHttpInfo(id: number, activityResource?: models.RepresentsAnActivityThatCanBeParameterizedAndTrackedThroughMetricsScoresEtc, extraHttpRequestParams?: any): Observable<Response> {
+    public updateActivityWithHttpInfo(id: number, activityResource?: models.ActivityResource, extraHttpRequestParams?: any): Observable<Response> {
         const path = this.basePath + '/activities/${id}'
                     .replace('${' + 'id' + '}', String(id));
 
@@ -806,9 +807,9 @@ export class ActivitiesApi {
             method: RequestMethod.Put,
             headers: headers,
             body: activityResource == null ? '' : JSON.stringify(activityResource), // https://github.com/angular/angular/issues/10612
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -858,9 +859,9 @@ export class ActivitiesApi {
             method: RequestMethod.Put,
             headers: headers,
             body: activityCccurrenceStatus == null ? '' : JSON.stringify(activityCccurrenceStatus), // https://github.com/angular/angular/issues/10612
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -910,9 +911,9 @@ export class ActivitiesApi {
             method: RequestMethod.Put,
             headers: headers,
             body: activityTemplateResource == null ? '' : JSON.stringify(activityTemplateResource), // https://github.com/angular/angular/issues/10612
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);

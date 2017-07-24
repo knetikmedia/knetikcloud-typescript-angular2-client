@@ -1,6 +1,6 @@
 /**
  * Knetik Platform API Documentation latest 
- * This is the spec for the Knetik API.  Use this in conjunction with the documentation found at https://knetikcloud.com
+ * This is the spec for the Knetik API.  Use this in conjunction with the documentation found at https://knetikcloud.com.
  *
  * OpenAPI spec version: latest 
  * Contact: support@knetik.com
@@ -9,6 +9,8 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
+
+/* tslint:disable:no-unused-variable member-ordering */
 
 import { Inject, Injectable, Optional }                      from '@angular/core';
 import { Http, Headers, URLSearchParams }                    from '@angular/http';
@@ -22,11 +24,10 @@ import * as models                                           from '../model/mode
 import { BASE_PATH, COLLECTION_FORMATS }                     from '../variables';
 import { Configuration }                                     from '../configuration';
 
-/* tslint:disable:no-unused-variable member-ordering */
-
 
 @Injectable()
 export class GamificationAchievementsApi {
+
     protected basePath = 'https://sandbox.knetikcloud.com';
     public defaultHeaders: Headers = new Headers();
     public configuration: Configuration = new Configuration();
@@ -41,8 +42,8 @@ export class GamificationAchievementsApi {
     }
 
     /**
-     * Create a new achievement definition
-     * If the definition contains a trigger event name, a BRE rule is created, so that tracking logic is executed when the triggering event occurs. If no trigger event name is specified, the user&#39;s achievement status must manually be updated via the API.
+     * If the definition contains a trigger event name, a BRE rule is created, so that tracking logic is executed when the triggering event occurs. If no trigger event name is specified, the user's achievement status must manually be updated via the API.
+     * @summary Create a new achievement definition
      * @param achievement The achievement definition
      */
     public createAchievement(achievement?: models.AchievementDefinitionResource, extraHttpRequestParams?: any): Observable<models.AchievementDefinitionResource> {
@@ -51,14 +52,14 @@ export class GamificationAchievementsApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Create an achievement template
      * Achievement templates define a type of achievement and the properties they have
+     * @summary Create an achievement template
      * @param template The achievement template to be created
      */
     public createAchievementTemplate(template?: models.TemplateResource, extraHttpRequestParams?: any): Observable<models.TemplateResource> {
@@ -67,14 +68,14 @@ export class GamificationAchievementsApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Delete an achievement definition
      * Will also disable the associated generated rule, if any.
+     * @summary Delete an achievement definition
      * @param name The name of the achievement
      */
     public deleteAchievement(name: string, extraHttpRequestParams?: any): Observable<{}> {
@@ -83,14 +84,14 @@ export class GamificationAchievementsApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Delete an achievement template
-     * If cascade &#x3D; &#39;detach&#39;, it will force delete the template even if it&#39;s attached to other objects
+     * If cascade = 'detach', it will force delete the template even if it's attached to other objects
+     * @summary Delete an achievement template
      * @param id The id of the template
      * @param cascade The value needed to delete used templates
      */
@@ -100,14 +101,14 @@ export class GamificationAchievementsApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Get a single achievement definition
      * 
+     * @summary Get a single achievement definition
      * @param name The name of the achievement
      */
     public getAchievement(name: string, extraHttpRequestParams?: any): Observable<models.AchievementDefinitionResource> {
@@ -116,14 +117,14 @@ export class GamificationAchievementsApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Get a single achievement template
      * 
+     * @summary Get a single achievement template
      * @param id The id of the template
      */
     public getAchievementTemplate(id: string, extraHttpRequestParams?: any): Observable<models.TemplateResource> {
@@ -132,14 +133,14 @@ export class GamificationAchievementsApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * List and search achievement templates
      * 
+     * @summary List and search achievement templates
      * @param size The number of objects returned per page
      * @param page The number of the page returned, starting with 1
      * @param order A comma separated list of sorting requirements in priority order, each entry matching PROPERTY_NAME:[ASC|DESC]
@@ -150,14 +151,14 @@ export class GamificationAchievementsApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Get the list of triggers that can be used to trigger an achievement progress update
      * 
+     * @summary Get the list of triggers that can be used to trigger an achievement progress update
      */
     public getAchievementTriggers(extraHttpRequestParams?: any): Observable<Array<models.BreTriggerResource>> {
         return this.getAchievementTriggersWithHttpInfo(extraHttpRequestParams)
@@ -165,14 +166,14 @@ export class GamificationAchievementsApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Get all achievement definitions in the system
      * 
+     * @summary Get all achievement definitions in the system
      * @param filterTagset Filter for achievements with specified tags (separated by comma)
      * @param filterName Filter for achievements whose name contains a string
      * @param filterHidden Filter for achievements that are hidden or not
@@ -187,14 +188,14 @@ export class GamificationAchievementsApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Get a list of derived achievements
      * Used by other services that depend on achievements
+     * @summary Get a list of derived achievements
      * @param name The name of the derived achievement
      */
     public getDerivedAchievements(name: string, extraHttpRequestParams?: any): Observable<Array<models.AchievementDefinitionResource>> {
@@ -203,14 +204,14 @@ export class GamificationAchievementsApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Retrieve progress on a given achievement for a given user
-     * Assets will not be filled in on the resources returned. Use &#39;Get a single poll&#39; to retrieve the full resource with assets for a given item as needed.
+     * Assets will not be filled in on the resources returned. Use 'Get a single poll' to retrieve the full resource with assets for a given item as needed.
+     * @summary Retrieve progress on a given achievement for a given user
      * @param userId The user&#39;s id
      * @param achievementName The achievement&#39;s name
      */
@@ -220,14 +221,14 @@ export class GamificationAchievementsApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Retrieve progress on achievements for a given user
-     * Assets will not be filled in on the resources returned. Use &#39;Get a single poll&#39; to retrieve the full resource with assets for a given item as needed.
+     * Assets will not be filled in on the resources returned. Use 'Get a single poll' to retrieve the full resource with assets for a given item as needed.
+     * @summary Retrieve progress on achievements for a given user
      * @param userId The user&#39;s id
      * @param filterAchievementDerived Filter for achievements that are derived from other services
      * @param filterAchievementTagset Filter for achievements with specified tags (separated by comma)
@@ -241,14 +242,14 @@ export class GamificationAchievementsApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Retrieve progress on a given achievement for all users
-     * Assets will not be filled in on the resources returned. Use &#39;Get single achievement progress for user&#39; to retrieve the full resource with assets for a given user as needed.
+     * Assets will not be filled in on the resources returned. Use 'Get single achievement progress for user' to retrieve the full resource with assets for a given user as needed.
+     * @summary Retrieve progress on a given achievement for all users
      * @param achievementName The achievement&#39;s name
      * @param filterAchievementDerived Filter for achievements that are derived from other services
      * @param filterAchievementTagset Filter for achievements with specified tags (separated by comma)
@@ -262,14 +263,14 @@ export class GamificationAchievementsApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Retrieve progress on achievements for all users
-     * Assets will not be filled in on the resources returned. Use &#39;Get single achievement progress for user&#39; to retrieve the full resource with assets for a given user as needed.
+     * Assets will not be filled in on the resources returned. Use 'Get single achievement progress for user' to retrieve the full resource with assets for a given user as needed.
+     * @summary Retrieve progress on achievements for all users
      * @param filterAchievementDerived Filter for achievements that are derived from other services
      * @param filterAchievementTagset Filter for achievements with specified tags (separated by comma)
      * @param filterAchievementName Filter for achievements whose name contains a string
@@ -282,14 +283,14 @@ export class GamificationAchievementsApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Increment an achievement progress record for a user
-     * If no progress record yet exists for the user, it will be created. Otherwise it will be updated and the provided value added to the existing progress. May be negative. If progress meets or exceeds the achievement&#39;s max_value it will be marked as earned and a BRE event will be triggered for the &lt;code&gt;BreAchievementEarnedTrigger&lt;/code&gt;.
+     * If no progress record yet exists for the user, it will be created. Otherwise it will be updated and the provided value added to the existing progress. May be negative. If progress meets or exceeds the achievement's max_value it will be marked as earned and a BRE event will be triggered for the <code>BreAchievementEarnedTrigger</code>.
+     * @summary Increment an achievement progress record for a user
      * @param userId The user&#39;s id
      * @param achievementName The achievement&#39;s name
      * @param progress The amount to add to the progress value
@@ -300,14 +301,14 @@ export class GamificationAchievementsApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Set an achievement progress record for a user
-     * If no progress record yet exists for the user, it will be created. Otherwise it will be updated and progress set to the provided value. If progress meets or exceeds the achievement&#39;s max_value it will be marked as earned and a BRE event will be triggered for the &lt;code&gt;BreAchievementEarnedTrigger&lt;/code&gt;.
+     * If no progress record yet exists for the user, it will be created. Otherwise it will be updated and progress set to the provided value. If progress meets or exceeds the achievement's max_value it will be marked as earned and a BRE event will be triggered for the <code>BreAchievementEarnedTrigger</code>.
+     * @summary Set an achievement progress record for a user
      * @param userId The user&#39;s id
      * @param achievementName The achievement&#39;s name
      * @param progress The new progress value
@@ -318,14 +319,14 @@ export class GamificationAchievementsApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Update an achievement definition
      * The existing generated rule, if any, will be deleted. A new rule will be created if a trigger event name is specified in the new version.
+     * @summary Update an achievement definition
      * @param name The name of the achievement
      * @param achievement The achievement definition
      */
@@ -335,14 +336,14 @@ export class GamificationAchievementsApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Update an achievement template
      * 
+     * @summary Update an achievement template
      * @param id The id of the template
      * @param template The updated template
      */
@@ -352,7 +353,7 @@ export class GamificationAchievementsApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
@@ -393,9 +394,9 @@ export class GamificationAchievementsApi {
             method: RequestMethod.Post,
             headers: headers,
             body: achievement == null ? '' : JSON.stringify(achievement), // https://github.com/angular/angular/issues/10612
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -439,9 +440,9 @@ export class GamificationAchievementsApi {
             method: RequestMethod.Post,
             headers: headers,
             body: template == null ? '' : JSON.stringify(template), // https://github.com/angular/angular/issues/10612
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -487,9 +488,9 @@ export class GamificationAchievementsApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Delete,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -540,9 +541,9 @@ export class GamificationAchievementsApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Delete,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -588,9 +589,9 @@ export class GamificationAchievementsApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Get,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -636,9 +637,9 @@ export class GamificationAchievementsApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Get,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -693,9 +694,9 @@ export class GamificationAchievementsApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Get,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -735,9 +736,9 @@ export class GamificationAchievementsApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Get,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -812,9 +813,9 @@ export class GamificationAchievementsApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Get,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -860,9 +861,9 @@ export class GamificationAchievementsApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Get,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -914,9 +915,9 @@ export class GamificationAchievementsApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Get,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -987,9 +988,9 @@ export class GamificationAchievementsApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Get,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -1060,9 +1061,9 @@ export class GamificationAchievementsApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Get,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -1127,9 +1128,9 @@ export class GamificationAchievementsApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Get,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -1185,9 +1186,9 @@ export class GamificationAchievementsApi {
             method: RequestMethod.Post,
             headers: headers,
             body: progress == null ? '' : JSON.stringify(progress), // https://github.com/angular/angular/issues/10612
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -1243,9 +1244,9 @@ export class GamificationAchievementsApi {
             method: RequestMethod.Put,
             headers: headers,
             body: progress == null ? '' : JSON.stringify(progress), // https://github.com/angular/angular/issues/10612
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -1295,9 +1296,9 @@ export class GamificationAchievementsApi {
             method: RequestMethod.Put,
             headers: headers,
             body: achievement == null ? '' : JSON.stringify(achievement), // https://github.com/angular/angular/issues/10612
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -1347,9 +1348,9 @@ export class GamificationAchievementsApi {
             method: RequestMethod.Put,
             headers: headers,
             body: template == null ? '' : JSON.stringify(template), // https://github.com/angular/angular/issues/10612
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);

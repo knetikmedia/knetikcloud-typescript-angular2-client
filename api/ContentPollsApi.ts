@@ -1,6 +1,6 @@
 /**
  * Knetik Platform API Documentation latest 
- * This is the spec for the Knetik API.  Use this in conjunction with the documentation found at https://knetikcloud.com
+ * This is the spec for the Knetik API.  Use this in conjunction with the documentation found at https://knetikcloud.com.
  *
  * OpenAPI spec version: latest 
  * Contact: support@knetik.com
@@ -9,6 +9,8 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
+
+/* tslint:disable:no-unused-variable member-ordering */
 
 import { Inject, Injectable, Optional }                      from '@angular/core';
 import { Http, Headers, URLSearchParams }                    from '@angular/http';
@@ -22,11 +24,10 @@ import * as models                                           from '../model/mode
 import { BASE_PATH, COLLECTION_FORMATS }                     from '../variables';
 import { Configuration }                                     from '../configuration';
 
-/* tslint:disable:no-unused-variable member-ordering */
-
 
 @Injectable()
 export class ContentPollsApi {
+
     protected basePath = 'https://sandbox.knetikcloud.com';
     public defaultHeaders: Headers = new Headers();
     public configuration: Configuration = new Configuration();
@@ -41,8 +42,8 @@ export class ContentPollsApi {
     }
 
     /**
-     * Add your vote to a poll
      * 
+     * @summary Add your vote to a poll
      * @param id The poll id
      * @param answerKey The answer key
      */
@@ -52,14 +53,14 @@ export class ContentPollsApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Create a new poll
      * Polls are blobs of text with titles, a category and assets. Formatting and display of the text is in the hands of the front end.
+     * @summary Create a new poll
      * @param pollResource The poll object
      */
     public createPoll(pollResource?: models.PollResource, extraHttpRequestParams?: any): Observable<models.PollResource> {
@@ -68,14 +69,14 @@ export class ContentPollsApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Create a poll template
      * Poll templates define a type of poll and the properties they have
+     * @summary Create a poll template
      * @param pollTemplateResource The poll template resource object
      */
     public createPollTemplate(pollTemplateResource?: models.TemplateResource, extraHttpRequestParams?: any): Observable<models.TemplateResource> {
@@ -84,14 +85,14 @@ export class ContentPollsApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Delete an existing poll
      * 
+     * @summary Delete an existing poll
      * @param id The poll id
      */
     public deletePoll(id: string, extraHttpRequestParams?: any): Observable<{}> {
@@ -100,14 +101,14 @@ export class ContentPollsApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Delete a poll template
-     * If cascade &#x3D; &#39;detach&#39;, it will force delete the template even if it&#39;s attached to other objects
+     * If cascade = 'detach', it will force delete the template even if it's attached to other objects
+     * @summary Delete a poll template
      * @param id The id of the template
      * @param cascade The value needed to delete used templates
      */
@@ -117,14 +118,14 @@ export class ContentPollsApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Get a single poll
      * 
+     * @summary Get a single poll
      * @param id The poll id
      */
     public getPoll(id: string, extraHttpRequestParams?: any): Observable<models.PollResource> {
@@ -133,14 +134,14 @@ export class ContentPollsApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Get poll answer
      * 
+     * @summary Get poll answer
      * @param id The poll id
      */
     public getPollAnswer(id: string, extraHttpRequestParams?: any): Observable<models.PollResponseResource> {
@@ -149,14 +150,14 @@ export class ContentPollsApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Get a single poll template
      * 
+     * @summary Get a single poll template
      * @param id The id of the template
      */
     public getPollTemplate(id: string, extraHttpRequestParams?: any): Observable<models.TemplateResource> {
@@ -165,14 +166,14 @@ export class ContentPollsApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * List and search poll templates
      * 
+     * @summary List and search poll templates
      * @param size The number of objects returned per page
      * @param page The number of the page returned, starting with 1
      * @param order A comma separated list of sorting requirements in priority order, each entry matching PROPERTY_NAME:[ASC|DESC]
@@ -183,14 +184,14 @@ export class ContentPollsApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * List and search polls
-     * Get a list of polls with optional filtering. Assets will not be filled in on the resources returned. Use &#39;Get a single poll&#39; to retrieve the full resource with assets for a given item as needed.
+     * Get a list of polls with optional filtering. Assets will not be filled in on the resources returned. Use 'Get a single poll' to retrieve the full resource with assets for a given item as needed.
+     * @summary List and search polls
      * @param filterCategory Filter for polls from a specific category by id
      * @param filterTagset Filter for polls with specified tags (separated by comma)
      * @param filterText Filter for polls whose text contains a string
@@ -204,14 +205,14 @@ export class ContentPollsApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Update an existing poll
      * 
+     * @summary Update an existing poll
      * @param id The poll id
      * @param pollResource The poll object
      */
@@ -221,14 +222,14 @@ export class ContentPollsApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Update a poll template
      * 
+     * @summary Update a poll template
      * @param id The id of the template
      * @param pollTemplateResource The poll template resource object
      */
@@ -238,7 +239,7 @@ export class ContentPollsApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
@@ -285,9 +286,9 @@ export class ContentPollsApi {
             method: RequestMethod.Post,
             headers: headers,
             body: answerKey == null ? '' : JSON.stringify(answerKey), // https://github.com/angular/angular/issues/10612
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -331,9 +332,9 @@ export class ContentPollsApi {
             method: RequestMethod.Post,
             headers: headers,
             body: pollResource == null ? '' : JSON.stringify(pollResource), // https://github.com/angular/angular/issues/10612
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -377,9 +378,9 @@ export class ContentPollsApi {
             method: RequestMethod.Post,
             headers: headers,
             body: pollTemplateResource == null ? '' : JSON.stringify(pollTemplateResource), // https://github.com/angular/angular/issues/10612
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -425,9 +426,9 @@ export class ContentPollsApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Delete,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -478,9 +479,9 @@ export class ContentPollsApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Delete,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -517,9 +518,9 @@ export class ContentPollsApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Get,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -565,9 +566,9 @@ export class ContentPollsApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Get,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -613,9 +614,9 @@ export class ContentPollsApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Get,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -670,9 +671,9 @@ export class ContentPollsApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Get,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -733,9 +734,9 @@ export class ContentPollsApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Get,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -785,9 +786,9 @@ export class ContentPollsApi {
             method: RequestMethod.Put,
             headers: headers,
             body: pollResource == null ? '' : JSON.stringify(pollResource), // https://github.com/angular/angular/issues/10612
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -837,9 +838,9 @@ export class ContentPollsApi {
             method: RequestMethod.Put,
             headers: headers,
             body: pollTemplateResource == null ? '' : JSON.stringify(pollTemplateResource), // https://github.com/angular/angular/issues/10612
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);

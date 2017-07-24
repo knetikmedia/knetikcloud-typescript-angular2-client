@@ -1,6 +1,6 @@
 /**
  * Knetik Platform API Documentation latest 
- * This is the spec for the Knetik API.  Use this in conjunction with the documentation found at https://knetikcloud.com
+ * This is the spec for the Knetik API.  Use this in conjunction with the documentation found at https://knetikcloud.com.
  *
  * OpenAPI spec version: latest 
  * Contact: support@knetik.com
@@ -9,6 +9,8 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
+
+/* tslint:disable:no-unused-variable member-ordering */
 
 import { Inject, Injectable, Optional }                      from '@angular/core';
 import { Http, Headers, URLSearchParams }                    from '@angular/http';
@@ -22,11 +24,10 @@ import * as models                                           from '../model/mode
 import { BASE_PATH, COLLECTION_FORMATS }                     from '../variables';
 import { Configuration }                                     from '../configuration';
 
-/* tslint:disable:no-unused-variable member-ordering */
-
 
 @Injectable()
 export class ReportingRevenueApi {
+
     protected basePath = 'https://sandbox.knetikcloud.com';
     public defaultHeaders: Headers = new Headers();
     public configuration: Configuration = new Configuration();
@@ -41,8 +42,8 @@ export class ReportingRevenueApi {
     }
 
     /**
-     * Get item revenue info
      * Get basic info about revenue from sales of items and bundles (not subscriptions, shipping, etc), summed up within a time range
+     * @summary Get item revenue info
      * @param currencyCode The code for a currency to get sales data for
      * @param startDate The start of the time range to aggregate, unix timestamp in seconds. Default is beginning of time
      * @param endDate The end of the time range to aggregate, unix timestamp in seconds. Default is end of time
@@ -53,14 +54,14 @@ export class ReportingRevenueApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Get refund revenue info
      * Get basic info about revenue loss from refunds (for all item types), summed up within a time range.
+     * @summary Get refund revenue info
      * @param currencyCode The code for a currency to get refund data for
      * @param startDate The start of the time range to aggregate, unix timestamp in seconds. Default is beginning of time
      * @param endDate The end of the time range to aggregate, unix timestamp in seconds. Default is end of time
@@ -71,14 +72,14 @@ export class ReportingRevenueApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Get revenue info by country
      * Get basic info about revenue from sales of all types, summed up within a time range and split out by country. Sorted for largest revenue at the top
+     * @summary Get revenue info by country
      * @param currencyCode The code for a currency to get sales data for
      * @param startDate The start of the time range to aggregate, unix timestamp in seconds. Default is beginning of time
      * @param endDate The end of the time range to aggregate, unix timestamp in seconds. Default is end of time
@@ -91,14 +92,14 @@ export class ReportingRevenueApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Get revenue info by item
      * Get basic info about revenue from sales of all types, summed up within a time range and split out by specific item. Sorted for largest revenue at the top
+     * @summary Get revenue info by item
      * @param currencyCode The code for a currency to get sales data for
      * @param startDate The start of the time range to aggregate, unix timestamp in seconds. Default is beginning of time
      * @param endDate The end of the time range to aggregate, unix timestamp in seconds. Default is end of time
@@ -111,14 +112,14 @@ export class ReportingRevenueApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Get subscription revenue info
      * Get basic info about revenue from sales of new subscriptions as well as recurring payemnts, summed up within a time range
+     * @summary Get subscription revenue info
      * @param currencyCode The code for a currency to get sales data for
      * @param startDate The start of the time range to aggregate, unix timestamp in seconds. Default is beginning of time
      * @param endDate The end of the time range to aggregate, unix timestamp in seconds. Default is end of time
@@ -129,7 +130,7 @@ export class ReportingRevenueApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
@@ -182,9 +183,9 @@ export class ReportingRevenueApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Get,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -240,9 +241,9 @@ export class ReportingRevenueApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Get,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -308,9 +309,9 @@ export class ReportingRevenueApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Get,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -376,9 +377,9 @@ export class ReportingRevenueApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Get,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -434,9 +435,9 @@ export class ReportingRevenueApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Get,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);

@@ -1,6 +1,6 @@
 /**
  * Knetik Platform API Documentation latest 
- * This is the spec for the Knetik API.  Use this in conjunction with the documentation found at https://knetikcloud.com
+ * This is the spec for the Knetik API.  Use this in conjunction with the documentation found at https://knetikcloud.com.
  *
  * OpenAPI spec version: latest 
  * Contact: support@knetik.com
@@ -9,6 +9,8 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
+
+/* tslint:disable:no-unused-variable member-ordering */
 
 import { Inject, Injectable, Optional }                      from '@angular/core';
 import { Http, Headers, URLSearchParams }                    from '@angular/http';
@@ -22,11 +24,10 @@ import * as models                                           from '../model/mode
 import { BASE_PATH, COLLECTION_FORMATS }                     from '../variables';
 import { Configuration }                                     from '../configuration';
 
-/* tslint:disable:no-unused-variable member-ordering */
-
 
 @Injectable()
 export class AuthRolesApi {
+
     protected basePath = 'https://sandbox.knetikcloud.com';
     public defaultHeaders: Headers = new Headers();
     public configuration: Configuration = new Configuration();
@@ -41,8 +42,8 @@ export class AuthRolesApi {
     }
 
     /**
-     * Create a new role
      * 
+     * @summary Create a new role
      * @param roleResource The role resource object
      */
     public createRole(roleResource?: models.RoleResource, extraHttpRequestParams?: any): Observable<models.RoleResource> {
@@ -51,14 +52,14 @@ export class AuthRolesApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Delete a role
      * 
+     * @summary Delete a role
      * @param role The role value
      * @param force If true, removes role from users/clients
      */
@@ -68,14 +69,14 @@ export class AuthRolesApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Get roles for a client
      * 
+     * @summary Get roles for a client
      * @param clientKey The client key
      */
     public getClientRoles(clientKey: string, extraHttpRequestParams?: any): Observable<Array<models.RoleResource>> {
@@ -84,14 +85,14 @@ export class AuthRolesApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Get a single role
      * 
+     * @summary Get a single role
      * @param role The role value
      */
     public getRole(role: string, extraHttpRequestParams?: any): Observable<models.RoleResource> {
@@ -100,14 +101,14 @@ export class AuthRolesApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * List and search roles
      * 
+     * @summary List and search roles
      * @param size The number of objects returned per page
      * @param page The number of the page returned, starting with 1
      * @param order A comma separated list of sorting requirements in priority order, each entry matching PROPERTY_NAME:[ASC|DESC]
@@ -118,14 +119,14 @@ export class AuthRolesApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Get roles for a user
      * 
+     * @summary Get roles for a user
      * @param userId The user&#39;s id
      */
     public getUserRoles(userId: number, extraHttpRequestParams?: any): Observable<Array<models.RoleResource>> {
@@ -134,14 +135,14 @@ export class AuthRolesApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Set roles for a client
      * 
+     * @summary Set roles for a client
      * @param clientKey The client key
      * @param rolesList The list of unique roles
      */
@@ -151,14 +152,14 @@ export class AuthRolesApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Set permissions for a role
      * 
+     * @summary Set permissions for a role
      * @param role The role value
      * @param permissionsList The list of unique permissions
      */
@@ -168,14 +169,14 @@ export class AuthRolesApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Set roles for a user
      * 
+     * @summary Set roles for a user
      * @param userId The user&#39;s id
      * @param rolesList The list of unique roles
      */
@@ -185,14 +186,14 @@ export class AuthRolesApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Update a role
      * 
+     * @summary Update a role
      * @param role The role value
      * @param roleResource The role resource object
      */
@@ -202,7 +203,7 @@ export class AuthRolesApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
@@ -243,9 +244,9 @@ export class AuthRolesApi {
             method: RequestMethod.Post,
             headers: headers,
             body: roleResource == null ? '' : JSON.stringify(roleResource), // https://github.com/angular/angular/issues/10612
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -296,9 +297,9 @@ export class AuthRolesApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Delete,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -344,9 +345,9 @@ export class AuthRolesApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Get,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -392,9 +393,9 @@ export class AuthRolesApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Get,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -449,9 +450,9 @@ export class AuthRolesApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Get,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -497,9 +498,9 @@ export class AuthRolesApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Get,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -549,9 +550,9 @@ export class AuthRolesApi {
             method: RequestMethod.Put,
             headers: headers,
             body: rolesList == null ? '' : JSON.stringify(rolesList), // https://github.com/angular/angular/issues/10612
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -601,9 +602,9 @@ export class AuthRolesApi {
             method: RequestMethod.Put,
             headers: headers,
             body: permissionsList == null ? '' : JSON.stringify(permissionsList), // https://github.com/angular/angular/issues/10612
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -653,9 +654,9 @@ export class AuthRolesApi {
             method: RequestMethod.Put,
             headers: headers,
             body: rolesList == null ? '' : JSON.stringify(rolesList), // https://github.com/angular/angular/issues/10612
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -705,9 +706,9 @@ export class AuthRolesApi {
             method: RequestMethod.Put,
             headers: headers,
             body: roleResource == null ? '' : JSON.stringify(roleResource), // https://github.com/angular/angular/issues/10612
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);

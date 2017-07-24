@@ -1,6 +1,6 @@
 /**
  * Knetik Platform API Documentation latest 
- * This is the spec for the Knetik API.  Use this in conjunction with the documentation found at https://knetikcloud.com
+ * This is the spec for the Knetik API.  Use this in conjunction with the documentation found at https://knetikcloud.com.
  *
  * OpenAPI spec version: latest 
  * Contact: support@knetik.com
@@ -9,6 +9,8 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
+
+/* tslint:disable:no-unused-variable member-ordering */
 
 import { Inject, Injectable, Optional }                      from '@angular/core';
 import { Http, Headers, URLSearchParams }                    from '@angular/http';
@@ -22,11 +24,10 @@ import * as models                                           from '../model/mode
 import { BASE_PATH, COLLECTION_FORMATS }                     from '../variables';
 import { Configuration }                                     from '../configuration';
 
-/* tslint:disable:no-unused-variable member-ordering */
-
 
 @Injectable()
 export class CampaignsChallengesApi {
+
     protected basePath = 'https://sandbox.knetikcloud.com';
     public defaultHeaders: Headers = new Headers();
     public configuration: Configuration = new Configuration();
@@ -41,8 +42,8 @@ export class CampaignsChallengesApi {
     }
 
     /**
-     * Create a challenge
      * Challenges do not run on their own.  They must be added to a campaign before events will spawn.
+     * @summary Create a challenge
      * @param challengeResource The challenge resource object
      */
     public createChallenge(challengeResource?: models.ChallengeResource, extraHttpRequestParams?: any): Observable<models.ChallengeResource> {
@@ -51,14 +52,14 @@ export class CampaignsChallengesApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Create a challenge activity
      * 
+     * @summary Create a challenge activity
      * @param challengeId The challenge id
      * @param challengeActivityResource The challenge activity resource object
      * @param validateSettings Whether to validate the settings being sent against the available settings on the base activity.
@@ -69,14 +70,14 @@ export class CampaignsChallengesApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Create a challenge activity template
      * Challenge Activity Templates define a type of challenge activity and the properties they have
+     * @summary Create a challenge activity template
      * @param challengeActivityTemplateResource The challengeActivity template resource object
      */
     public createChallengeActivityTemplate(challengeActivityTemplateResource?: models.TemplateResource, extraHttpRequestParams?: any): Observable<models.TemplateResource> {
@@ -85,14 +86,14 @@ export class CampaignsChallengesApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Create a challenge template
      * Challenge Templates define a type of challenge and the properties they have
+     * @summary Create a challenge template
      * @param challengeTemplateResource The challenge template resource object
      */
     public createChallengeTemplate(challengeTemplateResource?: models.TemplateResource, extraHttpRequestParams?: any): Observable<models.TemplateResource> {
@@ -101,14 +102,14 @@ export class CampaignsChallengesApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Delete a challenge
      * 
+     * @summary Delete a challenge
      * @param id The challenge id
      */
     public deleteChallenge(id: number, extraHttpRequestParams?: any): Observable<{}> {
@@ -117,31 +118,31 @@ export class CampaignsChallengesApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Delete a challenge activity
-     * 
-     * @param activityId The activity id
+     * A challenge can have multiple instances of the same activity and thus the id used is of the specific entry within the challenge
+     * @summary Delete a challenge activity
+     * @param id The challenge_activity id
      * @param challengeId The challenge id
      */
-    public deleteChallengeActivity(activityId: number, challengeId: number, extraHttpRequestParams?: any): Observable<{}> {
-        return this.deleteChallengeActivityWithHttpInfo(activityId, challengeId, extraHttpRequestParams)
+    public deleteChallengeActivity(id: number, challengeId: number, extraHttpRequestParams?: any): Observable<{}> {
+        return this.deleteChallengeActivityWithHttpInfo(id, challengeId, extraHttpRequestParams)
             .map((response: Response) => {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Delete a challenge activity template
-     * If cascade &#x3D; &#39;detach&#39;, it will force delete the template even if it&#39;s attached to other objects
+     * If cascade = 'detach', it will force delete the template even if it's attached to other objects
+     * @summary Delete a challenge activity template
      * @param id The id of the template
      * @param cascade The value needed to delete used templates
      */
@@ -151,14 +152,14 @@ export class CampaignsChallengesApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Delete a challenge event
      * 
+     * @summary Delete a challenge event
      * @param id The challenge event id
      */
     public deleteChallengeEvent(id: number, extraHttpRequestParams?: any): Observable<{}> {
@@ -167,14 +168,14 @@ export class CampaignsChallengesApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Delete a challenge template
-     * If cascade &#x3D; &#39;detach&#39;, it will force delete the template even if it&#39;s attached to other objects
+     * If cascade = 'detach', it will force delete the template even if it's attached to other objects
+     * @summary Delete a challenge template
      * @param id The id of the template
      * @param cascade The value needed to delete used templates
      */
@@ -184,14 +185,14 @@ export class CampaignsChallengesApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Retrieve a challenge
      * 
+     * @summary Retrieve a challenge
      * @param id The challenge id
      */
     public getChallenge(id: number, extraHttpRequestParams?: any): Observable<models.ChallengeResource> {
@@ -200,14 +201,14 @@ export class CampaignsChallengesApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * List and search challenge activities
      * 
+     * @summary List and search challenge activities
      * @param challengeId The challenge id
      * @param size The number of objects returned per page
      * @param page The number of the page returned, starting with 1
@@ -219,30 +220,31 @@ export class CampaignsChallengesApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Get a single challenge activity
-     * 
-     * @param activityId The activity id
+     * A challenge can have multiple instances of the same activity and thus the id used is of the specific entry within the challenge
+     * @summary Get a single challenge activity
+     * @param id The challenge_activity id
+     * @param challengeId The challenge id
      */
-    public getChallengeActivity(activityId: number, extraHttpRequestParams?: any): Observable<models.ChallengeActivityResource> {
-        return this.getChallengeActivityWithHttpInfo(activityId, extraHttpRequestParams)
+    public getChallengeActivity(id: number, challengeId: number, extraHttpRequestParams?: any): Observable<models.ChallengeActivityResource> {
+        return this.getChallengeActivityWithHttpInfo(id, challengeId, extraHttpRequestParams)
             .map((response: Response) => {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Get a single challenge activity template
      * 
+     * @summary Get a single challenge activity template
      * @param id The id of the template
      */
     public getChallengeActivityTemplate(id: string, extraHttpRequestParams?: any): Observable<models.TemplateResource> {
@@ -251,14 +253,14 @@ export class CampaignsChallengesApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * List and search challenge activity templates
      * 
+     * @summary List and search challenge activity templates
      * @param size The number of objects returned per page
      * @param page The number of the page returned, starting with 1
      * @param order A comma separated list of sorting requirements in priority order, each entry matching PROPERTY_NAME:[ASC|DESC]
@@ -269,14 +271,14 @@ export class CampaignsChallengesApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Retrieve a single challenge event details
      * 
+     * @summary Retrieve a single challenge event details
      * @param id The challenge event id
      */
     public getChallengeEvent(id: number, extraHttpRequestParams?: any): Observable<models.ChallengeEventResource> {
@@ -285,14 +287,14 @@ export class CampaignsChallengesApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Retrieve a list of challenge events
      * 
+     * @summary Retrieve a list of challenge events
      * @param filterStartDate A comma separated string without spaces.  First value is the operator to search on, second value is the event start date, a unix timestamp in seconds.  Allowed operators: (GT, LT, EQ, GOE, LOE).
      * @param filterEndDate A comma separated string without spaces.  First value is the operator to search on, second value is the event end date, a unix timestamp in seconds.  Allowed operators: (GT, LT, EQ, GOE, LOE).
      * @param filterCampaigns check only for events from currently running campaigns
@@ -307,14 +309,14 @@ export class CampaignsChallengesApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Get a single challenge template
      * 
+     * @summary Get a single challenge template
      * @param id The id of the template
      */
     public getChallengeTemplate(id: string, extraHttpRequestParams?: any): Observable<models.TemplateResource> {
@@ -323,14 +325,14 @@ export class CampaignsChallengesApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * List and search challenge templates
      * 
+     * @summary List and search challenge templates
      * @param size The number of objects returned per page
      * @param page The number of the page returned, starting with 1
      * @param order A comma separated list of sorting requirements in priority order, each entry matching PROPERTY_NAME:[ASC|DESC]
@@ -341,14 +343,14 @@ export class CampaignsChallengesApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Retrieve a list of challenges
      * 
+     * @summary Retrieve a list of challenges
      * @param filterTemplate Filter for challenges that are not tied to campaigns (templates)
      * @param filterActiveCampaign Filter for challenges that are tied to active campaigns
      * @param filterStartDate A comma separated string without spaces.  First value is the operator to search on, second value is the challenge start date, a unix timestamp in seconds.  Allowed operators: (GT, LT, EQ, GOE, LOE).
@@ -363,14 +365,14 @@ export class CampaignsChallengesApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Update a challenge
      * If the challenge is a copy, changes will propagate to all the related challenges
+     * @summary Update a challenge
      * @param id The challenge id
      * @param challengeResource The challenge resource object
      */
@@ -380,32 +382,32 @@ export class CampaignsChallengesApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Update a challenge activity
-     * 
-     * @param activityId The activity id
+     * A challenge can have multiple instances of the same activity and thus the id used is of the specific entry within the challenge
+     * @summary Update a challenge activity
+     * @param id The challenge_activity id
      * @param challengeId The challenge id
      * @param challengeActivityResource The challenge activity resource object
      */
-    public updateChallengeActivity(activityId: number, challengeId: number, challengeActivityResource?: models.ChallengeActivityResource, extraHttpRequestParams?: any): Observable<models.ChallengeActivityResource> {
-        return this.updateChallengeActivityWithHttpInfo(activityId, challengeId, challengeActivityResource, extraHttpRequestParams)
+    public updateChallengeActivity(id: number, challengeId: number, challengeActivityResource?: models.ChallengeActivityResource, extraHttpRequestParams?: any): Observable<models.ChallengeActivityResource> {
+        return this.updateChallengeActivityWithHttpInfo(id, challengeId, challengeActivityResource, extraHttpRequestParams)
             .map((response: Response) => {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Update an challenge activity template
      * 
+     * @summary Update an challenge activity template
      * @param id The id of the template
      * @param challengeActivityTemplateResource The challengeActivity template resource object
      */
@@ -415,14 +417,14 @@ export class CampaignsChallengesApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Update a challenge template
      * 
+     * @summary Update a challenge template
      * @param id The id of the template
      * @param challengeTemplateResource The challenge template resource object
      */
@@ -432,7 +434,7 @@ export class CampaignsChallengesApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
@@ -473,9 +475,9 @@ export class CampaignsChallengesApi {
             method: RequestMethod.Post,
             headers: headers,
             body: challengeResource == null ? '' : JSON.stringify(challengeResource), // https://github.com/angular/angular/issues/10612
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -530,9 +532,9 @@ export class CampaignsChallengesApi {
             method: RequestMethod.Post,
             headers: headers,
             body: challengeActivityResource == null ? '' : JSON.stringify(challengeActivityResource), // https://github.com/angular/angular/issues/10612
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -576,9 +578,9 @@ export class CampaignsChallengesApi {
             method: RequestMethod.Post,
             headers: headers,
             body: challengeActivityTemplateResource == null ? '' : JSON.stringify(challengeActivityTemplateResource), // https://github.com/angular/angular/issues/10612
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -622,9 +624,9 @@ export class CampaignsChallengesApi {
             method: RequestMethod.Post,
             headers: headers,
             body: challengeTemplateResource == null ? '' : JSON.stringify(challengeTemplateResource), // https://github.com/angular/angular/issues/10612
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -670,9 +672,9 @@ export class CampaignsChallengesApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Delete,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -683,20 +685,20 @@ export class CampaignsChallengesApi {
 
     /**
      * Delete a challenge activity
-     * 
-     * @param activityId The activity id
+     * A challenge can have multiple instances of the same activity and thus the id used is of the specific entry within the challenge
+     * @param id The challenge_activity id
      * @param challengeId The challenge id
      */
-    public deleteChallengeActivityWithHttpInfo(activityId: number, challengeId: number, extraHttpRequestParams?: any): Observable<Response> {
-        const path = this.basePath + '/challenges/${challenge_id}/activities/${activity_id}'
-                    .replace('${' + 'activity_id' + '}', String(activityId))
+    public deleteChallengeActivityWithHttpInfo(id: number, challengeId: number, extraHttpRequestParams?: any): Observable<Response> {
+        const path = this.basePath + '/challenges/${challenge_id}/activities/${id}'
+                    .replace('${' + 'id' + '}', String(id))
                     .replace('${' + 'challenge_id' + '}', String(challengeId));
 
         let queryParameters = new URLSearchParams();
         let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
-        // verify required parameter 'activityId' is not null or undefined
-        if (activityId === null || activityId === undefined) {
-            throw new Error('Required parameter activityId was null or undefined when calling deleteChallengeActivity.');
+        // verify required parameter 'id' is not null or undefined
+        if (id === null || id === undefined) {
+            throw new Error('Required parameter id was null or undefined when calling deleteChallengeActivity.');
         }
         // verify required parameter 'challengeId' is not null or undefined
         if (challengeId === null || challengeId === undefined) {
@@ -724,9 +726,9 @@ export class CampaignsChallengesApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Delete,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -777,9 +779,9 @@ export class CampaignsChallengesApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Delete,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -825,9 +827,9 @@ export class CampaignsChallengesApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Delete,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -878,9 +880,9 @@ export class CampaignsChallengesApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Delete,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -917,9 +919,9 @@ export class CampaignsChallengesApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Get,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -971,9 +973,9 @@ export class CampaignsChallengesApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Get,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -984,18 +986,24 @@ export class CampaignsChallengesApi {
 
     /**
      * Get a single challenge activity
-     * 
-     * @param activityId The activity id
+     * A challenge can have multiple instances of the same activity and thus the id used is of the specific entry within the challenge
+     * @param id The challenge_activity id
+     * @param challengeId The challenge id
      */
-    public getChallengeActivityWithHttpInfo(activityId: number, extraHttpRequestParams?: any): Observable<Response> {
-        const path = this.basePath + '/challenges/${challenge_id}/activities/${activity_id}'
-                    .replace('${' + 'activity_id' + '}', String(activityId));
+    public getChallengeActivityWithHttpInfo(id: number, challengeId: number, extraHttpRequestParams?: any): Observable<Response> {
+        const path = this.basePath + '/challenges/${challenge_id}/activities/${id}'
+                    .replace('${' + 'id' + '}', String(id))
+                    .replace('${' + 'challenge_id' + '}', String(challengeId));
 
         let queryParameters = new URLSearchParams();
         let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
-        // verify required parameter 'activityId' is not null or undefined
-        if (activityId === null || activityId === undefined) {
-            throw new Error('Required parameter activityId was null or undefined when calling getChallengeActivity.');
+        // verify required parameter 'id' is not null or undefined
+        if (id === null || id === undefined) {
+            throw new Error('Required parameter id was null or undefined when calling getChallengeActivity.');
+        }
+        // verify required parameter 'challengeId' is not null or undefined
+        if (challengeId === null || challengeId === undefined) {
+            throw new Error('Required parameter challengeId was null or undefined when calling getChallengeActivity.');
         }
         // to determine the Content-Type header
         let consumes: string[] = [
@@ -1010,9 +1018,9 @@ export class CampaignsChallengesApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Get,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -1058,9 +1066,9 @@ export class CampaignsChallengesApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Get,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -1115,9 +1123,9 @@ export class CampaignsChallengesApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Get,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -1154,9 +1162,9 @@ export class CampaignsChallengesApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Get,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -1222,9 +1230,9 @@ export class CampaignsChallengesApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Get,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -1270,9 +1278,9 @@ export class CampaignsChallengesApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Get,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -1327,9 +1335,9 @@ export class CampaignsChallengesApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Get,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -1395,9 +1403,9 @@ export class CampaignsChallengesApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Get,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -1447,9 +1455,9 @@ export class CampaignsChallengesApi {
             method: RequestMethod.Put,
             headers: headers,
             body: challengeResource == null ? '' : JSON.stringify(challengeResource), // https://github.com/angular/angular/issues/10612
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -1460,21 +1468,21 @@ export class CampaignsChallengesApi {
 
     /**
      * Update a challenge activity
-     * 
-     * @param activityId The activity id
+     * A challenge can have multiple instances of the same activity and thus the id used is of the specific entry within the challenge
+     * @param id The challenge_activity id
      * @param challengeId The challenge id
      * @param challengeActivityResource The challenge activity resource object
      */
-    public updateChallengeActivityWithHttpInfo(activityId: number, challengeId: number, challengeActivityResource?: models.ChallengeActivityResource, extraHttpRequestParams?: any): Observable<Response> {
-        const path = this.basePath + '/challenges/${challenge_id}/activities/${activity_id}'
-                    .replace('${' + 'activity_id' + '}', String(activityId))
+    public updateChallengeActivityWithHttpInfo(id: number, challengeId: number, challengeActivityResource?: models.ChallengeActivityResource, extraHttpRequestParams?: any): Observable<Response> {
+        const path = this.basePath + '/challenges/${challenge_id}/activities/${id}'
+                    .replace('${' + 'id' + '}', String(id))
                     .replace('${' + 'challenge_id' + '}', String(challengeId));
 
         let queryParameters = new URLSearchParams();
         let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
-        // verify required parameter 'activityId' is not null or undefined
-        if (activityId === null || activityId === undefined) {
-            throw new Error('Required parameter activityId was null or undefined when calling updateChallengeActivity.');
+        // verify required parameter 'id' is not null or undefined
+        if (id === null || id === undefined) {
+            throw new Error('Required parameter id was null or undefined when calling updateChallengeActivity.');
         }
         // verify required parameter 'challengeId' is not null or undefined
         if (challengeId === null || challengeId === undefined) {
@@ -1505,9 +1513,9 @@ export class CampaignsChallengesApi {
             method: RequestMethod.Put,
             headers: headers,
             body: challengeActivityResource == null ? '' : JSON.stringify(challengeActivityResource), // https://github.com/angular/angular/issues/10612
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -1557,9 +1565,9 @@ export class CampaignsChallengesApi {
             method: RequestMethod.Put,
             headers: headers,
             body: challengeActivityTemplateResource == null ? '' : JSON.stringify(challengeActivityTemplateResource), // https://github.com/angular/angular/issues/10612
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -1609,9 +1617,9 @@ export class CampaignsChallengesApi {
             method: RequestMethod.Put,
             headers: headers,
             body: challengeTemplateResource == null ? '' : JSON.stringify(challengeTemplateResource), // https://github.com/angular/angular/issues/10612
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);

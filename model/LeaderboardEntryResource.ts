@@ -1,6 +1,6 @@
 /**
  * Knetik Platform API Documentation latest 
- * This is the spec for the Knetik API.  Use this in conjunction with the documentation found at https://knetikcloud.com
+ * This is the spec for the Knetik API.  Use this in conjunction with the documentation found at https://knetikcloud.com.
  *
  * OpenAPI spec version: latest 
  * Contact: support@knetik.com
@@ -22,6 +22,11 @@ export interface LeaderboardEntryResource {
      * The raw score in this leaderboard. Null means non-compete or disqualification
      */
     score?: number;
+
+    /**
+     * The date this score was recorded or updated. Unix timestamp in seconds
+     */
+    updatedDate?: number;
 
     /**
      * The player for this entry

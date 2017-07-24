@@ -1,6 +1,6 @@
 /**
  * Knetik Platform API Documentation latest 
- * This is the spec for the Knetik API.  Use this in conjunction with the documentation found at https://knetikcloud.com
+ * This is the spec for the Knetik API.  Use this in conjunction with the documentation found at https://knetikcloud.com.
  *
  * OpenAPI spec version: latest 
  * Contact: support@knetik.com
@@ -9,6 +9,8 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
+
+/* tslint:disable:no-unused-variable member-ordering */
 
 import { Inject, Injectable, Optional }                      from '@angular/core';
 import { Http, Headers, URLSearchParams }                    from '@angular/http';
@@ -22,11 +24,10 @@ import * as models                                           from '../model/mode
 import { BASE_PATH, COLLECTION_FORMATS }                     from '../variables';
 import { Configuration }                                     from '../configuration';
 
-/* tslint:disable:no-unused-variable member-ordering */
-
 
 @Injectable()
 export class UsersGroupsApi {
+
     protected basePath = 'https://sandbox.knetikcloud.com';
     public defaultHeaders: Headers = new Headers();
     public configuration: Configuration = new Configuration();
@@ -41,8 +42,8 @@ export class UsersGroupsApi {
     }
 
     /**
-     * Adds a new member to the group
      * 
+     * @summary Adds a new member to the group
      * @param uniqueName The group unique name
      * @param user The id and status for a user to add to the group
      */
@@ -52,14 +53,14 @@ export class UsersGroupsApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Adds multiple members to the group
      * 
+     * @summary Adds multiple members to the group
      * @param uniqueName The group unique name
      * @param users The id and status for a list of users to add to the group
      */
@@ -69,14 +70,14 @@ export class UsersGroupsApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Create a group
      * 
+     * @summary Create a group
      * @param groupResource The new group
      */
     public createGroup(groupResource?: models.GroupResource, extraHttpRequestParams?: any): Observable<models.GroupResource> {
@@ -85,14 +86,14 @@ export class UsersGroupsApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Create a group template
      * Group Templates define a type of group and the properties they have
+     * @summary Create a group template
      * @param groupTemplateResource The group template resource object
      */
     public createGroupTemplate(groupTemplateResource?: models.TemplateResource, extraHttpRequestParams?: any): Observable<models.TemplateResource> {
@@ -101,14 +102,14 @@ export class UsersGroupsApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Removes a group from the system IF no resources are attached to it
      * 
+     * @summary Removes a group from the system IF no resources are attached to it
      * @param uniqueName The group unique name
      */
     public deleteGroup(uniqueName: string, extraHttpRequestParams?: any): Observable<{}> {
@@ -117,14 +118,14 @@ export class UsersGroupsApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Delete a group template
-     * If cascade &#x3D; &#39;detach&#39;, it will force delete the template even if it&#39;s attached to other objects
+     * If cascade = 'detach', it will force delete the template even if it's attached to other objects
+     * @summary Delete a group template
      * @param id The id of the template
      * @param cascade The value needed to delete used templates
      */
@@ -134,14 +135,14 @@ export class UsersGroupsApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Loads a specific group&#39;s details
      * 
+     * @summary Loads a specific group's details
      * @param uniqueName The group unique name
      */
     public getGroup(uniqueName: string, extraHttpRequestParams?: any): Observable<models.GroupResource> {
@@ -150,14 +151,14 @@ export class UsersGroupsApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Get a user from a group
      * 
+     * @summary Get a user from a group
      * @param uniqueName The group unique name
      * @param userId The id of the user
      */
@@ -167,14 +168,14 @@ export class UsersGroupsApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Lists members of the group
      * 
+     * @summary Lists members of the group
      * @param uniqueName The group unique name
      * @param size The number of objects returned per page
      * @param page The number of the page returned, starting with 1
@@ -186,14 +187,14 @@ export class UsersGroupsApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Get a single group template
      * 
+     * @summary Get a single group template
      * @param id The id of the template
      */
     public getGroupTemplate(id: string, extraHttpRequestParams?: any): Observable<models.TemplateResource> {
@@ -202,14 +203,14 @@ export class UsersGroupsApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * List and search group templates
      * 
+     * @summary List and search group templates
      * @param size The number of objects returned per page
      * @param page The number of the page returned, starting with 1
      * @param order a comma separated list of sorting requirements in priority order, each entry matching PROPERTY_NAME:[ASC|DESC]
@@ -220,14 +221,14 @@ export class UsersGroupsApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * List groups a user is in
      * 
+     * @summary List groups a user is in
      * @param userId The id of the user
      */
     public getGroupsForUser(userId: number, extraHttpRequestParams?: any): Observable<Array<string>> {
@@ -236,14 +237,14 @@ export class UsersGroupsApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Removes a user from a group
      * 
+     * @summary Removes a user from a group
      * @param uniqueName The group unique name
      * @param userId The id of the user to remove
      */
@@ -253,14 +254,14 @@ export class UsersGroupsApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Update a group
      * 
+     * @summary Update a group
      * @param uniqueName The group unique name
      * @param groupResource The updated group
      */
@@ -270,14 +271,14 @@ export class UsersGroupsApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Change a user&#39;s status
      * 
+     * @summary Change a user's status
      * @param uniqueName The group unique name
      * @param userId The user id of the member to modify
      * @param status The new status for the user
@@ -288,14 +289,14 @@ export class UsersGroupsApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Update a group template
      * 
+     * @summary Update a group template
      * @param id The id of the template
      * @param groupTemplateResource The group template resource object
      */
@@ -305,14 +306,14 @@ export class UsersGroupsApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * List and search groups
      * 
+     * @summary List and search groups
      * @param filterTemplate Filter for groups using a specific template, by id
      * @param filterMemberCount Filters groups by member count. Multiple values possible for range search. Format: filter_member_count&#x3D;OP,ts&amp;... where OP in (GT, LT, GOE, LOE, EQ). Ex: filter_member_count&#x3D;GT,14,LT,17
      * @param filterName Filter for groups with names starting with the given string
@@ -329,7 +330,7 @@ export class UsersGroupsApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
@@ -380,9 +381,9 @@ export class UsersGroupsApi {
             method: RequestMethod.Post,
             headers: headers,
             body: user == null ? '' : JSON.stringify(user), // https://github.com/angular/angular/issues/10612
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -436,9 +437,9 @@ export class UsersGroupsApi {
             method: RequestMethod.Post,
             headers: headers,
             body: users == null ? '' : JSON.stringify(users), // https://github.com/angular/angular/issues/10612
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -482,9 +483,9 @@ export class UsersGroupsApi {
             method: RequestMethod.Post,
             headers: headers,
             body: groupResource == null ? '' : JSON.stringify(groupResource), // https://github.com/angular/angular/issues/10612
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -528,9 +529,9 @@ export class UsersGroupsApi {
             method: RequestMethod.Post,
             headers: headers,
             body: groupTemplateResource == null ? '' : JSON.stringify(groupTemplateResource), // https://github.com/angular/angular/issues/10612
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -576,9 +577,9 @@ export class UsersGroupsApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Delete,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -629,9 +630,9 @@ export class UsersGroupsApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Delete,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -668,9 +669,9 @@ export class UsersGroupsApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Get,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -713,9 +714,9 @@ export class UsersGroupsApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Get,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -767,9 +768,9 @@ export class UsersGroupsApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Get,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -815,9 +816,9 @@ export class UsersGroupsApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Get,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -872,9 +873,9 @@ export class UsersGroupsApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Get,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -911,9 +912,9 @@ export class UsersGroupsApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Get,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -965,9 +966,9 @@ export class UsersGroupsApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Delete,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -1017,9 +1018,9 @@ export class UsersGroupsApi {
             method: RequestMethod.Put,
             headers: headers,
             body: groupResource == null ? '' : JSON.stringify(groupResource), // https://github.com/angular/angular/issues/10612
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -1079,9 +1080,9 @@ export class UsersGroupsApi {
             method: RequestMethod.Put,
             headers: headers,
             body: status == null ? '' : JSON.stringify(status), // https://github.com/angular/angular/issues/10612
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -1131,9 +1132,9 @@ export class UsersGroupsApi {
             method: RequestMethod.Put,
             headers: headers,
             body: groupTemplateResource == null ? '' : JSON.stringify(groupTemplateResource), // https://github.com/angular/angular/issues/10612
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -1209,9 +1210,9 @@ export class UsersGroupsApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Get,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);

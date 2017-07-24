@@ -1,6 +1,6 @@
 /**
  * Knetik Platform API Documentation latest 
- * This is the spec for the Knetik API.  Use this in conjunction with the documentation found at https://knetikcloud.com
+ * This is the spec for the Knetik API.  Use this in conjunction with the documentation found at https://knetikcloud.com.
  *
  * OpenAPI spec version: latest 
  * Contact: support@knetik.com
@@ -9,6 +9,8 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
+
+/* tslint:disable:no-unused-variable member-ordering */
 
 import { Inject, Injectable, Optional }                      from '@angular/core';
 import { Http, Headers, URLSearchParams }                    from '@angular/http';
@@ -22,11 +24,10 @@ import * as models                                           from '../model/mode
 import { BASE_PATH, COLLECTION_FORMATS }                     from '../variables';
 import { Configuration }                                     from '../configuration';
 
-/* tslint:disable:no-unused-variable member-ordering */
-
 
 @Injectable()
 export class PaymentsWalletsApi {
+
     protected basePath = 'https://sandbox.knetikcloud.com';
     public defaultHeaders: Headers = new Headers();
     public configuration: Configuration = new Configuration();
@@ -41,8 +42,8 @@ export class PaymentsWalletsApi {
     }
 
     /**
-     * Returns the user&#39;s wallet for the given currency code
      * 
+     * @summary Returns the user's wallet for the given currency code
      * @param userId The ID of the user for whom wallet is being retrieved
      * @param currencyCode Currency code of the user&#39;s wallet
      */
@@ -52,14 +53,14 @@ export class PaymentsWalletsApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Retrieve a user&#39;s wallet transactions
      * 
+     * @summary Retrieve a user's wallet transactions
      * @param userId The ID of the user for whom wallet transactions are being retrieved
      * @param currencyCode Currency code of the user&#39;s wallet
      * @param filterType Filter for transactions with specified type
@@ -76,14 +77,14 @@ export class PaymentsWalletsApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * List all of a user&#39;s wallets
      * 
+     * @summary List all of a user's wallets
      * @param userId The ID of the user for whom wallets are being retrieved
      */
     public getUserWallets(userId: number, extraHttpRequestParams?: any): Observable<Array<models.SimpleWallet>> {
@@ -92,14 +93,14 @@ export class PaymentsWalletsApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Retrieves a summation of wallet balances by currency code
      * 
+     * @summary Retrieves a summation of wallet balances by currency code
      */
     public getWalletBalances(extraHttpRequestParams?: any): Observable<models.PageResourceWalletTotalResponse> {
         return this.getWalletBalancesWithHttpInfo(extraHttpRequestParams)
@@ -107,14 +108,14 @@ export class PaymentsWalletsApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Retrieve wallet transactions across the system
      * 
+     * @summary Retrieve wallet transactions across the system
      * @param filterInvoice Filter for transactions from a specific invoice
      * @param filterType Filter for transactions with specified type
      * @param filterDate A comma separated string without spaces.  First value is the operator to search on, second value is the log start date, a unix timestamp in seconds. Can be repeated for a range, eg: GT,123,LT,456  Allowed operators: (GT, LT, EQ, GOE, LOE).
@@ -133,14 +134,14 @@ export class PaymentsWalletsApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Retrieve a list of wallets across the system
      * 
+     * @summary Retrieve a list of wallets across the system
      * @param size The number of objects returned per page
      * @param page The number of the page returned, starting with 1
      * @param order A comma separated list of sorting requirements in priority order, each entry matching PROPERTY_NAME:[ASC|DESC]
@@ -151,14 +152,14 @@ export class PaymentsWalletsApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Updates the balance for a user&#39;s wallet
      * 
+     * @summary Updates the balance for a user's wallet
      * @param userId The ID of the user for whom wallet is being modified
      * @param currencyCode Currency code of the user&#39;s wallet
      * @param request The requested balance modification to be made to the user&#39;s wallet
@@ -169,7 +170,7 @@ export class PaymentsWalletsApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
@@ -218,9 +219,9 @@ export class PaymentsWalletsApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Get,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -307,9 +308,9 @@ export class PaymentsWalletsApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Get,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -355,9 +356,9 @@ export class PaymentsWalletsApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Get,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -397,9 +398,9 @@ export class PaymentsWalletsApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Get,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -494,9 +495,9 @@ export class PaymentsWalletsApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Get,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -551,9 +552,9 @@ export class PaymentsWalletsApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Get,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -609,9 +610,9 @@ export class PaymentsWalletsApi {
             method: RequestMethod.Put,
             headers: headers,
             body: request == null ? '' : JSON.stringify(request), // https://github.com/angular/angular/issues/10612
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);

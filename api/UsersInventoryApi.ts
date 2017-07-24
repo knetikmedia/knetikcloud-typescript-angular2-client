@@ -1,6 +1,6 @@
 /**
  * Knetik Platform API Documentation latest 
- * This is the spec for the Knetik API.  Use this in conjunction with the documentation found at https://knetikcloud.com
+ * This is the spec for the Knetik API.  Use this in conjunction with the documentation found at https://knetikcloud.com.
  *
  * OpenAPI spec version: latest 
  * Contact: support@knetik.com
@@ -9,6 +9,8 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
+
+/* tslint:disable:no-unused-variable member-ordering */
 
 import { Inject, Injectable, Optional }                      from '@angular/core';
 import { Http, Headers, URLSearchParams }                    from '@angular/http';
@@ -22,11 +24,10 @@ import * as models                                           from '../model/mode
 import { BASE_PATH, COLLECTION_FORMATS }                     from '../variables';
 import { Configuration }                                     from '../configuration';
 
-/* tslint:disable:no-unused-variable member-ordering */
-
 
 @Injectable()
 export class UsersInventoryApi {
+
     protected basePath = 'https://sandbox.knetikcloud.com';
     public defaultHeaders: Headers = new Headers();
     public configuration: Configuration = new Configuration();
@@ -41,8 +42,8 @@ export class UsersInventoryApi {
     }
 
     /**
-     * Adds an item to the user inventory
      * The inventory is fulfilled asynchronously UNLESS the invoice is explicitely skipped. Depending on the use case, it might require the client to verify that the entitlement was added after the fact or configure a BRE rule to get a notification in real time
+     * @summary Adds an item to the user inventory
      * @param id The id of the user
      * @param userInventoryAddRequest The user inventory add request object
      */
@@ -52,14 +53,14 @@ export class UsersInventoryApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Check for access to an item without consuming
      * Useful for pre-check and accounts for all various buisness rules
+     * @summary Check for access to an item without consuming
      * @param userId The id of the user to check for or &#39;me&#39; for logged in user
      * @param itemId The id of the item
      * @param sku The specific sku of an entitlement list addition to check entitlement for. This is of very limited and specific use and should generally be left out
@@ -70,14 +71,14 @@ export class UsersInventoryApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Create an entitlement item
      * 
+     * @summary Create an entitlement item
      * @param cascade Whether to cascade group changes, such as in the limited gettable behavior. A 400 error will return otherwise if the group is already in use with different values.
      * @param entitlementItem The entitlement item object
      */
@@ -87,14 +88,14 @@ export class UsersInventoryApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Create an entitlement template
      * Entitlement templates define a type of entitlement and the properties they have
+     * @summary Create an entitlement template
      * @param template The entitlement template to be created
      */
     public createEntitlementTemplate(template?: models.ItemTemplateResource, extraHttpRequestParams?: any): Observable<models.ItemTemplateResource> {
@@ -103,14 +104,14 @@ export class UsersInventoryApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Delete an entitlement item
      * 
+     * @summary Delete an entitlement item
      * @param entitlementId The id of the entitlement
      */
     public deleteEntitlementItem(entitlementId: number, extraHttpRequestParams?: any): Observable<{}> {
@@ -119,14 +120,14 @@ export class UsersInventoryApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Delete an entitlement template
-     * If cascade &#x3D; &#39;detach&#39;, it will force delete the template even if it&#39;s attached to other objects
+     * If cascade = 'detach', it will force delete the template even if it's attached to other objects
+     * @summary Delete an entitlement template
      * @param id The id of the template
      * @param cascade The value needed to delete used templates
      */
@@ -136,14 +137,14 @@ export class UsersInventoryApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Get a single entitlement item
      * 
+     * @summary Get a single entitlement item
      * @param entitlementId The id of the entitlement
      */
     public getEntitlementItem(entitlementId: number, extraHttpRequestParams?: any): Observable<models.EntitlementItem> {
@@ -152,14 +153,14 @@ export class UsersInventoryApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * List and search entitlement items
      * 
+     * @summary List and search entitlement items
      * @param size The number of objects returned per page
      * @param page The number of the page returned, starting with 1
      * @param order A comma separated list of sorting requirements in priority order, each entry matching PROPERTY_NAME:[ASC|DESC]
@@ -170,14 +171,14 @@ export class UsersInventoryApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Get a single entitlement template
      * 
+     * @summary Get a single entitlement template
      * @param id The id of the template
      */
     public getEntitlementTemplate(id: string, extraHttpRequestParams?: any): Observable<models.ItemTemplateResource> {
@@ -186,14 +187,14 @@ export class UsersInventoryApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * List and search entitlement templates
      * 
+     * @summary List and search entitlement templates
      * @param size The number of objects returned per page
      * @param page The number of the page returned, starting with 1
      * @param order A comma separated list of sorting requirements in priority order, each entry matching PROPERTY_NAME:[ASC|DESC]
@@ -204,14 +205,14 @@ export class UsersInventoryApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * List the user inventory entries for a given user
      * 
+     * @summary List the user inventory entries for a given user
      * @param id The id of the user
      * @param inactive If true, accepts inactive user inventories
      * @param size The number of objects returned per page
@@ -228,14 +229,14 @@ export class UsersInventoryApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Get an inventory entry
      * 
+     * @summary Get an inventory entry
      * @param userId The id of the inventory owner or &#39;me&#39; for the logged in user
      * @param id The id of the user inventory
      */
@@ -245,14 +246,14 @@ export class UsersInventoryApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * List the log entries for this inventory entry
      * 
+     * @summary List the log entries for this inventory entry
      * @param userId The id of the inventory owner or &#39;me&#39; for the logged in user
      * @param id The id of the user inventory
      * @param size The number of objects returned per page
@@ -264,14 +265,14 @@ export class UsersInventoryApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * List the user inventory entries for all users
      * 
+     * @summary List the user inventory entries for all users
      * @param inactive If true, accepts inactive user inventories
      * @param size The number of objects returned per page
      * @param page The number of the page returned, starting with 1
@@ -287,14 +288,14 @@ export class UsersInventoryApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Grant an entitlement
      * 
+     * @summary Grant an entitlement
      * @param userId The id of the user to grant the entitlement to
      * @param grantRequest grantRequest
      */
@@ -304,14 +305,14 @@ export class UsersInventoryApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Update an entitlement item
      * 
+     * @summary Update an entitlement item
      * @param entitlementId The id of the entitlement
      * @param cascade Whether to cascade group changes, such as in the limited gettable behavior. A 400 error will return otherwise if the group is already in use with different values.
      * @param entitlementItem The entitlement item object
@@ -322,14 +323,14 @@ export class UsersInventoryApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Update an entitlement template
      * 
+     * @summary Update an entitlement template
      * @param id The id of the template
      * @param template The updated template
      */
@@ -339,14 +340,14 @@ export class UsersInventoryApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Set the behavior data for an inventory entry
      * 
+     * @summary Set the behavior data for an inventory entry
      * @param userId The id of the user
      * @param id The id of the user inventory
      * @param data The data map
@@ -357,14 +358,14 @@ export class UsersInventoryApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Set the expiration date
      * Will change the current grace period for a subscription but not the bill date (possibly even ending before having the chance to re-bill)
+     * @summary Set the expiration date
      * @param userId user_id
      * @param id The id of the user inventory
      * @param timestamp The new expiration date as a unix timestamp in seconds. May be null (no body).
@@ -375,14 +376,14 @@ export class UsersInventoryApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Set the status for an inventory entry
      * 
+     * @summary Set the status for an inventory entry
      * @param userId The id of the user
      * @param id The id of the user inventory
      * @param inventoryStatus The inventory status object
@@ -393,14 +394,14 @@ export class UsersInventoryApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Use an item
      * 
+     * @summary Use an item
      * @param userId The id of the user to check for or &#39;me&#39; for logged in user
      * @param itemId The id of the item
      * @param sku The specific sku of an entitlement_list addition to check entitlement for. This is of very limited and specific use and should generally be left out
@@ -412,7 +413,7 @@ export class UsersInventoryApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
@@ -459,9 +460,9 @@ export class UsersInventoryApi {
             method: RequestMethod.Post,
             headers: headers,
             body: userInventoryAddRequest == null ? '' : JSON.stringify(userInventoryAddRequest), // https://github.com/angular/angular/issues/10612
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -518,9 +519,9 @@ export class UsersInventoryApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Get,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -569,9 +570,9 @@ export class UsersInventoryApi {
             method: RequestMethod.Post,
             headers: headers,
             body: entitlementItem == null ? '' : JSON.stringify(entitlementItem), // https://github.com/angular/angular/issues/10612
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -615,9 +616,9 @@ export class UsersInventoryApi {
             method: RequestMethod.Post,
             headers: headers,
             body: template == null ? '' : JSON.stringify(template), // https://github.com/angular/angular/issues/10612
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -663,9 +664,9 @@ export class UsersInventoryApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Delete,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -716,9 +717,9 @@ export class UsersInventoryApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Delete,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -755,9 +756,9 @@ export class UsersInventoryApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Get,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -803,9 +804,9 @@ export class UsersInventoryApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Get,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -851,9 +852,9 @@ export class UsersInventoryApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Get,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -908,9 +909,9 @@ export class UsersInventoryApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Get,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -996,9 +997,9 @@ export class UsersInventoryApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Get,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -1050,9 +1051,9 @@ export class UsersInventoryApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Get,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -1114,9 +1115,9 @@ export class UsersInventoryApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Get,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -1196,9 +1197,9 @@ export class UsersInventoryApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Get,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -1252,9 +1253,9 @@ export class UsersInventoryApi {
             method: RequestMethod.Post,
             headers: headers,
             body: grantRequest == null ? '' : JSON.stringify(grantRequest), // https://github.com/angular/angular/issues/10612
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -1309,9 +1310,9 @@ export class UsersInventoryApi {
             method: RequestMethod.Put,
             headers: headers,
             body: entitlementItem == null ? '' : JSON.stringify(entitlementItem), // https://github.com/angular/angular/issues/10612
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -1361,9 +1362,9 @@ export class UsersInventoryApi {
             method: RequestMethod.Put,
             headers: headers,
             body: template == null ? '' : JSON.stringify(template), // https://github.com/angular/angular/issues/10612
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -1419,9 +1420,9 @@ export class UsersInventoryApi {
             method: RequestMethod.Put,
             headers: headers,
             body: data == null ? '' : JSON.stringify(data), // https://github.com/angular/angular/issues/10612
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -1477,9 +1478,9 @@ export class UsersInventoryApi {
             method: RequestMethod.Put,
             headers: headers,
             body: timestamp == null ? '' : JSON.stringify(timestamp), // https://github.com/angular/angular/issues/10612
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -1535,9 +1536,9 @@ export class UsersInventoryApi {
             method: RequestMethod.Put,
             headers: headers,
             body: inventoryStatus == null ? '' : JSON.stringify(inventoryStatus), // https://github.com/angular/angular/issues/10612
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -1599,9 +1600,9 @@ export class UsersInventoryApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Post,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);

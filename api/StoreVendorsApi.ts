@@ -1,6 +1,6 @@
 /**
  * Knetik Platform API Documentation latest 
- * This is the spec for the Knetik API.  Use this in conjunction with the documentation found at https://knetikcloud.com
+ * This is the spec for the Knetik API.  Use this in conjunction with the documentation found at https://knetikcloud.com.
  *
  * OpenAPI spec version: latest 
  * Contact: support@knetik.com
@@ -9,6 +9,8 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
+
+/* tslint:disable:no-unused-variable member-ordering */
 
 import { Inject, Injectable, Optional }                      from '@angular/core';
 import { Http, Headers, URLSearchParams }                    from '@angular/http';
@@ -22,11 +24,10 @@ import * as models                                           from '../model/mode
 import { BASE_PATH, COLLECTION_FORMATS }                     from '../variables';
 import { Configuration }                                     from '../configuration';
 
-/* tslint:disable:no-unused-variable member-ordering */
-
 
 @Injectable()
 export class StoreVendorsApi {
+
     protected basePath = 'https://sandbox.knetikcloud.com';
     public defaultHeaders: Headers = new Headers();
     public configuration: Configuration = new Configuration();
@@ -41,8 +42,8 @@ export class StoreVendorsApi {
     }
 
     /**
-     * Create a vendor
      * 
+     * @summary Create a vendor
      * @param vendor The vendor
      */
     public createVendor(vendor?: models.VendorResource, extraHttpRequestParams?: any): Observable<models.VendorResource> {
@@ -51,14 +52,14 @@ export class StoreVendorsApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Create a vendor template
      * Vendor Templates define a type of vendor and the properties they have.
+     * @summary Create a vendor template
      * @param vendorTemplateResource The new vendor template
      */
     public createVendorTemplate(vendorTemplateResource?: models.ItemTemplateResource, extraHttpRequestParams?: any): Observable<models.ItemTemplateResource> {
@@ -67,14 +68,14 @@ export class StoreVendorsApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Delete a vendor
      * 
+     * @summary Delete a vendor
      * @param id The id of the vendor
      */
     public deleteVendor(id: number, extraHttpRequestParams?: any): Observable<{}> {
@@ -83,14 +84,14 @@ export class StoreVendorsApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Delete a vendor template
      * 
+     * @summary Delete a vendor template
      * @param id The id of the template
      * @param cascade force deleting the template if it&#39;s attached to other objects, cascade &#x3D; detach
      */
@@ -100,14 +101,14 @@ export class StoreVendorsApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Get a single vendor
      * 
+     * @summary Get a single vendor
      * @param id The id of the vendor
      */
     public getVendor(id: number, extraHttpRequestParams?: any): Observable<models.VendorResource> {
@@ -116,14 +117,14 @@ export class StoreVendorsApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Get a single vendor template
      * Vendor Templates define a type of vendor and the properties they have.
+     * @summary Get a single vendor template
      * @param id The id of the template
      */
     public getVendorTemplate(id: string, extraHttpRequestParams?: any): Observable<models.ItemTemplateResource> {
@@ -132,14 +133,14 @@ export class StoreVendorsApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * List and search vendor templates
      * 
+     * @summary List and search vendor templates
      * @param size The number of objects returned per page
      * @param page The number of the page returned, starting with 1
      * @param order A comma separated list of sorting requirements in priority order, each entry matching PROPERTY_NAME:[ASC|DESC]
@@ -150,14 +151,14 @@ export class StoreVendorsApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * List and search vendors
      * 
+     * @summary List and search vendors
      * @param filterName Filters vendors by name starting with the text provided in the filter
      * @param size The number of objects returned per page
      * @param page The number of the page returned, starting with 1
@@ -169,14 +170,14 @@ export class StoreVendorsApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Update a vendor
      * 
+     * @summary Update a vendor
      * @param id The id of the vendor
      * @param vendor The vendor
      */
@@ -186,14 +187,14 @@ export class StoreVendorsApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Update a vendor template
      * 
+     * @summary Update a vendor template
      * @param id The id of the template
      * @param vendorTemplateResource The vendor template resource object
      */
@@ -203,7 +204,7 @@ export class StoreVendorsApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
@@ -244,9 +245,9 @@ export class StoreVendorsApi {
             method: RequestMethod.Post,
             headers: headers,
             body: vendor == null ? '' : JSON.stringify(vendor), // https://github.com/angular/angular/issues/10612
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -290,9 +291,9 @@ export class StoreVendorsApi {
             method: RequestMethod.Post,
             headers: headers,
             body: vendorTemplateResource == null ? '' : JSON.stringify(vendorTemplateResource), // https://github.com/angular/angular/issues/10612
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -338,9 +339,9 @@ export class StoreVendorsApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Delete,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -391,9 +392,9 @@ export class StoreVendorsApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Delete,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -430,9 +431,9 @@ export class StoreVendorsApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Get,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -478,9 +479,9 @@ export class StoreVendorsApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Get,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -535,9 +536,9 @@ export class StoreVendorsApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Get,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -588,9 +589,9 @@ export class StoreVendorsApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Get,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -640,9 +641,9 @@ export class StoreVendorsApi {
             method: RequestMethod.Put,
             headers: headers,
             body: vendor == null ? '' : JSON.stringify(vendor), // https://github.com/angular/angular/issues/10612
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -692,9 +693,9 @@ export class StoreVendorsApi {
             method: RequestMethod.Put,
             headers: headers,
             body: vendorTemplateResource == null ? '' : JSON.stringify(vendorTemplateResource), // https://github.com/angular/angular/issues/10612
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);

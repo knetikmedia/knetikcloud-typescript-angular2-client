@@ -1,6 +1,6 @@
 /**
  * Knetik Platform API Documentation latest 
- * This is the spec for the Knetik API.  Use this in conjunction with the documentation found at https://knetikcloud.com
+ * This is the spec for the Knetik API.  Use this in conjunction with the documentation found at https://knetikcloud.com.
  *
  * OpenAPI spec version: latest 
  * Contact: support@knetik.com
@@ -16,6 +16,6 @@ export interface ActivityOccurrenceResults {
     /**
      * The game results for each user. Include all users that played (paid to get in) even if they were eliminated without a result. A null metric is allowed
      */
-    users: Array<models.UserActivityResultsResource>;
+    users: Array<models.UserActivityResults>;
 
 }

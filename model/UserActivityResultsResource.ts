@@ -1,6 +1,6 @@
 /**
  * Knetik Platform API Documentation latest 
- * This is the spec for the Knetik API.  Use this in conjunction with the documentation found at https://knetikcloud.com
+ * This is the spec for the Knetik API.  Use this in conjunction with the documentation found at https://knetikcloud.com.
  *
  * OpenAPI spec version: latest 
  * Contact: support@knetik.com
@@ -14,22 +14,7 @@ import * as models from './models';
 
 export interface UserActivityResultsResource {
     /**
-     * Any currency rewarded to this user
-     */
-    currencyRewards?: Array<models.RewardCurrencyResource>;
-
-    /**
-     * Any items rewarded to this user
-     */
-    itemRewards?: Array<models.RewardItemResource>;
-
-    /**
-     * The position of the user in the leaderboard. Null means non-compete or disqualification
-     */
-    rank?: number;
-
-    /**
-     * The raw score in this leaderboard. Null means non-compete or disqualification
+     * The raw score. Null means non-compete or disqualification
      */
     score?: number;
 
@@ -39,13 +24,8 @@ export interface UserActivityResultsResource {
     tags?: Array<string>;
 
     /**
-     * The number of users tied at this rank, including this user. 1 means no tie
+     * The id of the player
      */
-    ties?: number;
-
-    /**
-     * The player for this entry
-     */
-    user: models.SimpleUserResource;
+    userId: number;
 
 }

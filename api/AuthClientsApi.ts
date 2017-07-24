@@ -1,6 +1,6 @@
 /**
  * Knetik Platform API Documentation latest 
- * This is the spec for the Knetik API.  Use this in conjunction with the documentation found at https://knetikcloud.com
+ * This is the spec for the Knetik API.  Use this in conjunction with the documentation found at https://knetikcloud.com.
  *
  * OpenAPI spec version: latest 
  * Contact: support@knetik.com
@@ -9,6 +9,8 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
+
+/* tslint:disable:no-unused-variable member-ordering */
 
 import { Inject, Injectable, Optional }                      from '@angular/core';
 import { Http, Headers, URLSearchParams }                    from '@angular/http';
@@ -22,11 +24,10 @@ import * as models                                           from '../model/mode
 import { BASE_PATH, COLLECTION_FORMATS }                     from '../variables';
 import { Configuration }                                     from '../configuration';
 
-/* tslint:disable:no-unused-variable member-ordering */
-
 
 @Injectable()
 export class AuthClientsApi {
+
     protected basePath = 'https://sandbox.knetikcloud.com';
     public defaultHeaders: Headers = new Headers();
     public configuration: Configuration = new Configuration();
@@ -41,8 +42,8 @@ export class AuthClientsApi {
     }
 
     /**
-     * Create a new client
      * 
+     * @summary Create a new client
      * @param clientResource The client resource object
      */
     public createClient(clientResource?: models.ClientResource, extraHttpRequestParams?: any): Observable<models.ClientResource> {
@@ -51,14 +52,14 @@ export class AuthClientsApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Delete a client
      * 
+     * @summary Delete a client
      * @param clientKey The key of the client
      */
     public deleteClient(clientKey: string, extraHttpRequestParams?: any): Observable<{}> {
@@ -67,14 +68,14 @@ export class AuthClientsApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Get a single client
      * 
+     * @summary Get a single client
      * @param clientKey The key of the client
      */
     public getClient(clientKey: string, extraHttpRequestParams?: any): Observable<models.ClientResource> {
@@ -83,14 +84,14 @@ export class AuthClientsApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * List available client grant types
      * 
+     * @summary List available client grant types
      */
     public getClientGrantTypes(extraHttpRequestParams?: any): Observable<Array<models.GrantTypeResource>> {
         return this.getClientGrantTypesWithHttpInfo(extraHttpRequestParams)
@@ -98,14 +99,14 @@ export class AuthClientsApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * List and search clients
      * 
+     * @summary List and search clients
      * @param size The number of objects returned per page
      * @param page The number of the page returned, starting with 1
      * @param order A comma separated list of sorting requirements in priority order, each entry matching PROPERTY_NAME:[ASC|DESC]
@@ -116,14 +117,14 @@ export class AuthClientsApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Set grant types for a client
      * 
+     * @summary Set grant types for a client
      * @param clientKey The key of the client
      * @param grantList A list of unique grant types
      */
@@ -133,14 +134,14 @@ export class AuthClientsApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Set redirect uris for a client
      * 
+     * @summary Set redirect uris for a client
      * @param clientKey The key of the client
      * @param redirectList A list of unique redirect uris
      */
@@ -150,14 +151,14 @@ export class AuthClientsApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Update a client
      * 
+     * @summary Update a client
      * @param clientKey The key of the client
      * @param clientResource The client resource object
      */
@@ -167,7 +168,7 @@ export class AuthClientsApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
@@ -208,9 +209,9 @@ export class AuthClientsApi {
             method: RequestMethod.Post,
             headers: headers,
             body: clientResource == null ? '' : JSON.stringify(clientResource), // https://github.com/angular/angular/issues/10612
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -256,9 +257,9 @@ export class AuthClientsApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Delete,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -304,9 +305,9 @@ export class AuthClientsApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Get,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -346,9 +347,9 @@ export class AuthClientsApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Get,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -403,9 +404,9 @@ export class AuthClientsApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Get,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -455,9 +456,9 @@ export class AuthClientsApi {
             method: RequestMethod.Put,
             headers: headers,
             body: grantList == null ? '' : JSON.stringify(grantList), // https://github.com/angular/angular/issues/10612
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -507,9 +508,9 @@ export class AuthClientsApi {
             method: RequestMethod.Put,
             headers: headers,
             body: redirectList == null ? '' : JSON.stringify(redirectList), // https://github.com/angular/angular/issues/10612
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -559,9 +560,9 @@ export class AuthClientsApi {
             method: RequestMethod.Put,
             headers: headers,
             body: clientResource == null ? '' : JSON.stringify(clientResource), // https://github.com/angular/angular/issues/10612
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);

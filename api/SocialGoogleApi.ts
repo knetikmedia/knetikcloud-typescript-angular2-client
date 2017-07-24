@@ -1,6 +1,6 @@
 /**
  * Knetik Platform API Documentation latest 
- * This is the spec for the Knetik API.  Use this in conjunction with the documentation found at https://knetikcloud.com
+ * This is the spec for the Knetik API.  Use this in conjunction with the documentation found at https://knetikcloud.com.
  *
  * OpenAPI spec version: latest 
  * Contact: support@knetik.com
@@ -9,6 +9,8 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
+
+/* tslint:disable:no-unused-variable member-ordering */
 
 import { Inject, Injectable, Optional }                      from '@angular/core';
 import { Http, Headers, URLSearchParams }                    from '@angular/http';
@@ -22,11 +24,10 @@ import * as models                                           from '../model/mode
 import { BASE_PATH, COLLECTION_FORMATS }                     from '../variables';
 import { Configuration }                                     from '../configuration';
 
-/* tslint:disable:no-unused-variable member-ordering */
-
 
 @Injectable()
 export class SocialGoogleApi {
+
     protected basePath = 'https://sandbox.knetikcloud.com';
     public defaultHeaders: Headers = new Headers();
     public configuration: Configuration = new Configuration();
@@ -41,28 +42,28 @@ export class SocialGoogleApi {
     }
 
     /**
-     * Link facebook account
-     * Links the current user account to a facebook account, using the acccess token from facebook. Can also be used to update the access token after it has expired.
-     * @param facebookToken The token from facebook
+     * Links the current user account to a google account, using the acccess token from google. Can also be used to update the access token after it has expired.
+     * @summary Link google account
+     * @param googleToken The token from google
      */
-    public linkAccounts1(facebookToken?: models.GoogleToken, extraHttpRequestParams?: any): Observable<{}> {
-        return this.linkAccounts1WithHttpInfo(facebookToken, extraHttpRequestParams)
+    public linkAccounts1(googleToken?: models.GoogleToken, extraHttpRequestParams?: any): Observable<{}> {
+        return this.linkAccounts1WithHttpInfo(googleToken, extraHttpRequestParams)
             .map((response: Response) => {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
 
     /**
-     * Link facebook account
-     * Links the current user account to a facebook account, using the acccess token from facebook. Can also be used to update the access token after it has expired.
-     * @param facebookToken The token from facebook
+     * Link google account
+     * Links the current user account to a google account, using the acccess token from google. Can also be used to update the access token after it has expired.
+     * @param googleToken The token from google
      */
-    public linkAccounts1WithHttpInfo(facebookToken?: models.GoogleToken, extraHttpRequestParams?: any): Observable<Response> {
+    public linkAccounts1WithHttpInfo(googleToken?: models.GoogleToken, extraHttpRequestParams?: any): Observable<Response> {
         const path = this.basePath + '/social/google/users';
 
         let queryParameters = new URLSearchParams();
@@ -91,10 +92,10 @@ export class SocialGoogleApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Post,
             headers: headers,
-            body: facebookToken == null ? '' : JSON.stringify(facebookToken), // https://github.com/angular/angular/issues/10612
-            search: queryParameters
+            body: googleToken == null ? '' : JSON.stringify(googleToken), // https://github.com/angular/angular/issues/10612
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);

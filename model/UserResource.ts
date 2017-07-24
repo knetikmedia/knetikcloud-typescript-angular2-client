@@ -1,6 +1,6 @@
 /**
  * Knetik Platform API Documentation latest 
- * This is the spec for the Knetik API.  Use this in conjunction with the documentation found at https://knetikcloud.com
+ * This is the spec for the Knetik API.  Use this in conjunction with the documentation found at https://knetikcloud.com.
  *
  * OpenAPI spec version: latest 
  * Contact: support@knetik.com
@@ -97,6 +97,11 @@ export interface UserResource {
      * The ISO3 code for the user's currency (private)
      */
     languageCode?: string;
+
+    /**
+     * The date the user last interacted with the API (private)
+     */
+    lastActivity?: number;
 
     /**
      * The user's last name (private)

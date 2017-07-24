@@ -1,6 +1,6 @@
 /**
  * Knetik Platform API Documentation latest 
- * This is the spec for the Knetik API.  Use this in conjunction with the documentation found at https://knetikcloud.com
+ * This is the spec for the Knetik API.  Use this in conjunction with the documentation found at https://knetikcloud.com.
  *
  * OpenAPI spec version: latest 
  * Contact: support@knetik.com
@@ -9,6 +9,8 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
+
+/* tslint:disable:no-unused-variable member-ordering */
 
 import { Inject, Injectable, Optional }                      from '@angular/core';
 import { Http, Headers, URLSearchParams }                    from '@angular/http';
@@ -22,11 +24,10 @@ import * as models                                           from '../model/mode
 import { BASE_PATH, COLLECTION_FORMATS }                     from '../variables';
 import { Configuration }                                     from '../configuration';
 
-/* tslint:disable:no-unused-variable member-ordering */
-
 
 @Injectable()
 export class MediaArtistsApi {
+
     protected basePath = 'https://sandbox.knetikcloud.com';
     public defaultHeaders: Headers = new Headers();
     public configuration: Configuration = new Configuration();
@@ -41,8 +42,8 @@ export class MediaArtistsApi {
     }
 
     /**
-     * Adds a new artist in the system
      * Adds a new artist in the system. Use specific media contributions endpoint to add contributions
+     * @summary Adds a new artist in the system
      * @param artistResource The new artist
      */
     public addArtist(artistResource?: models.ArtistResource, extraHttpRequestParams?: any): Observable<models.ArtistResource> {
@@ -51,14 +52,14 @@ export class MediaArtistsApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Create an artist template
      * Artist Templates define a type of artist and the properties they have
+     * @summary Create an artist template
      * @param artistTemplateResource The artist template resource object
      */
     public createArtistTemplate(artistTemplateResource?: models.TemplateResource, extraHttpRequestParams?: any): Observable<models.TemplateResource> {
@@ -67,14 +68,14 @@ export class MediaArtistsApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Removes an artist from the system IF no resources are attached to it
      * 
+     * @summary Removes an artist from the system IF no resources are attached to it
      * @param id The artist id
      */
     public deleteArtist(id: number, extraHttpRequestParams?: any): Observable<{}> {
@@ -83,14 +84,14 @@ export class MediaArtistsApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Delete an artist template
-     * If cascade &#x3D; &#39;detach&#39;, it will force delete the template even if it&#39;s attached to other objects
+     * If cascade = 'detach', it will force delete the template even if it's attached to other objects
+     * @summary Delete an artist template
      * @param id The id of the template
      * @param cascade The value needed to delete used templates
      */
@@ -100,14 +101,14 @@ export class MediaArtistsApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Loads a specific artist details
      * 
+     * @summary Loads a specific artist details
      * @param id The artist id
      * @param showContributions The number of contributions to show fetch
      */
@@ -117,14 +118,14 @@ export class MediaArtistsApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Get a single artist template
      * 
+     * @summary Get a single artist template
      * @param id The id of the template
      */
     public getArtistTemplate(id: string, extraHttpRequestParams?: any): Observable<models.TemplateResource> {
@@ -133,14 +134,14 @@ export class MediaArtistsApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * List and search artist templates
      * 
+     * @summary List and search artist templates
      * @param size The number of objects returned per page
      * @param page The number of the page returned, starting with 1
      * @param order A comma separated list of sorting requirements in priority order, each entry matching PROPERTY_NAME:[ASC|DESC]
@@ -151,14 +152,14 @@ export class MediaArtistsApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Search for artists
      * 
+     * @summary Search for artists
      * @param filterArtistsByName Filter for artists which name *STARTS* with the given string
      * @param size The number of objects returned per page
      * @param page The number of the page returned, starting with 1
@@ -170,14 +171,14 @@ export class MediaArtistsApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Modifies an artist details
      * 
+     * @summary Modifies an artist details
      * @param id The artist id
      * @param artistResource The new artist
      */
@@ -187,14 +188,14 @@ export class MediaArtistsApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Update an artist template
      * 
+     * @summary Update an artist template
      * @param id The id of the template
      * @param artistTemplateResource The artist template resource object
      */
@@ -204,7 +205,7 @@ export class MediaArtistsApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
@@ -245,9 +246,9 @@ export class MediaArtistsApi {
             method: RequestMethod.Post,
             headers: headers,
             body: artistResource == null ? '' : JSON.stringify(artistResource), // https://github.com/angular/angular/issues/10612
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -291,9 +292,9 @@ export class MediaArtistsApi {
             method: RequestMethod.Post,
             headers: headers,
             body: artistTemplateResource == null ? '' : JSON.stringify(artistTemplateResource), // https://github.com/angular/angular/issues/10612
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -339,9 +340,9 @@ export class MediaArtistsApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Delete,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -392,9 +393,9 @@ export class MediaArtistsApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Delete,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -436,9 +437,9 @@ export class MediaArtistsApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Get,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -484,9 +485,9 @@ export class MediaArtistsApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Get,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -541,9 +542,9 @@ export class MediaArtistsApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Get,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -594,9 +595,9 @@ export class MediaArtistsApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Get,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -646,9 +647,9 @@ export class MediaArtistsApi {
             method: RequestMethod.Put,
             headers: headers,
             body: artistResource == null ? '' : JSON.stringify(artistResource), // https://github.com/angular/angular/issues/10612
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -698,9 +699,9 @@ export class MediaArtistsApi {
             method: RequestMethod.Put,
             headers: headers,
             body: artistTemplateResource == null ? '' : JSON.stringify(artistTemplateResource), // https://github.com/angular/angular/issues/10612
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);

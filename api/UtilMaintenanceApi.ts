@@ -1,6 +1,6 @@
 /**
  * Knetik Platform API Documentation latest 
- * This is the spec for the Knetik API.  Use this in conjunction with the documentation found at https://knetikcloud.com
+ * This is the spec for the Knetik API.  Use this in conjunction with the documentation found at https://knetikcloud.com.
  *
  * OpenAPI spec version: latest 
  * Contact: support@knetik.com
@@ -9,6 +9,8 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
+
+/* tslint:disable:no-unused-variable member-ordering */
 
 import { Inject, Injectable, Optional }                      from '@angular/core';
 import { Http, Headers, URLSearchParams }                    from '@angular/http';
@@ -22,11 +24,10 @@ import * as models                                           from '../model/mode
 import { BASE_PATH, COLLECTION_FORMATS }                     from '../variables';
 import { Configuration }                                     from '../configuration';
 
-/* tslint:disable:no-unused-variable member-ordering */
-
 
 @Injectable()
 export class UtilMaintenanceApi {
+
     protected basePath = 'https://sandbox.knetikcloud.com';
     public defaultHeaders: Headers = new Headers();
     public configuration: Configuration = new Configuration();
@@ -41,8 +42,8 @@ export class UtilMaintenanceApi {
     }
 
     /**
-     * Delete maintenance info
      * 
+     * @summary Delete maintenance info
      */
     public deleteMaintenance(extraHttpRequestParams?: any): Observable<{}> {
         return this.deleteMaintenanceWithHttpInfo(extraHttpRequestParams)
@@ -50,14 +51,14 @@ export class UtilMaintenanceApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Get current maintenance info
      * Get current maintenance info. 404 if no maintenance.
+     * @summary Get current maintenance info
      */
     public getMaintenance(extraHttpRequestParams?: any): Observable<models.Maintenance> {
         return this.getMaintenanceWithHttpInfo(extraHttpRequestParams)
@@ -65,14 +66,14 @@ export class UtilMaintenanceApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Set current maintenance info
      * 
+     * @summary Set current maintenance info
      * @param maintenance The maintenance object
      */
     public setMaintenance(maintenance?: models.Maintenance, extraHttpRequestParams?: any): Observable<{}> {
@@ -81,14 +82,14 @@ export class UtilMaintenanceApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Update current maintenance info
      * 
+     * @summary Update current maintenance info
      * @param maintenance The maintenance object
      */
     public updateMaintenance(maintenance?: models.Maintenance, extraHttpRequestParams?: any): Observable<{}> {
@@ -97,7 +98,7 @@ export class UtilMaintenanceApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
@@ -134,9 +135,9 @@ export class UtilMaintenanceApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Delete,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -167,9 +168,9 @@ export class UtilMaintenanceApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Get,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -213,9 +214,9 @@ export class UtilMaintenanceApi {
             method: RequestMethod.Post,
             headers: headers,
             body: maintenance == null ? '' : JSON.stringify(maintenance), // https://github.com/angular/angular/issues/10612
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -259,9 +260,9 @@ export class UtilMaintenanceApi {
             method: RequestMethod.Put,
             headers: headers,
             body: maintenance == null ? '' : JSON.stringify(maintenance), // https://github.com/angular/angular/issues/10612
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);

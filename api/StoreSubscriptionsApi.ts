@@ -1,6 +1,6 @@
 /**
  * Knetik Platform API Documentation latest 
- * This is the spec for the Knetik API.  Use this in conjunction with the documentation found at https://knetikcloud.com
+ * This is the spec for the Knetik API.  Use this in conjunction with the documentation found at https://knetikcloud.com.
  *
  * OpenAPI spec version: latest 
  * Contact: support@knetik.com
@@ -9,6 +9,8 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
+
+/* tslint:disable:no-unused-variable member-ordering */
 
 import { Inject, Injectable, Optional }                      from '@angular/core';
 import { Http, Headers, URLSearchParams }                    from '@angular/http';
@@ -22,11 +24,10 @@ import * as models                                           from '../model/mode
 import { BASE_PATH, COLLECTION_FORMATS }                     from '../variables';
 import { Configuration }                                     from '../configuration';
 
-/* tslint:disable:no-unused-variable member-ordering */
-
 
 @Injectable()
 export class StoreSubscriptionsApi {
+
     protected basePath = 'https://sandbox.knetikcloud.com';
     public defaultHeaders: Headers = new Headers();
     public configuration: Configuration = new Configuration();
@@ -41,8 +42,8 @@ export class StoreSubscriptionsApi {
     }
 
     /**
-     * Creates a subscription item and associated plans
      * 
+     * @summary Creates a subscription item and associated plans
      * @param subscriptionResource The subscription to be created
      */
     public createSubscription(subscriptionResource?: models.SubscriptionResource, extraHttpRequestParams?: any): Observable<models.SubscriptionResource> {
@@ -51,14 +52,14 @@ export class StoreSubscriptionsApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Create a subscription template
      * Subscription Templates define a type of subscription and the properties they have.
+     * @summary Create a subscription template
      * @param subscriptionTemplateResource The new subscription template
      */
     public createSubscriptionTemplate(subscriptionTemplateResource?: models.SubscriptionTemplateResource, extraHttpRequestParams?: any): Observable<models.SubscriptionTemplateResource> {
@@ -67,14 +68,14 @@ export class StoreSubscriptionsApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Delete a subscription plan
      * Must not be locked or a migration target
+     * @summary Delete a subscription plan
      * @param id The id of the subscription
      * @param planId The id of the plan
      */
@@ -84,14 +85,14 @@ export class StoreSubscriptionsApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Delete a subscription template
      * 
+     * @summary Delete a subscription template
      * @param id The id of the template
      * @param cascade force deleting the template if it&#39;s attached to other objects, cascade &#x3D; detach
      */
@@ -101,14 +102,14 @@ export class StoreSubscriptionsApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Retrieve a single subscription item and associated plans
      * 
+     * @summary Retrieve a single subscription item and associated plans
      * @param id The id of the subscription
      */
     public getSubscription(id: number, extraHttpRequestParams?: any): Observable<models.SubscriptionResource> {
@@ -117,14 +118,14 @@ export class StoreSubscriptionsApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Get a single subscription template
      * Subscription Templates define a type of subscription and the properties they have.
+     * @summary Get a single subscription template
      * @param id The id of the template
      */
     public getSubscriptionTemplate(id: string, extraHttpRequestParams?: any): Observable<models.SubscriptionTemplateResource> {
@@ -133,14 +134,14 @@ export class StoreSubscriptionsApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * List and search subscription templates
      * 
+     * @summary List and search subscription templates
      * @param size The number of objects returned per page
      * @param page The number of the page returned, starting with 1
      * @param order A comma separated list of sorting requirements in priority order, each entry matching PROPERTY_NAME:[ASC|DESC]
@@ -151,14 +152,14 @@ export class StoreSubscriptionsApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * List available subscription items and associated plans
      * 
+     * @summary List available subscription items and associated plans
      * @param size The number of objects returned per page
      * @param page The number of the page returned, starting with 1
      * @param order A comma separated list of sorting requirements in priority order, each entry matching PROPERTY_NAME:[ASC|DESC]
@@ -169,14 +170,14 @@ export class StoreSubscriptionsApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Processes subscriptions and charge dues
      * 
+     * @summary Processes subscriptions and charge dues
      */
     public processSubscriptions(extraHttpRequestParams?: any): Observable<{}> {
         return this.processSubscriptionsWithHttpInfo(extraHttpRequestParams)
@@ -184,14 +185,14 @@ export class StoreSubscriptionsApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Updates a subscription item and associated plans
      * Will not remove plans left out
+     * @summary Updates a subscription item and associated plans
      * @param id The id of the subscription
      * @param subscriptionResource The subscription resource object
      */
@@ -201,14 +202,14 @@ export class StoreSubscriptionsApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Update a subscription template
      * 
+     * @summary Update a subscription template
      * @param id The id of the template
      * @param subscriptionTemplateResource The subscription template resource object
      */
@@ -218,7 +219,7 @@ export class StoreSubscriptionsApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
@@ -259,9 +260,9 @@ export class StoreSubscriptionsApi {
             method: RequestMethod.Post,
             headers: headers,
             body: subscriptionResource == null ? '' : JSON.stringify(subscriptionResource), // https://github.com/angular/angular/issues/10612
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -305,9 +306,9 @@ export class StoreSubscriptionsApi {
             method: RequestMethod.Post,
             headers: headers,
             body: subscriptionTemplateResource == null ? '' : JSON.stringify(subscriptionTemplateResource), // https://github.com/angular/angular/issues/10612
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -359,9 +360,9 @@ export class StoreSubscriptionsApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Delete,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -412,9 +413,9 @@ export class StoreSubscriptionsApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Delete,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -451,9 +452,9 @@ export class StoreSubscriptionsApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Get,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -499,9 +500,9 @@ export class StoreSubscriptionsApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Get,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -556,9 +557,9 @@ export class StoreSubscriptionsApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Get,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -604,9 +605,9 @@ export class StoreSubscriptionsApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Get,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -646,9 +647,9 @@ export class StoreSubscriptionsApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Post,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -698,9 +699,9 @@ export class StoreSubscriptionsApi {
             method: RequestMethod.Put,
             headers: headers,
             body: subscriptionResource == null ? '' : JSON.stringify(subscriptionResource), // https://github.com/angular/angular/issues/10612
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -750,9 +751,9 @@ export class StoreSubscriptionsApi {
             method: RequestMethod.Put,
             headers: headers,
             body: subscriptionTemplateResource == null ? '' : JSON.stringify(subscriptionTemplateResource), // https://github.com/angular/angular/issues/10612
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);

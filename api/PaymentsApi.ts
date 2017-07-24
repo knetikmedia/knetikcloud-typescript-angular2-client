@@ -1,6 +1,6 @@
 /**
  * Knetik Platform API Documentation latest 
- * This is the spec for the Knetik API.  Use this in conjunction with the documentation found at https://knetikcloud.com
+ * This is the spec for the Knetik API.  Use this in conjunction with the documentation found at https://knetikcloud.com.
  *
  * OpenAPI spec version: latest 
  * Contact: support@knetik.com
@@ -9,6 +9,8 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
+
+/* tslint:disable:no-unused-variable member-ordering */
 
 import { Inject, Injectable, Optional }                      from '@angular/core';
 import { Http, Headers, URLSearchParams }                    from '@angular/http';
@@ -22,11 +24,10 @@ import * as models                                           from '../model/mode
 import { BASE_PATH, COLLECTION_FORMATS }                     from '../variables';
 import { Configuration }                                     from '../configuration';
 
-/* tslint:disable:no-unused-variable member-ordering */
-
 
 @Injectable()
 export class PaymentsApi {
+
     protected basePath = 'https://sandbox.knetikcloud.com';
     public defaultHeaders: Headers = new Headers();
     public configuration: Configuration = new Configuration();
@@ -41,8 +42,8 @@ export class PaymentsApi {
     }
 
     /**
-     * Create a new payment method for a user
      * 
+     * @summary Create a new payment method for a user
      * @param userId ID of the user for whom the payment method is being created
      * @param paymentMethod Payment method being created
      */
@@ -52,14 +53,14 @@ export class PaymentsApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Delete an existing payment method for a user
      * 
+     * @summary Delete an existing payment method for a user
      * @param userId ID of the user for whom the payment method is being updated
      * @param id ID of the payment method being deleted
      */
@@ -69,14 +70,14 @@ export class PaymentsApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Get a single payment method for a user
      * 
+     * @summary Get a single payment method for a user
      * @param userId ID of the user for whom the payment method is being retrieved
      * @param id ID of the payment method being retrieved
      */
@@ -86,33 +87,37 @@ export class PaymentsApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Get all payment methods for a user
      * 
+     * @summary Get all payment methods for a user
      * @param userId ID of the user for whom the payment methods are being retrieved
+     * @param filterName Filter for payment methods whose name starts with a given string
+     * @param filterPaymentType Filter for payment methods with a specific payment type
+     * @param filterPaymentMethodTypeId Filter for payment methods with a specific payment method type by id
+     * @param filterPaymentMethodTypeName Filter for payment methods whose payment method type name starts with a given string
      * @param size The number of objects returned per page
      * @param page The number of the page returned, starting with 1
      * @param order a comma separated list of sorting requirements in priority order, each entry matching PROPERTY_NAME:[ASC|DESC]
      */
-    public getPaymentMethods(userId: number, size?: number, page?: number, order?: string, extraHttpRequestParams?: any): Observable<Array<models.PaymentMethodResource>> {
-        return this.getPaymentMethodsWithHttpInfo(userId, size, page, order, extraHttpRequestParams)
+    public getPaymentMethods(userId: number, filterName?: string, filterPaymentType?: string, filterPaymentMethodTypeId?: number, filterPaymentMethodTypeName?: string, size?: number, page?: number, order?: string, extraHttpRequestParams?: any): Observable<Array<models.PaymentMethodResource>> {
+        return this.getPaymentMethodsWithHttpInfo(userId, filterName, filterPaymentType, filterPaymentMethodTypeId, filterPaymentMethodTypeName, size, page, order, extraHttpRequestParams)
             .map((response: Response) => {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Authorize payment of an invoice for later capture
      * 
+     * @summary Authorize payment of an invoice for later capture
      * @param request Payment authorization request
      */
     public paymentAuthorization(request?: models.PaymentAuthorizationResource, extraHttpRequestParams?: any): Observable<models.PaymentAuthorizationResource> {
@@ -121,14 +126,14 @@ export class PaymentsApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Capture an existing invoice payment authorization
      * 
+     * @summary Capture an existing invoice payment authorization
      * @param id ID of the payment authorization to capture
      */
     public paymentCapture(id: number, extraHttpRequestParams?: any): Observable<{}> {
@@ -137,14 +142,14 @@ export class PaymentsApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Update an existing payment method for a user
      * 
+     * @summary Update an existing payment method for a user
      * @param userId ID of the user for whom the payment method is being updated
      * @param id ID of the payment method being updated
      * @param paymentMethod The updated payment method data
@@ -155,7 +160,7 @@ export class PaymentsApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
@@ -202,9 +207,9 @@ export class PaymentsApi {
             method: RequestMethod.Post,
             headers: headers,
             body: paymentMethod == null ? '' : JSON.stringify(paymentMethod), // https://github.com/angular/angular/issues/10612
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -256,9 +261,9 @@ export class PaymentsApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Delete,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -310,9 +315,9 @@ export class PaymentsApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Get,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -325,11 +330,15 @@ export class PaymentsApi {
      * Get all payment methods for a user
      * 
      * @param userId ID of the user for whom the payment methods are being retrieved
+     * @param filterName Filter for payment methods whose name starts with a given string
+     * @param filterPaymentType Filter for payment methods with a specific payment type
+     * @param filterPaymentMethodTypeId Filter for payment methods with a specific payment method type by id
+     * @param filterPaymentMethodTypeName Filter for payment methods whose payment method type name starts with a given string
      * @param size The number of objects returned per page
      * @param page The number of the page returned, starting with 1
      * @param order a comma separated list of sorting requirements in priority order, each entry matching PROPERTY_NAME:[ASC|DESC]
      */
-    public getPaymentMethodsWithHttpInfo(userId: number, size?: number, page?: number, order?: string, extraHttpRequestParams?: any): Observable<Response> {
+    public getPaymentMethodsWithHttpInfo(userId: number, filterName?: string, filterPaymentType?: string, filterPaymentMethodTypeId?: number, filterPaymentMethodTypeName?: string, size?: number, page?: number, order?: string, extraHttpRequestParams?: any): Observable<Response> {
         const path = this.basePath + '/users/${user_id}/payment-methods'
                     .replace('${' + 'user_id' + '}', String(userId));
 
@@ -339,6 +348,22 @@ export class PaymentsApi {
         if (userId === null || userId === undefined) {
             throw new Error('Required parameter userId was null or undefined when calling getPaymentMethods.');
         }
+        if (filterName !== undefined) {
+            queryParameters.set('filter_name', <any>filterName);
+        }
+
+        if (filterPaymentType !== undefined) {
+            queryParameters.set('filter_payment_type', <any>filterPaymentType);
+        }
+
+        if (filterPaymentMethodTypeId !== undefined) {
+            queryParameters.set('filter_payment_method_type_id', <any>filterPaymentMethodTypeId);
+        }
+
+        if (filterPaymentMethodTypeName !== undefined) {
+            queryParameters.set('filter_payment_method_type_name', <any>filterPaymentMethodTypeName);
+        }
+
         if (size !== undefined) {
             queryParameters.set('size', <any>size);
         }
@@ -373,9 +398,9 @@ export class PaymentsApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Get,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -419,9 +444,9 @@ export class PaymentsApi {
             method: RequestMethod.Post,
             headers: headers,
             body: request == null ? '' : JSON.stringify(request), // https://github.com/angular/angular/issues/10612
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -467,9 +492,9 @@ export class PaymentsApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Post,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -525,9 +550,9 @@ export class PaymentsApi {
             method: RequestMethod.Put,
             headers: headers,
             body: paymentMethod == null ? '' : JSON.stringify(paymentMethod), // https://github.com/angular/angular/issues/10612
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);

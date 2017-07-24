@@ -1,6 +1,6 @@
 /**
  * Knetik Platform API Documentation latest 
- * This is the spec for the Knetik API.  Use this in conjunction with the documentation found at https://knetikcloud.com
+ * This is the spec for the Knetik API.  Use this in conjunction with the documentation found at https://knetikcloud.com.
  *
  * OpenAPI spec version: latest 
  * Contact: support@knetik.com
@@ -9,6 +9,8 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
+
+/* tslint:disable:no-unused-variable member-ordering */
 
 import { Inject, Injectable, Optional }                      from '@angular/core';
 import { Http, Headers, URLSearchParams }                    from '@angular/http';
@@ -22,11 +24,10 @@ import * as models                                           from '../model/mode
 import { BASE_PATH, COLLECTION_FORMATS }                     from '../variables';
 import { Configuration }                                     from '../configuration';
 
-/* tslint:disable:no-unused-variable member-ordering */
-
 
 @Injectable()
 export class BRERuleEngineTriggersApi {
+
     protected basePath = 'https://sandbox.knetikcloud.com';
     public defaultHeaders: Headers = new Headers();
     public configuration: Configuration = new Configuration();
@@ -41,8 +42,8 @@ export class BRERuleEngineTriggersApi {
     }
 
     /**
-     * Create a trigger
      * Customer added triggers will not be fired automatically or have rules associated with them by default. Custom rules must be added to get use from the trigger and it must then be fired from the outside. See the Bre Event services
+     * @summary Create a trigger
      * @param breTriggerResource The BRE trigger resource object
      */
     public createBRETrigger(breTriggerResource?: models.BreTriggerResource, extraHttpRequestParams?: any): Observable<models.BreTriggerResource> {
@@ -51,14 +52,14 @@ export class BRERuleEngineTriggersApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Delete a trigger
      * May fail if there are existing rules against it. Cannot delete core triggers
+     * @summary Delete a trigger
      * @param eventName The trigger event name
      */
     public deleteBRETrigger(eventName: string, extraHttpRequestParams?: any): Observable<{}> {
@@ -67,14 +68,14 @@ export class BRERuleEngineTriggersApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Get a single trigger
      * 
+     * @summary Get a single trigger
      * @param eventName The trigger event name
      */
     public getBRETrigger(eventName: string, extraHttpRequestParams?: any): Observable<models.BreTriggerResource> {
@@ -83,14 +84,14 @@ export class BRERuleEngineTriggersApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * List triggers
      * 
+     * @summary List triggers
      * @param filterSystem Filter for triggers that are system triggers when true, or not when false. Leave off for both mixed
      * @param filterCategory Filter for triggers that are within a specific category
      * @param filterTags Filter for triggers that have all of the given tags (comma separated list)
@@ -105,14 +106,14 @@ export class BRERuleEngineTriggersApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Update a trigger
      * May fail if new parameters mismatch requirements of existing rules. Cannot update core triggers
+     * @summary Update a trigger
      * @param eventName The trigger event name
      * @param breTriggerResource The BRE trigger resource object
      */
@@ -122,7 +123,7 @@ export class BRERuleEngineTriggersApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
@@ -163,9 +164,9 @@ export class BRERuleEngineTriggersApi {
             method: RequestMethod.Post,
             headers: headers,
             body: breTriggerResource == null ? '' : JSON.stringify(breTriggerResource), // https://github.com/angular/angular/issues/10612
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -211,9 +212,9 @@ export class BRERuleEngineTriggersApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Delete,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -259,9 +260,9 @@ export class BRERuleEngineTriggersApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Get,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -336,9 +337,9 @@ export class BRERuleEngineTriggersApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Get,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -388,9 +389,9 @@ export class BRERuleEngineTriggersApi {
             method: RequestMethod.Put,
             headers: headers,
             body: breTriggerResource == null ? '' : JSON.stringify(breTriggerResource), // https://github.com/angular/angular/issues/10612
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);

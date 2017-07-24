@@ -1,6 +1,6 @@
 /**
  * Knetik Platform API Documentation latest 
- * This is the spec for the Knetik API.  Use this in conjunction with the documentation found at https://knetikcloud.com
+ * This is the spec for the Knetik API.  Use this in conjunction with the documentation found at https://knetikcloud.com.
  *
  * OpenAPI spec version: latest 
  * Contact: support@knetik.com
@@ -9,6 +9,8 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
+
+/* tslint:disable:no-unused-variable member-ordering */
 
 import { Inject, Injectable, Optional }                      from '@angular/core';
 import { Http, Headers, URLSearchParams }                    from '@angular/http';
@@ -22,11 +24,10 @@ import * as models                                           from '../model/mode
 import { BASE_PATH, COLLECTION_FORMATS }                     from '../variables';
 import { Configuration }                                     from '../configuration';
 
-/* tslint:disable:no-unused-variable member-ordering */
-
 
 @Injectable()
 export class MediaVideosApi {
+
     protected basePath = 'https://sandbox.knetikcloud.com';
     public defaultHeaders: Headers = new Headers();
     public configuration: Configuration = new Configuration();
@@ -41,8 +42,8 @@ export class MediaVideosApi {
     }
 
     /**
-     * Adds a user to a video&#39;s whitelist
      * Whitelisted users can view video regardless of privacy setting.
+     * @summary Adds a user to a video's whitelist
      * @param id The video id
      * @param userId The user id
      */
@@ -52,14 +53,14 @@ export class MediaVideosApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Adds a new video in the system
      * 
+     * @summary Adds a new video in the system
      * @param videoResource The video object
      */
     public addVideo(videoResource?: models.VideoResource, extraHttpRequestParams?: any): Observable<models.VideoResource> {
@@ -68,14 +69,14 @@ export class MediaVideosApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Add a new video comment
      * 
+     * @summary Add a new video comment
      * @param videoId The video id 
      * @param commentResource The comment object
      */
@@ -85,14 +86,14 @@ export class MediaVideosApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Adds a contributor to a video
      * 
+     * @summary Adds a contributor to a video
      * @param videoId The video id
      * @param contributionResource The contribution object
      */
@@ -102,14 +103,14 @@ export class MediaVideosApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Add a new flag
      * 
+     * @summary Add a new flag
      * @param videoId The video id
      * @param reason The flag reason
      */
@@ -119,14 +120,14 @@ export class MediaVideosApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Adds one or more existing videos as related to this one
      * 
+     * @summary Adds one or more existing videos as related to this one
      * @param videoId The video id
      * @param videoRelationshipResource The video relationship object 
      */
@@ -136,14 +137,14 @@ export class MediaVideosApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Create a video disposition
      * 
+     * @summary Create a video disposition
      * @param videoId The video id
      * @param dispositionResource The disposition object
      */
@@ -153,14 +154,14 @@ export class MediaVideosApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Deletes a video from the system if no resources are attached to it
      * 
+     * @summary Deletes a video from the system if no resources are attached to it
      * @param id The video id
      */
     public deleteVideo(id: number, extraHttpRequestParams?: any): Observable<{}> {
@@ -169,14 +170,14 @@ export class MediaVideosApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Delete a video comment
      * 
+     * @summary Delete a video comment
      * @param videoId The video id
      * @param id The comment id
      */
@@ -186,14 +187,14 @@ export class MediaVideosApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Delete a video disposition
      * 
+     * @summary Delete a video disposition
      * @param dispositionId The disposition id
      */
     public deleteVideoDisposition(dispositionId: number, extraHttpRequestParams?: any): Observable<{}> {
@@ -202,14 +203,14 @@ export class MediaVideosApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Delete a flag
      * 
+     * @summary Delete a flag
      * @param videoId The video id
      */
     public deleteVideoFlag(videoId: number, extraHttpRequestParams?: any): Observable<{}> {
@@ -218,14 +219,14 @@ export class MediaVideosApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Delete a video&#39;s relationship
      * 
+     * @summary Delete a video's relationship
      * @param videoId The video id
      * @param id The relationship id
      */
@@ -235,14 +236,14 @@ export class MediaVideosApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Get user videos
      * 
+     * @summary Get user videos
      * @param userId The user id
      * @param excludeFlagged Skip videos that have been flagged by the current user
      * @param size The number of objects returned per page
@@ -254,14 +255,14 @@ export class MediaVideosApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Loads a specific video details
      * 
+     * @summary Loads a specific video details
      * @param id The video id
      */
     public getVideo(id: number, extraHttpRequestParams?: any): Observable<models.VideoResource> {
@@ -270,14 +271,14 @@ export class MediaVideosApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Returns a page of comments for a video
      * 
+     * @summary Returns a page of comments for a video
      * @param videoId The video id
      * @param size The number of objects returned per page
      * @param page The number of the page returned, starting with 1
@@ -288,14 +289,14 @@ export class MediaVideosApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Returns a page of dispositions for a video
      * 
+     * @summary Returns a page of dispositions for a video
      * @param videoId The video id
      * @param size The number of objects returned per page
      * @param page The number of the page returned, starting with 1
@@ -306,14 +307,14 @@ export class MediaVideosApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Returns a page of video relationships
      * 
+     * @summary Returns a page of video relationships
      * @param videoId The video id
      * @param size The number of objects returned per page
      * @param page The number of the page returned, starting with 1
@@ -324,14 +325,14 @@ export class MediaVideosApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Search videos using the documented filters
      * 
+     * @summary Search videos using the documented filters
      * @param excludeFlagged Skip videos that have been flagged by the current user
      * @param filterVideosByUploader Filter for videos by uploader id
      * @param filterCategory Filter for videos from a specific category by id
@@ -348,20 +349,20 @@ export class MediaVideosApi {
      * @param page The number of the page returned, starting with 1
      * @param order A comma separated list of sorting requirements in priority order, each entry matching PROPERTY_NAME:[ASC|DESC]
      */
-    public getVideos(excludeFlagged?: boolean, filterVideosByUploader?: models.models.ModelObject, filterCategory?: string, filterTagset?: string, filterVideosByName?: string, filterVideosByContributor?: models.models.ModelObject, filterVideosByAuthor?: models.models.ModelObject, filterHasAuthor?: boolean, filterHasUploader?: boolean, filterRelatedTo?: string, filterFriends?: boolean, filterDisposition?: string, size?: number, page?: number, order?: string, extraHttpRequestParams?: any): Observable<models.PageResourceVideoResource> {
+    public getVideos(excludeFlagged?: boolean, filterVideosByUploader?: number, filterCategory?: string, filterTagset?: string, filterVideosByName?: string, filterVideosByContributor?: number, filterVideosByAuthor?: number, filterHasAuthor?: boolean, filterHasUploader?: boolean, filterRelatedTo?: string, filterFriends?: boolean, filterDisposition?: string, size?: number, page?: number, order?: string, extraHttpRequestParams?: any): Observable<models.PageResourceVideoResource> {
         return this.getVideosWithHttpInfo(excludeFlagged, filterVideosByUploader, filterCategory, filterTagset, filterVideosByName, filterVideosByContributor, filterVideosByAuthor, filterHasAuthor, filterHasUploader, filterRelatedTo, filterFriends, filterDisposition, size, page, order, extraHttpRequestParams)
             .map((response: Response) => {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Removes a user from a video&#39;s whitelist
      * Remove the user with the id given in the path from the whitelist of users that can view this video regardless of privacy setting.
+     * @summary Removes a user from a video's whitelist
      * @param videoId The video id
      * @param id The user id
      */
@@ -371,14 +372,14 @@ export class MediaVideosApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Removes a contributor from a video
      * 
+     * @summary Removes a contributor from a video
      * @param videoId The video id
      * @param id The contributor id
      */
@@ -388,14 +389,14 @@ export class MediaVideosApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Modifies a video&#39;s details
      * 
+     * @summary Modifies a video's details
      * @param id The video id
      * @param videoResource The video object
      */
@@ -405,14 +406,14 @@ export class MediaVideosApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Update a video comment
      * 
+     * @summary Update a video comment
      * @param videoId The video id
      * @param id The comment id
      * @param content The comment content
@@ -423,14 +424,14 @@ export class MediaVideosApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Update a video&#39;s relationship details
      * 
+     * @summary Update a video's relationship details
      * @param videoId The video id
      * @param relationshipId The relationship id
      * @param details The video relationship details
@@ -441,14 +442,14 @@ export class MediaVideosApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Increment a video&#39;s view count
      * 
+     * @summary Increment a video's view count
      * @param id The video id
      */
     public viewVideo(id: number, extraHttpRequestParams?: any): Observable<{}> {
@@ -457,7 +458,7 @@ export class MediaVideosApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
@@ -504,9 +505,9 @@ export class MediaVideosApi {
             method: RequestMethod.Post,
             headers: headers,
             body: userId == null ? '' : JSON.stringify(userId), // https://github.com/angular/angular/issues/10612
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -550,9 +551,9 @@ export class MediaVideosApi {
             method: RequestMethod.Post,
             headers: headers,
             body: videoResource == null ? '' : JSON.stringify(videoResource), // https://github.com/angular/angular/issues/10612
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -602,9 +603,9 @@ export class MediaVideosApi {
             method: RequestMethod.Post,
             headers: headers,
             body: commentResource == null ? '' : JSON.stringify(commentResource), // https://github.com/angular/angular/issues/10612
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -654,9 +655,9 @@ export class MediaVideosApi {
             method: RequestMethod.Post,
             headers: headers,
             body: contributionResource == null ? '' : JSON.stringify(contributionResource), // https://github.com/angular/angular/issues/10612
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -706,9 +707,9 @@ export class MediaVideosApi {
             method: RequestMethod.Post,
             headers: headers,
             body: reason == null ? '' : JSON.stringify(reason), // https://github.com/angular/angular/issues/10612
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -758,9 +759,9 @@ export class MediaVideosApi {
             method: RequestMethod.Post,
             headers: headers,
             body: videoRelationshipResource == null ? '' : JSON.stringify(videoRelationshipResource), // https://github.com/angular/angular/issues/10612
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -810,9 +811,9 @@ export class MediaVideosApi {
             method: RequestMethod.Post,
             headers: headers,
             body: dispositionResource == null ? '' : JSON.stringify(dispositionResource), // https://github.com/angular/angular/issues/10612
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -858,9 +859,9 @@ export class MediaVideosApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Delete,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -912,9 +913,9 @@ export class MediaVideosApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Delete,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -960,9 +961,9 @@ export class MediaVideosApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Delete,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -1008,9 +1009,9 @@ export class MediaVideosApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Delete,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -1062,9 +1063,9 @@ export class MediaVideosApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Delete,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -1125,9 +1126,9 @@ export class MediaVideosApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Get,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -1173,9 +1174,9 @@ export class MediaVideosApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Get,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -1222,9 +1223,9 @@ export class MediaVideosApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Get,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -1271,9 +1272,9 @@ export class MediaVideosApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Get,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -1320,9 +1321,9 @@ export class MediaVideosApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Get,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -1350,7 +1351,7 @@ export class MediaVideosApi {
      * @param page The number of the page returned, starting with 1
      * @param order A comma separated list of sorting requirements in priority order, each entry matching PROPERTY_NAME:[ASC|DESC]
      */
-    public getVideosWithHttpInfo(excludeFlagged?: boolean, filterVideosByUploader?: models.models.ModelObject, filterCategory?: string, filterTagset?: string, filterVideosByName?: string, filterVideosByContributor?: models.models.ModelObject, filterVideosByAuthor?: models.models.ModelObject, filterHasAuthor?: boolean, filterHasUploader?: boolean, filterRelatedTo?: string, filterFriends?: boolean, filterDisposition?: string, size?: number, page?: number, order?: string, extraHttpRequestParams?: any): Observable<Response> {
+    public getVideosWithHttpInfo(excludeFlagged?: boolean, filterVideosByUploader?: number, filterCategory?: string, filterTagset?: string, filterVideosByName?: string, filterVideosByContributor?: number, filterVideosByAuthor?: number, filterHasAuthor?: boolean, filterHasUploader?: boolean, filterRelatedTo?: string, filterFriends?: boolean, filterDisposition?: string, size?: number, page?: number, order?: string, extraHttpRequestParams?: any): Observable<Response> {
         const path = this.basePath + '/media/videos';
 
         let queryParameters = new URLSearchParams();
@@ -1428,9 +1429,9 @@ export class MediaVideosApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Get,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -1482,9 +1483,9 @@ export class MediaVideosApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Delete,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -1536,9 +1537,9 @@ export class MediaVideosApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Delete,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -1588,9 +1589,9 @@ export class MediaVideosApi {
             method: RequestMethod.Put,
             headers: headers,
             body: videoResource == null ? '' : JSON.stringify(videoResource), // https://github.com/angular/angular/issues/10612
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -1646,9 +1647,9 @@ export class MediaVideosApi {
             method: RequestMethod.Put,
             headers: headers,
             body: content == null ? '' : JSON.stringify(content), // https://github.com/angular/angular/issues/10612
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -1704,9 +1705,9 @@ export class MediaVideosApi {
             method: RequestMethod.Put,
             headers: headers,
             body: details == null ? '' : JSON.stringify(details), // https://github.com/angular/angular/issues/10612
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -1743,9 +1744,9 @@ export class MediaVideosApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Post,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);

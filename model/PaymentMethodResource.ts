@@ -1,6 +1,6 @@
 /**
  * Knetik Platform API Documentation latest 
- * This is the spec for the Knetik API.  Use this in conjunction with the documentation found at https://knetikcloud.com
+ * This is the spec for the Knetik API.  Use this in conjunction with the documentation found at https://knetikcloud.com.
  *
  * OpenAPI spec version: latest 
  * Contact: support@knetik.com
@@ -41,7 +41,7 @@ export interface PaymentMethodResource {
     expirationYear?: number;
 
     /**
-     * The unique ID for that resource
+     * The unique ID of the resource
      */
     id?: number;
 
@@ -51,12 +51,7 @@ export interface PaymentMethodResource {
     last4?: string;
 
     /**
-     * The user friendly name of that resource. Defaults to blank string
-     */
-    longDescription?: string;
-
-    /**
-     * The user friendly name of that resource
+     * The user friendly name of the resource
      */
     name: string;
 
@@ -69,11 +64,6 @@ export interface PaymentMethodResource {
      * The generic payment type. Default is card
      */
     paymentType?: PaymentMethodResource.PaymentTypeEnum;
-
-    /**
-     * The user friendly name of that resource. Defaults to blank string
-     */
-    shortDescription?: string;
 
     /**
      * The sort value for the payment method

@@ -1,6 +1,6 @@
 /**
  * Knetik Platform API Documentation latest 
- * This is the spec for the Knetik API.  Use this in conjunction with the documentation found at https://knetikcloud.com
+ * This is the spec for the Knetik API.  Use this in conjunction with the documentation found at https://knetikcloud.com.
  *
  * OpenAPI spec version: latest 
  * Contact: support@knetik.com
@@ -9,6 +9,8 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
+
+/* tslint:disable:no-unused-variable member-ordering */
 
 import { Inject, Injectable, Optional }                      from '@angular/core';
 import { Http, Headers, URLSearchParams }                    from '@angular/http';
@@ -22,11 +24,10 @@ import * as models                                           from '../model/mode
 import { BASE_PATH, COLLECTION_FORMATS }                     from '../variables';
 import { Configuration }                                     from '../configuration';
 
-/* tslint:disable:no-unused-variable member-ordering */
-
 
 @Injectable()
 export class GamificationTriviaApi {
+
     protected basePath = 'https://sandbox.knetikcloud.com';
     public defaultHeaders: Headers = new Headers();
     public configuration: Configuration = new Configuration();
@@ -41,8 +42,8 @@ export class GamificationTriviaApi {
     }
 
     /**
-     * Add an answer to a question
      * 
+     * @summary Add an answer to a question
      * @param questionId The id of the question
      * @param answer The new answer
      */
@@ -52,14 +53,14 @@ export class GamificationTriviaApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Add a tag to a question
      * 
+     * @summary Add a tag to a question
      * @param id The id of the question
      * @param tag The new tag
      */
@@ -69,14 +70,14 @@ export class GamificationTriviaApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Add a tag to a batch of questions
-     * All questions that dont&#39;t have the tag and match filters will have it added. The returned number is the number of questions updated.
+     * All questions that dont't have the tag and match filters will have it added. The returned number is the number of questions updated.
+     * @summary Add a tag to a batch of questions
      * @param tag The tag to add
      * @param filterSearch Filter for documents whose question, answers or tags contains provided string
      * @param filterIdset Filter for documents whose id is in the comma separated list provided
@@ -93,14 +94,14 @@ export class GamificationTriviaApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Create an import job
      * Set up a job to import a set of trivia questions from a cvs file at a remote url. the file will be validated asynchronously but will not be processed until started manually with the process endpoint.
+     * @summary Create an import job
      * @param request The new import job
      */
     public createImportJob(request?: models.ImportJobResource, extraHttpRequestParams?: any): Observable<models.ImportJobResource> {
@@ -109,14 +110,14 @@ export class GamificationTriviaApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Create a question
      * 
+     * @summary Create a question
      * @param question The new question
      */
     public createQuestion(question?: models.QuestionResource, extraHttpRequestParams?: any): Observable<models.QuestionResource> {
@@ -125,14 +126,14 @@ export class GamificationTriviaApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Create a question template
      * Question templates define a type of question and the properties they have
+     * @summary Create a question template
      * @param questionTemplateResource The question template resource object
      */
     public createQuestionTemplate(questionTemplateResource?: models.QuestionTemplateResource, extraHttpRequestParams?: any): Observable<models.QuestionTemplateResource> {
@@ -141,14 +142,14 @@ export class GamificationTriviaApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Delete an import job
      * Also deletes all questions that were imported by it
+     * @summary Delete an import job
      * @param id The id of the job
      */
     public deleteImportJob(id: number, extraHttpRequestParams?: any): Observable<{}> {
@@ -157,14 +158,14 @@ export class GamificationTriviaApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Delete a question
      * 
+     * @summary Delete a question
      * @param id The id of the question
      */
     public deleteQuestion(id: string, extraHttpRequestParams?: any): Observable<{}> {
@@ -173,14 +174,14 @@ export class GamificationTriviaApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Remove an answer from a question
      * 
+     * @summary Remove an answer from a question
      * @param questionId The id of the question
      * @param id The id of the answer
      */
@@ -190,14 +191,14 @@ export class GamificationTriviaApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Delete a question template
-     * If cascade &#x3D; &#39;detach&#39;, it will force delete the template even if it&#39;s attached to other objects
+     * If cascade = 'detach', it will force delete the template even if it's attached to other objects
+     * @summary Delete a question template
      * @param id The id of the template
      * @param cascade The value needed to delete used templates
      */
@@ -207,14 +208,14 @@ export class GamificationTriviaApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Get an import job
      * 
+     * @summary Get an import job
      * @param id The id of the job
      */
     public getImportJob(id: number, extraHttpRequestParams?: any): Observable<models.ImportJobResource> {
@@ -223,14 +224,14 @@ export class GamificationTriviaApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Get a list of import job
      * 
+     * @summary Get a list of import job
      * @param filterVendor Filter for jobs by vendor id
      * @param filterCategory Filter for jobs by category id
      * @param filterName Filter for jobs which name *STARTS* with the given string
@@ -245,14 +246,14 @@ export class GamificationTriviaApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Get a single question
      * 
+     * @summary Get a single question
      * @param id The id of the question
      */
     public getQuestion(id: string, extraHttpRequestParams?: any): Observable<models.QuestionResource> {
@@ -261,14 +262,14 @@ export class GamificationTriviaApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Get an answer for a question
      * 
+     * @summary Get an answer for a question
      * @param questionId The id of the question
      * @param id The id of the answer
      */
@@ -278,14 +279,14 @@ export class GamificationTriviaApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * List the answers available for a question
      * 
+     * @summary List the answers available for a question
      * @param questionId The id of the question
      */
     public getQuestionAnswers(questionId: string, extraHttpRequestParams?: any): Observable<Array<models.AnswerResource>> {
@@ -294,14 +295,14 @@ export class GamificationTriviaApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * List question deltas in ascending order of updated date
-     * The &#39;since&#39; parameter is important to avoid getting a full list of all questions. Implementors should make sure they pass the updated date of the last resource loaded, not the date of the last request, in order to avoid gaps
+     * The 'since' parameter is important to avoid getting a full list of all questions. Implementors should make sure they pass the updated date of the last resource loaded, not the date of the last request, in order to avoid gaps
+     * @summary List question deltas in ascending order of updated date
      * @param since Timestamp in seconds
      */
     public getQuestionDeltas(since?: number, extraHttpRequestParams?: any): Observable<Array<models.DeltaResource>> {
@@ -310,14 +311,14 @@ export class GamificationTriviaApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * List the tags for a question
      * 
+     * @summary List the tags for a question
      * @param id The id of the question
      */
     public getQuestionTags(id: string, extraHttpRequestParams?: any): Observable<Array<string>> {
@@ -326,14 +327,14 @@ export class GamificationTriviaApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Get a single question template
      * 
+     * @summary Get a single question template
      * @param id The id of the template
      */
     public getQuestionTemplate(id: string, extraHttpRequestParams?: any): Observable<models.QuestionTemplateResource> {
@@ -342,14 +343,14 @@ export class GamificationTriviaApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * List and search question templates
      * 
+     * @summary List and search question templates
      * @param size The number of objects returned per page
      * @param page The number of the page returned, starting with 1
      * @param order A comma separated list of sorting requirements in priority order, each entry matching PROPERTY_NAME:[ASC|DESC]
@@ -360,14 +361,14 @@ export class GamificationTriviaApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * List and search questions
      * 
+     * @summary List and search questions
      * @param size The number of objects returned per page
      * @param page The number of the page returned, starting with 1
      * @param order A comma separated list of sorting requirements in priority order, each entry matching PROPERTY_NAME:[ASC|DESC]
@@ -386,14 +387,14 @@ export class GamificationTriviaApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Count questions based on filters
-     * This is also provided by the list endpoint so you don&#39;t need to call this for pagination purposes
+     * This is also provided by the list endpoint so you don't need to call this for pagination purposes
+     * @summary Count questions based on filters
      * @param filterSearch Filter for documents whose question, answers or tags contains provided string
      * @param filterIdset Filter for documents whose id is in the comma separated list provided
      * @param filterCategory Filter for questions with specified category, by id
@@ -408,14 +409,14 @@ export class GamificationTriviaApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Start processing an import job
-     * Will process the CSV file and add new questions asynchronously. The status of the job must be &#39;VALID&#39;.
+     * Will process the CSV file and add new questions asynchronously. The status of the job must be 'VALID'.
+     * @summary Start processing an import job
      * @param id The id of the job
      * @param publishNow Whether the new questions should be published live immediately
      */
@@ -425,14 +426,14 @@ export class GamificationTriviaApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Remove a tag from a question
      * 
+     * @summary Remove a tag from a question
      * @param id The id of the question
      * @param tag The tag to remove
      */
@@ -442,14 +443,14 @@ export class GamificationTriviaApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Remove a tag from a batch of questions
      * ll questions that have the tag and match filters will have it removed. The returned number is the number of questions updated.
+     * @summary Remove a tag from a batch of questions
      * @param tag The tag to remove
      * @param filterSearch Filter for documents whose question, answers or tags contains provided string
      * @param filterIdset Filter for documents whose id is in the comma separated list provided
@@ -466,14 +467,14 @@ export class GamificationTriviaApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * List and search tags by the beginning of the string
-     * For performance reasons, search &amp; category filters are mutually exclusive. If category is specified, search filter will be ignored in order to do fast matches for typeahead.
+     * For performance reasons, search & category filters are mutually exclusive. If category is specified, search filter will be ignored in order to do fast matches for typeahead.
+     * @summary List and search tags by the beginning of the string
      * @param filterSearch Filter for tags starting with the given text
      * @param filterCategory Filter for tags on questions from a specific category
      * @param filterImportId Filter for tags on questions from a specific import job
@@ -484,14 +485,14 @@ export class GamificationTriviaApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Update an import job
      * Changes should be made before process is started for there to be any effect.
+     * @summary Update an import job
      * @param id The id of the job
      * @param request The updated job
      */
@@ -501,14 +502,14 @@ export class GamificationTriviaApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Update a question
      * 
+     * @summary Update a question
      * @param id The id of the question
      * @param question The updated question
      */
@@ -518,14 +519,14 @@ export class GamificationTriviaApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Update an answer for a question
      * 
+     * @summary Update an answer for a question
      * @param questionId The id of the question
      * @param id The id of the answer
      * @param answer The updated answer
@@ -536,14 +537,14 @@ export class GamificationTriviaApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Update a question template
      * 
+     * @summary Update a question template
      * @param id The id of the template
      * @param questionTemplateResource The question template resource object
      */
@@ -553,14 +554,14 @@ export class GamificationTriviaApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Bulk update questions
      * Will update all questions that match filters used (or all questions in system if no filters used). Body should match a question resource with only those properties you wish to set. Null values will be ignored. Returned number is how many were updated.
+     * @summary Bulk update questions
      * @param question New values for a set of question fields
      * @param filterSearch Filter for documents whose question, answers or tags contains provided string
      * @param filterIdset Filter for documents whose id is in the comma separated list provided
@@ -576,7 +577,7 @@ export class GamificationTriviaApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
@@ -623,9 +624,9 @@ export class GamificationTriviaApi {
             method: RequestMethod.Post,
             headers: headers,
             body: answer == null ? '' : JSON.stringify(answer), // https://github.com/angular/angular/issues/10612
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -675,9 +676,9 @@ export class GamificationTriviaApi {
             method: RequestMethod.Post,
             headers: headers,
             body: tag == null ? '' : JSON.stringify(tag), // https://github.com/angular/angular/issues/10612
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -761,9 +762,9 @@ export class GamificationTriviaApi {
             method: RequestMethod.Post,
             headers: headers,
             body: tag == null ? '' : JSON.stringify(tag), // https://github.com/angular/angular/issues/10612
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -807,9 +808,9 @@ export class GamificationTriviaApi {
             method: RequestMethod.Post,
             headers: headers,
             body: request == null ? '' : JSON.stringify(request), // https://github.com/angular/angular/issues/10612
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -853,9 +854,9 @@ export class GamificationTriviaApi {
             method: RequestMethod.Post,
             headers: headers,
             body: question == null ? '' : JSON.stringify(question), // https://github.com/angular/angular/issues/10612
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -899,9 +900,9 @@ export class GamificationTriviaApi {
             method: RequestMethod.Post,
             headers: headers,
             body: questionTemplateResource == null ? '' : JSON.stringify(questionTemplateResource), // https://github.com/angular/angular/issues/10612
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -947,9 +948,9 @@ export class GamificationTriviaApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Delete,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -995,9 +996,9 @@ export class GamificationTriviaApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Delete,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -1049,9 +1050,9 @@ export class GamificationTriviaApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Delete,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -1102,9 +1103,9 @@ export class GamificationTriviaApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Delete,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -1150,9 +1151,9 @@ export class GamificationTriviaApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Get,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -1227,9 +1228,9 @@ export class GamificationTriviaApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Get,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -1275,9 +1276,9 @@ export class GamificationTriviaApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Get,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -1329,9 +1330,9 @@ export class GamificationTriviaApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Get,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -1377,9 +1378,9 @@ export class GamificationTriviaApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Get,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -1424,9 +1425,9 @@ export class GamificationTriviaApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Get,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -1472,9 +1473,9 @@ export class GamificationTriviaApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Get,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -1520,9 +1521,9 @@ export class GamificationTriviaApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Get,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -1577,9 +1578,9 @@ export class GamificationTriviaApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Get,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -1674,9 +1675,9 @@ export class GamificationTriviaApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Get,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -1751,9 +1752,9 @@ export class GamificationTriviaApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Get,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -1808,9 +1809,9 @@ export class GamificationTriviaApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Post,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -1862,9 +1863,9 @@ export class GamificationTriviaApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Delete,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -1950,9 +1951,9 @@ export class GamificationTriviaApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Delete,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -2007,9 +2008,9 @@ export class GamificationTriviaApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Get,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -2059,9 +2060,9 @@ export class GamificationTriviaApi {
             method: RequestMethod.Put,
             headers: headers,
             body: request == null ? '' : JSON.stringify(request), // https://github.com/angular/angular/issues/10612
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -2111,9 +2112,9 @@ export class GamificationTriviaApi {
             method: RequestMethod.Put,
             headers: headers,
             body: question == null ? '' : JSON.stringify(question), // https://github.com/angular/angular/issues/10612
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -2169,9 +2170,9 @@ export class GamificationTriviaApi {
             method: RequestMethod.Put,
             headers: headers,
             body: answer == null ? '' : JSON.stringify(answer), // https://github.com/angular/angular/issues/10612
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -2221,9 +2222,9 @@ export class GamificationTriviaApi {
             method: RequestMethod.Put,
             headers: headers,
             body: questionTemplateResource == null ? '' : JSON.stringify(questionTemplateResource), // https://github.com/angular/angular/issues/10612
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -2302,9 +2303,9 @@ export class GamificationTriviaApi {
             method: RequestMethod.Put,
             headers: headers,
             body: question == null ? '' : JSON.stringify(question), // https://github.com/angular/angular/issues/10612
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);

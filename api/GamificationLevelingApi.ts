@@ -1,6 +1,6 @@
 /**
  * Knetik Platform API Documentation latest 
- * This is the spec for the Knetik API.  Use this in conjunction with the documentation found at https://knetikcloud.com
+ * This is the spec for the Knetik API.  Use this in conjunction with the documentation found at https://knetikcloud.com.
  *
  * OpenAPI spec version: latest 
  * Contact: support@knetik.com
@@ -9,6 +9,8 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
+
+/* tslint:disable:no-unused-variable member-ordering */
 
 import { Inject, Injectable, Optional }                      from '@angular/core';
 import { Http, Headers, URLSearchParams }                    from '@angular/http';
@@ -22,11 +24,10 @@ import * as models                                           from '../model/mode
 import { BASE_PATH, COLLECTION_FORMATS }                     from '../variables';
 import { Configuration }                                     from '../configuration';
 
-/* tslint:disable:no-unused-variable member-ordering */
-
 
 @Injectable()
 export class GamificationLevelingApi {
+
     protected basePath = 'https://sandbox.knetikcloud.com';
     public defaultHeaders: Headers = new Headers();
     public configuration: Configuration = new Configuration();
@@ -41,8 +42,8 @@ export class GamificationLevelingApi {
     }
 
     /**
-     * Create a level schema
      * 
+     * @summary Create a level schema
      * @param level The level schema definition
      */
     public createLevel(level?: models.LevelingResource, extraHttpRequestParams?: any): Observable<models.LevelingResource> {
@@ -51,14 +52,14 @@ export class GamificationLevelingApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Delete a level
      * 
+     * @summary Delete a level
      * @param name The level schema name
      */
     public deleteLevel(name: string, extraHttpRequestParams?: any): Observable<{}> {
@@ -67,14 +68,14 @@ export class GamificationLevelingApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Retrieve a level
      * 
+     * @summary Retrieve a level
      * @param name The level schema name
      */
     public getLevel(name: string, extraHttpRequestParams?: any): Observable<models.LevelingResource> {
@@ -83,14 +84,14 @@ export class GamificationLevelingApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Get the list of triggers that can be used to trigger a leveling progress update
      * 
+     * @summary Get the list of triggers that can be used to trigger a leveling progress update
      */
     public getLevelTriggers(extraHttpRequestParams?: any): Observable<Array<models.BreTriggerResource>> {
         return this.getLevelTriggersWithHttpInfo(extraHttpRequestParams)
@@ -98,14 +99,14 @@ export class GamificationLevelingApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * List and search levels
      * Get a list of levels schemas with optional filtering
+     * @summary List and search levels
      * @param filterName Filter for level schemas whose name contains a given string
      * @param size The number of objects returned per page
      * @param page The number of the page returned, starting with 1
@@ -117,14 +118,14 @@ export class GamificationLevelingApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Get a user&#39;s progress for a given level schema
      * 
+     * @summary Get a user's progress for a given level schema
      * @param userId The id of the user
      * @param name The level schema name
      */
@@ -134,14 +135,14 @@ export class GamificationLevelingApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Get a user&#39;s progress for all level schemas
      * Filtering and sorting is based on the LevelingResource object, not the UserLevelingResource that is returned here.
+     * @summary Get a user's progress for all level schemas
      * @param userId The id of the user
      * @param filterName Filter for level schemas whose name contains a given string
      * @param size The number of objects returned per page
@@ -154,14 +155,14 @@ export class GamificationLevelingApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Update or create a leveling progress record for a user
-     * If no progress record yet exists for the user, it will be created. Otherwise the provided value will be added to it. May be negative. If progress meets or exceeds the level&#39;s max_value it will be marked as earned and a BRE event will be triggered for the &lt;code&gt;BreAchievementEarnedTrigger&lt;/code&gt;.
+     * If no progress record yet exists for the user, it will be created. Otherwise the provided value will be added to it. May be negative. If progress meets or exceeds the level's max_value it will be marked as earned and a BRE event will be triggered for the <code>BreAchievementEarnedTrigger</code>.
+     * @summary Update or create a leveling progress record for a user
      * @param userId The id of the user
      * @param name The level schema name
      * @param progress The amount of progress to add
@@ -172,14 +173,14 @@ export class GamificationLevelingApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Set leveling progress for a user
-     * If no progress record yet exists for the user, it will be created. Otherwise it will be updated to the provided value. If progress meets or exceeds the level&#39;s max_value it will be marked as earned and a BRE event will be triggered for the &lt;code&gt;BreAchievementEarnedTrigger&lt;/code&gt;.
+     * If no progress record yet exists for the user, it will be created. Otherwise it will be updated to the provided value. If progress meets or exceeds the level's max_value it will be marked as earned and a BRE event will be triggered for the <code>BreAchievementEarnedTrigger</code>.
+     * @summary Set leveling progress for a user
      * @param userId The id of the user
      * @param name The level schema name
      * @param progress The new progress amount
@@ -190,14 +191,14 @@ export class GamificationLevelingApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Update a level
      * 
+     * @summary Update a level
      * @param name The level schema name
      * @param newLevel The level schema definition
      */
@@ -207,7 +208,7 @@ export class GamificationLevelingApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
@@ -248,9 +249,9 @@ export class GamificationLevelingApi {
             method: RequestMethod.Post,
             headers: headers,
             body: level == null ? '' : JSON.stringify(level), // https://github.com/angular/angular/issues/10612
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -296,9 +297,9 @@ export class GamificationLevelingApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Delete,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -344,9 +345,9 @@ export class GamificationLevelingApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Get,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -386,9 +387,9 @@ export class GamificationLevelingApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Get,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -448,9 +449,9 @@ export class GamificationLevelingApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Get,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -502,9 +503,9 @@ export class GamificationLevelingApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Get,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -570,9 +571,9 @@ export class GamificationLevelingApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Get,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -628,9 +629,9 @@ export class GamificationLevelingApi {
             method: RequestMethod.Post,
             headers: headers,
             body: progress == null ? '' : JSON.stringify(progress), // https://github.com/angular/angular/issues/10612
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -686,9 +687,9 @@ export class GamificationLevelingApi {
             method: RequestMethod.Put,
             headers: headers,
             body: progress == null ? '' : JSON.stringify(progress), // https://github.com/angular/angular/issues/10612
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -738,9 +739,9 @@ export class GamificationLevelingApi {
             method: RequestMethod.Put,
             headers: headers,
             body: newLevel == null ? '' : JSON.stringify(newLevel), // https://github.com/angular/angular/issues/10612
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);

@@ -1,6 +1,6 @@
 /**
  * Knetik Platform API Documentation latest 
- * This is the spec for the Knetik API.  Use this in conjunction with the documentation found at https://knetikcloud.com
+ * This is the spec for the Knetik API.  Use this in conjunction with the documentation found at https://knetikcloud.com.
  *
  * OpenAPI spec version: latest 
  * Contact: support@knetik.com
@@ -9,6 +9,8 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
+
+/* tslint:disable:no-unused-variable member-ordering */
 
 import { Inject, Injectable, Optional }                      from '@angular/core';
 import { Http, Headers, URLSearchParams }                    from '@angular/http';
@@ -22,11 +24,10 @@ import * as models                                           from '../model/mode
 import { BASE_PATH, COLLECTION_FORMATS }                     from '../variables';
 import { Configuration }                                     from '../configuration';
 
-/* tslint:disable:no-unused-variable member-ordering */
-
 
 @Injectable()
 export class BRERuleEngineGlobalsApi {
+
     protected basePath = 'https://sandbox.knetikcloud.com';
     public defaultHeaders: Headers = new Headers();
     public configuration: Configuration = new Configuration();
@@ -41,8 +42,8 @@ export class BRERuleEngineGlobalsApi {
     }
 
     /**
-     * Create a global definition
      * Once created you can then use in a custom rule. Note that global definitions cannot be modified or deleted if in use.
+     * @summary Create a global definition
      * @param breGlobalResource The BRE global resource object
      */
     public createBREGlobal(breGlobalResource?: models.BreGlobalResource, extraHttpRequestParams?: any): Observable<models.BreGlobalResource> {
@@ -51,14 +52,14 @@ export class BRERuleEngineGlobalsApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Delete a global
      * May fail if there are existing rules against it. Cannot delete core globals
+     * @summary Delete a global
      * @param id The id of the global definition
      */
     public deleteBREGlobal(id: string, extraHttpRequestParams?: any): Observable<{}> {
@@ -67,14 +68,14 @@ export class BRERuleEngineGlobalsApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Get a single global definition
      * 
+     * @summary Get a single global definition
      * @param id The id of the global definition
      */
     public getBREGlobal(id: string, extraHttpRequestParams?: any): Observable<models.BreGlobalResource> {
@@ -83,14 +84,14 @@ export class BRERuleEngineGlobalsApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * List global definitions
      * 
+     * @summary List global definitions
      * @param filterSystem Filter for globals that are system globals when true, or not when false. Leave off for both mixed
      * @param size The number of objects returned per page
      * @param page The number of the page returned, starting with 1
@@ -101,14 +102,14 @@ export class BRERuleEngineGlobalsApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Update a global definition
      * May fail if new parameters mismatch requirements of existing rules. Cannot update core globals
+     * @summary Update a global definition
      * @param id The id of the global definition
      * @param breGlobalResource The BRE global resource object
      */
@@ -118,7 +119,7 @@ export class BRERuleEngineGlobalsApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
@@ -159,9 +160,9 @@ export class BRERuleEngineGlobalsApi {
             method: RequestMethod.Post,
             headers: headers,
             body: breGlobalResource == null ? '' : JSON.stringify(breGlobalResource), // https://github.com/angular/angular/issues/10612
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -207,9 +208,9 @@ export class BRERuleEngineGlobalsApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Delete,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -255,9 +256,9 @@ export class BRERuleEngineGlobalsApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Get,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -312,9 +313,9 @@ export class BRERuleEngineGlobalsApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Get,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -364,9 +365,9 @@ export class BRERuleEngineGlobalsApi {
             method: RequestMethod.Put,
             headers: headers,
             body: breGlobalResource == null ? '' : JSON.stringify(breGlobalResource), // https://github.com/angular/angular/issues/10612
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);

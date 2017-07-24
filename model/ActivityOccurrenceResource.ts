@@ -1,6 +1,6 @@
 /**
  * Knetik Platform API Documentation latest 
- * This is the spec for the Knetik API.  Use this in conjunction with the documentation found at https://knetikcloud.com
+ * This is the spec for the Knetik API.  Use this in conjunction with the documentation found at https://knetikcloud.com.
  *
  * OpenAPI spec version: latest 
  * Contact: support@knetik.com
@@ -12,7 +12,10 @@
 
 import * as models from './models';
 
-export interface AOccurrenceOfAnActivityTheActualGameForExampleUsedToTrackScoresParticipantsAndProvideSettings {
+/**
+ * A occurrence of an activity (the actual game for example). Used to track scores, participants, and provide settings
+ */
+export interface ActivityOccurrenceResource {
     /**
      * The id of the activity
      */
@@ -46,7 +49,7 @@ export interface AOccurrenceOfAnActivityTheActualGameForExampleUsedToTrackScores
     /**
      * Indicate if the rewards have been given out already
      */
-    rewardStatus?: AOccurrenceOfAnActivityTheActualGameForExampleUsedToTrackScoresParticipantsAndProvideSettings.RewardStatusEnum;
+    rewardStatus?: ActivityOccurrenceResource.RewardStatusEnum;
 
     /**
      * The values selected from the available settings defined for the activity. Ex: difficulty: hard. Can be left out if the activity is played during an event and the settings are already set at the event level. Ex: every monday, difficulty: hard, number of questions: 10, category: sport. Otherwise, the set must exactly match those of the activity.
@@ -66,7 +69,7 @@ export interface AOccurrenceOfAnActivityTheActualGameForExampleUsedToTrackScores
     /**
      * The current status of the occurrence (default: OPEN)
      */
-    status?: AOccurrenceOfAnActivityTheActualGameForExampleUsedToTrackScoresParticipantsAndProvideSettings.StatusEnum;
+    status?: ActivityOccurrenceResource.StatusEnum;
 
     /**
      * The date this occurrence was last updated, unix timestamp in seconds
@@ -79,7 +82,7 @@ export interface AOccurrenceOfAnActivityTheActualGameForExampleUsedToTrackScores
     users?: Array<models.ActivityUserResource>;
 
 }
-export namespace AOccurrenceOfAnActivityTheActualGameForExampleUsedToTrackScoresParticipantsAndProvideSettings {
+export namespace ActivityOccurrenceResource {
     export enum RewardStatusEnum {
         Pending = <any> 'pending',
         Failed = <any> 'failed',

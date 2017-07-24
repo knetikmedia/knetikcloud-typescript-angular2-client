@@ -1,6 +1,6 @@
 /**
  * Knetik Platform API Documentation latest 
- * This is the spec for the Knetik API.  Use this in conjunction with the documentation found at https://knetikcloud.com
+ * This is the spec for the Knetik API.  Use this in conjunction with the documentation found at https://knetikcloud.com.
  *
  * OpenAPI spec version: latest 
  * Contact: support@knetik.com
@@ -9,6 +9,8 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
+
+/* tslint:disable:no-unused-variable member-ordering */
 
 import { Inject, Injectable, Optional }                      from '@angular/core';
 import { Http, Headers, URLSearchParams }                    from '@angular/http';
@@ -22,11 +24,10 @@ import * as models                                           from '../model/mode
 import { BASE_PATH, COLLECTION_FORMATS }                     from '../variables';
 import { Configuration }                                     from '../configuration';
 
-/* tslint:disable:no-unused-variable member-ordering */
-
 
 @Injectable()
 export class MessagingApi {
+
     protected basePath = 'https://sandbox.knetikcloud.com';
     public defaultHeaders: Headers = new Headers();
     public configuration: Configuration = new Configuration();
@@ -41,8 +42,8 @@ export class MessagingApi {
     }
 
     /**
-     * Send a raw email to one or more users
      * 
+     * @summary Send a raw email to one or more users
      * @param rawEmailResource The new raw email to be sent
      */
     public sendRawEmail(rawEmailResource?: models.RawEmailResource, extraHttpRequestParams?: any): Observable<{}> {
@@ -51,14 +52,14 @@ export class MessagingApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Send a raw SMS
-     * Sends a raw SMS text message to one or more users. User&#39;s without registered mobile numbers will be skipped.
+     * Sends a raw SMS text message to one or more users. User's without registered mobile numbers will be skipped.
+     * @summary Send a raw SMS
      * @param rawSMSResource The new raw SMS to be sent
      */
     public sendRawSMS(rawSMSResource?: models.RawSMSResource, extraHttpRequestParams?: any): Observable<{}> {
@@ -67,14 +68,14 @@ export class MessagingApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Send a templated email to one or more users
      * 
+     * @summary Send a templated email to one or more users
      * @param messageResource The new template email to be sent
      */
     public sendTemplatedEmail(messageResource?: models.TemplateEmailResource, extraHttpRequestParams?: any): Observable<{}> {
@@ -83,14 +84,14 @@ export class MessagingApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Send a new templated SMS
-     * Sends a templated SMS text message to one or more users. User&#39;s without registered mobile numbers will be skipped.
+     * Sends a templated SMS text message to one or more users. User's without registered mobile numbers will be skipped.
+     * @summary Send a new templated SMS
      * @param templateSMSResource The new template SMS to be sent
      */
     public sendTemplatedSMS(templateSMSResource?: models.TemplateSMSResource, extraHttpRequestParams?: any): Observable<{}> {
@@ -99,7 +100,7 @@ export class MessagingApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
@@ -140,9 +141,9 @@ export class MessagingApi {
             method: RequestMethod.Post,
             headers: headers,
             body: rawEmailResource == null ? '' : JSON.stringify(rawEmailResource), // https://github.com/angular/angular/issues/10612
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -186,9 +187,9 @@ export class MessagingApi {
             method: RequestMethod.Post,
             headers: headers,
             body: rawSMSResource == null ? '' : JSON.stringify(rawSMSResource), // https://github.com/angular/angular/issues/10612
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -232,9 +233,9 @@ export class MessagingApi {
             method: RequestMethod.Post,
             headers: headers,
             body: messageResource == null ? '' : JSON.stringify(messageResource), // https://github.com/angular/angular/issues/10612
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -278,9 +279,9 @@ export class MessagingApi {
             method: RequestMethod.Post,
             headers: headers,
             body: templateSMSResource == null ? '' : JSON.stringify(templateSMSResource), // https://github.com/angular/angular/issues/10612
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);

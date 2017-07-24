@@ -1,6 +1,6 @@
 /**
  * Knetik Platform API Documentation latest 
- * This is the spec for the Knetik API.  Use this in conjunction with the documentation found at https://knetikcloud.com
+ * This is the spec for the Knetik API.  Use this in conjunction with the documentation found at https://knetikcloud.com.
  *
  * OpenAPI spec version: latest 
  * Contact: support@knetik.com
@@ -9,6 +9,8 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
+
+/* tslint:disable:no-unused-variable member-ordering */
 
 import { Inject, Injectable, Optional }                      from '@angular/core';
 import { Http, Headers, URLSearchParams }                    from '@angular/http';
@@ -22,11 +24,10 @@ import * as models                                           from '../model/mode
 import { BASE_PATH, COLLECTION_FORMATS }                     from '../variables';
 import { Configuration }                                     from '../configuration';
 
-/* tslint:disable:no-unused-variable member-ordering */
-
 
 @Injectable()
 export class ContentArticlesApi {
+
     protected basePath = 'https://sandbox.knetikcloud.com';
     public defaultHeaders: Headers = new Headers();
     public configuration: Configuration = new Configuration();
@@ -41,8 +42,8 @@ export class ContentArticlesApi {
     }
 
     /**
-     * Create a new article
      * Articles are blobs of text with titles, a category and assets. Formatting and display of the text is in the hands of the front end.
+     * @summary Create a new article
      * @param articleResource The new article
      */
     public createArticle(articleResource?: models.ArticleResource, extraHttpRequestParams?: any): Observable<models.ArticleResource> {
@@ -51,14 +52,14 @@ export class ContentArticlesApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Create an article template
      * Article Templates define a type of article and the properties they have
+     * @summary Create an article template
      * @param articleTemplateResource The article template resource object
      */
     public createArticleTemplate(articleTemplateResource?: models.TemplateResource, extraHttpRequestParams?: any): Observable<models.TemplateResource> {
@@ -67,14 +68,14 @@ export class ContentArticlesApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Delete an existing article
      * 
+     * @summary Delete an existing article
      * @param id The article id
      */
     public deleteArticle(id: string, extraHttpRequestParams?: any): Observable<{}> {
@@ -83,14 +84,14 @@ export class ContentArticlesApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Delete an article template
-     * If cascade &#x3D; &#39;detach&#39;, it will force delete the template even if it&#39;s attached to other objects
+     * If cascade = 'detach', it will force delete the template even if it's attached to other objects
+     * @summary Delete an article template
      * @param id The id of the template
      * @param cascade The value needed to delete used templates
      */
@@ -100,14 +101,14 @@ export class ContentArticlesApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Get a single article
      * 
+     * @summary Get a single article
      * @param id The article id
      */
     public getArticle(id: string, extraHttpRequestParams?: any): Observable<models.ArticleResource> {
@@ -116,14 +117,14 @@ export class ContentArticlesApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Get a single article template
      * 
+     * @summary Get a single article template
      * @param id The id of the template
      */
     public getArticleTemplate(id: string, extraHttpRequestParams?: any): Observable<models.TemplateResource> {
@@ -132,14 +133,14 @@ export class ContentArticlesApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * List and search article templates
      * 
+     * @summary List and search article templates
      * @param size The number of objects returned per page
      * @param page The number of the page returned, starting with 1
      * @param order A comma separated list of sorting requirements in priority order, each entry matching PROPERTY_NAME:[ASC|DESC]
@@ -150,35 +151,37 @@ export class ContentArticlesApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * List and search articles
-     * Get a list of articles with optional filtering. Assets will not be filled in on the resources returned. Use &#39;Get a single article&#39; to retrieve the full resource with assets for a given item as needed.
+     * Get a list of articles with optional filtering. Assets will not be filled in on the resources returned. Use 'Get a single article' to retrieve the full resource with assets for a given item as needed.
+     * @summary List and search articles
      * @param filterCategory Filter for articles from a specific category by id
-     * @param filterTagset Filter for articles with specified tags (separated by comma)
+     * @param filterTagset Filter for articles with at least one of a specified set of tags (separated by comma)
+     * @param filterTagIntersection Filter for articles with all of a specified set of tags (separated by comma)
+     * @param filterTagExclusion Filter for articles with none of a specified set of tags (separated by comma)
      * @param filterTitle Filter for articles whose title contains a string
      * @param size The number of objects returned per page
      * @param page The number of the page returned, starting with 1
      * @param order A comma separated list of sorting requirements in priority order, each entry matching PROPERTY_NAME:[ASC|DESC]
      */
-    public getArticles(filterCategory?: string, filterTagset?: string, filterTitle?: string, size?: number, page?: number, order?: string, extraHttpRequestParams?: any): Observable<models.PageResourceArticleResource> {
-        return this.getArticlesWithHttpInfo(filterCategory, filterTagset, filterTitle, size, page, order, extraHttpRequestParams)
+    public getArticles(filterCategory?: string, filterTagset?: string, filterTagIntersection?: string, filterTagExclusion?: string, filterTitle?: string, size?: number, page?: number, order?: string, extraHttpRequestParams?: any): Observable<models.PageResourceArticleResource> {
+        return this.getArticlesWithHttpInfo(filterCategory, filterTagset, filterTagIntersection, filterTagExclusion, filterTitle, size, page, order, extraHttpRequestParams)
             .map((response: Response) => {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Update an existing article
      * 
+     * @summary Update an existing article
      * @param id The article id
      * @param articleResource The article object
      */
@@ -188,14 +191,14 @@ export class ContentArticlesApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Update an article template
      * 
+     * @summary Update an article template
      * @param id The id of the template
      * @param articleTemplateResource The article template resource object
      */
@@ -205,7 +208,7 @@ export class ContentArticlesApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
@@ -246,9 +249,9 @@ export class ContentArticlesApi {
             method: RequestMethod.Post,
             headers: headers,
             body: articleResource == null ? '' : JSON.stringify(articleResource), // https://github.com/angular/angular/issues/10612
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -292,9 +295,9 @@ export class ContentArticlesApi {
             method: RequestMethod.Post,
             headers: headers,
             body: articleTemplateResource == null ? '' : JSON.stringify(articleTemplateResource), // https://github.com/angular/angular/issues/10612
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -340,9 +343,9 @@ export class ContentArticlesApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Delete,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -393,9 +396,9 @@ export class ContentArticlesApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Delete,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -432,9 +435,9 @@ export class ContentArticlesApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Get,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -480,9 +483,9 @@ export class ContentArticlesApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Get,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -537,9 +540,9 @@ export class ContentArticlesApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Get,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -552,13 +555,15 @@ export class ContentArticlesApi {
      * List and search articles
      * Get a list of articles with optional filtering. Assets will not be filled in on the resources returned. Use &#39;Get a single article&#39; to retrieve the full resource with assets for a given item as needed.
      * @param filterCategory Filter for articles from a specific category by id
-     * @param filterTagset Filter for articles with specified tags (separated by comma)
+     * @param filterTagset Filter for articles with at least one of a specified set of tags (separated by comma)
+     * @param filterTagIntersection Filter for articles with all of a specified set of tags (separated by comma)
+     * @param filterTagExclusion Filter for articles with none of a specified set of tags (separated by comma)
      * @param filterTitle Filter for articles whose title contains a string
      * @param size The number of objects returned per page
      * @param page The number of the page returned, starting with 1
      * @param order A comma separated list of sorting requirements in priority order, each entry matching PROPERTY_NAME:[ASC|DESC]
      */
-    public getArticlesWithHttpInfo(filterCategory?: string, filterTagset?: string, filterTitle?: string, size?: number, page?: number, order?: string, extraHttpRequestParams?: any): Observable<Response> {
+    public getArticlesWithHttpInfo(filterCategory?: string, filterTagset?: string, filterTagIntersection?: string, filterTagExclusion?: string, filterTitle?: string, size?: number, page?: number, order?: string, extraHttpRequestParams?: any): Observable<Response> {
         const path = this.basePath + '/content/articles';
 
         let queryParameters = new URLSearchParams();
@@ -569,6 +574,14 @@ export class ContentArticlesApi {
 
         if (filterTagset !== undefined) {
             queryParameters.set('filter_tagset', <any>filterTagset);
+        }
+
+        if (filterTagIntersection !== undefined) {
+            queryParameters.set('filter_tag_intersection', <any>filterTagIntersection);
+        }
+
+        if (filterTagExclusion !== undefined) {
+            queryParameters.set('filter_tag_exclusion', <any>filterTagExclusion);
         }
 
         if (filterTitle !== undefined) {
@@ -600,9 +613,9 @@ export class ContentArticlesApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Get,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -652,9 +665,9 @@ export class ContentArticlesApi {
             method: RequestMethod.Put,
             headers: headers,
             body: articleResource == null ? '' : JSON.stringify(articleResource), // https://github.com/angular/angular/issues/10612
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -704,9 +717,9 @@ export class ContentArticlesApi {
             method: RequestMethod.Put,
             headers: headers,
             body: articleTemplateResource == null ? '' : JSON.stringify(articleTemplateResource), // https://github.com/angular/angular/issues/10612
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);

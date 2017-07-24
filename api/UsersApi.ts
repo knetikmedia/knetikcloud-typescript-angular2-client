@@ -1,6 +1,6 @@
 /**
  * Knetik Platform API Documentation latest 
- * This is the spec for the Knetik API.  Use this in conjunction with the documentation found at https://knetikcloud.com
+ * This is the spec for the Knetik API.  Use this in conjunction with the documentation found at https://knetikcloud.com.
  *
  * OpenAPI spec version: latest 
  * Contact: support@knetik.com
@@ -9,6 +9,8 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
+
+/* tslint:disable:no-unused-variable member-ordering */
 
 import { Inject, Injectable, Optional }                      from '@angular/core';
 import { Http, Headers, URLSearchParams }                    from '@angular/http';
@@ -22,11 +24,10 @@ import * as models                                           from '../model/mode
 import { BASE_PATH, COLLECTION_FORMATS }                     from '../variables';
 import { Configuration }                                     from '../configuration';
 
-/* tslint:disable:no-unused-variable member-ordering */
-
 
 @Injectable()
 export class UsersApi {
+
     protected basePath = 'https://sandbox.knetikcloud.com';
     public defaultHeaders: Headers = new Headers();
     public configuration: Configuration = new Configuration();
@@ -41,8 +42,8 @@ export class UsersApi {
     }
 
     /**
-     * Add a tag to a user
      * 
+     * @summary Add a tag to a user
      * @param userId The id of the user
      * @param tag tag
      */
@@ -52,14 +53,14 @@ export class UsersApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Create a user template
      * User Templates define a type of user and the properties they have
+     * @summary Create a user template
      * @param userTemplateResource The user template resource object
      */
     public createUserTemplate(userTemplateResource?: models.TemplateResource, extraHttpRequestParams?: any): Observable<models.TemplateResource> {
@@ -68,14 +69,14 @@ export class UsersApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Delete a user template
-     * If cascade &#x3D; &#39;detach&#39;, it will force delete the template even if it&#39;s attached to other objects
+     * If cascade = 'detach', it will force delete the template even if it's attached to other objects
+     * @summary Delete a user template
      * @param id The id of the template
      * @param cascade The value needed to delete used templates
      */
@@ -85,14 +86,14 @@ export class UsersApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Get a single user
      * Additional private info is included as USERS_ADMIN
+     * @summary Get a single user
      * @param id The id of the user or &#39;me&#39;
      */
     public getUser(id: string, extraHttpRequestParams?: any): Observable<models.UserResource> {
@@ -101,14 +102,14 @@ export class UsersApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * List tags for a user
      * 
+     * @summary List tags for a user
      * @param userId The id of the user
      */
     public getUserTags(userId: number, extraHttpRequestParams?: any): Observable<Array<string>> {
@@ -117,14 +118,14 @@ export class UsersApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Get a single user template
      * 
+     * @summary Get a single user template
      * @param id The id of the template
      */
     public getUserTemplate(id: string, extraHttpRequestParams?: any): Observable<models.TemplateResource> {
@@ -133,14 +134,14 @@ export class UsersApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * List and search user templates
      * 
+     * @summary List and search user templates
      * @param size The number of objects returned per page
      * @param page The number of the page returned, starting with 1
      * @param order A comma separated list of sorting requirements in priority order, each entry matching PROPERTY_NAME:[ASC|DESC]
@@ -151,14 +152,14 @@ export class UsersApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * List and search users
      * Additional private info is included as USERS_ADMIN
+     * @summary List and search users
      * @param filterDisplayname Filter for users whose display name starts with provided string.
      * @param filterEmail Filter for users whose email starts with provided string. Requires USERS_ADMIN permission
      * @param filterFirstname Filter for users whose first name starts with provided string. Requires USERS_ADMIN permission
@@ -179,14 +180,14 @@ export class UsersApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Choose a new password after a reset
-     * Finish resetting a user&#39;s password using the secret provided from the password-reset endpoint.  Password should be in plain text and will be encrypted on receipt. Use SSL for security.
+     * Finish resetting a user's password using the secret provided from the password-reset endpoint.  Password should be in plain text and will be encrypted on receipt. Use SSL for security.
+     * @summary Choose a new password after a reset
      * @param id The id of the user
      * @param newPasswordRequest The new password request object
      */
@@ -196,14 +197,14 @@ export class UsersApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Register a new user
      * Password should be in plain text and will be encrypted on receipt. Use SSL for security
+     * @summary Register a new user
      * @param userResource The user resource object
      */
     public registerUser(userResource?: models.UserResource, extraHttpRequestParams?: any): Observable<models.UserResource> {
@@ -212,14 +213,14 @@ export class UsersApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Remove a tag from a user
      * 
+     * @summary Remove a tag from a user
      * @param userId The id of the user
      * @param tag The tag to remove
      */
@@ -229,14 +230,14 @@ export class UsersApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Set a user&#39;s password
      * Password should be in plain text and will be encrypted on receipt. Use SSL for security.
+     * @summary Set a user's password
      * @param id The id of the user
      * @param password The new plain text password
      */
@@ -246,14 +247,14 @@ export class UsersApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Reset a user&#39;s password
-     * A reset code will be generated and a &#39;forgot_password&#39; BRE event will be fired with that code.  The default system rule will send an email to the selected user if an email service has been setup. You can modify that rule in BRE to send an SMS instead or any other type of notification as you see fit
+     * A reset code will be generated and a 'forgot_password' BRE event will be fired with that code.  The default system rule will send an email to the selected user if an email service has been setup. You can modify that rule in BRE to send an SMS instead or any other type of notification as you see fit
+     * @summary Reset a user's password
      * @param id The id of the user
      */
     public startPasswordReset(id: number, extraHttpRequestParams?: any): Observable<{}> {
@@ -262,30 +263,30 @@ export class UsersApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Reset a user&#39;s password without user id
-     * A reset code will be generated and a &#39;forgot_password&#39; BRE event will be fired with that code.  The default system rule will send an email to the selected user if an email service has been setup. You can modify that rule in BRE to send an SMS instead or any other type of notification as you see fit.  Must submit their email, username, or mobile phone number
+     * A reset code will be generated and a 'forgot_password' BRE event will be fired with that code.  The default system rule will send an email to the selected user if an email service has been setup. You can modify that rule in BRE to send an SMS instead or any other type of notification as you see fit.  Must submit their email, username, or mobile phone number
+     * @summary Reset a user's password without user id
      * @param passwordReset An object containing one of three methods to look up a user
      */
-    public submitPasswordReset(passwordReset?: models.ARequestToResetAUsersPasswordByUsingAKnownUserProperty, extraHttpRequestParams?: any): Observable<{}> {
+    public submitPasswordReset(passwordReset?: models.PasswordResetRequest, extraHttpRequestParams?: any): Observable<{}> {
         return this.submitPasswordResetWithHttpInfo(passwordReset, extraHttpRequestParams)
             .map((response: Response) => {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Update a user
      * Password will not be edited on this endpoint, use password specific endpoints.
+     * @summary Update a user
      * @param id The id of the user or &#39;me&#39;
      * @param userResource The user resource object
      */
@@ -295,14 +296,14 @@ export class UsersApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Update a user template
      * 
+     * @summary Update a user template
      * @param id The id of the template
      * @param userTemplateResource The user template resource object
      */
@@ -312,7 +313,7 @@ export class UsersApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
@@ -363,9 +364,9 @@ export class UsersApi {
             method: RequestMethod.Post,
             headers: headers,
             body: tag == null ? '' : JSON.stringify(tag), // https://github.com/angular/angular/issues/10612
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -409,9 +410,9 @@ export class UsersApi {
             method: RequestMethod.Post,
             headers: headers,
             body: userTemplateResource == null ? '' : JSON.stringify(userTemplateResource), // https://github.com/angular/angular/issues/10612
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -462,9 +463,9 @@ export class UsersApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Delete,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -510,9 +511,9 @@ export class UsersApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Get,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -558,9 +559,9 @@ export class UsersApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Get,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -606,9 +607,9 @@ export class UsersApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Get,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -663,9 +664,9 @@ export class UsersApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Get,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -770,9 +771,9 @@ export class UsersApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Get,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -813,9 +814,9 @@ export class UsersApi {
             method: RequestMethod.Put,
             headers: headers,
             body: newPasswordRequest == null ? '' : JSON.stringify(newPasswordRequest), // https://github.com/angular/angular/issues/10612
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -850,9 +851,9 @@ export class UsersApi {
             method: RequestMethod.Post,
             headers: headers,
             body: userResource == null ? '' : JSON.stringify(userResource), // https://github.com/angular/angular/issues/10612
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -904,9 +905,9 @@ export class UsersApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Delete,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -956,9 +957,9 @@ export class UsersApi {
             method: RequestMethod.Put,
             headers: headers,
             body: password == null ? '' : JSON.stringify(password), // https://github.com/angular/angular/issues/10612
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -995,9 +996,9 @@ export class UsersApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Post,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -1011,7 +1012,7 @@ export class UsersApi {
      * A reset code will be generated and a &#39;forgot_password&#39; BRE event will be fired with that code.  The default system rule will send an email to the selected user if an email service has been setup. You can modify that rule in BRE to send an SMS instead or any other type of notification as you see fit.  Must submit their email, username, or mobile phone number
      * @param passwordReset An object containing one of three methods to look up a user
      */
-    public submitPasswordResetWithHttpInfo(passwordReset?: models.ARequestToResetAUsersPasswordByUsingAKnownUserProperty, extraHttpRequestParams?: any): Observable<Response> {
+    public submitPasswordResetWithHttpInfo(passwordReset?: models.PasswordResetRequest, extraHttpRequestParams?: any): Observable<Response> {
         const path = this.basePath + '/users/password-reset';
 
         let queryParameters = new URLSearchParams();
@@ -1032,9 +1033,9 @@ export class UsersApi {
             method: RequestMethod.Post,
             headers: headers,
             body: passwordReset == null ? '' : JSON.stringify(passwordReset), // https://github.com/angular/angular/issues/10612
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -1084,9 +1085,9 @@ export class UsersApi {
             method: RequestMethod.Put,
             headers: headers,
             body: userResource == null ? '' : JSON.stringify(userResource), // https://github.com/angular/angular/issues/10612
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -1136,9 +1137,9 @@ export class UsersApi {
             method: RequestMethod.Put,
             headers: headers,
             body: userTemplateResource == null ? '' : JSON.stringify(userTemplateResource), // https://github.com/angular/angular/issues/10612
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);

@@ -1,6 +1,6 @@
 /**
  * Knetik Platform API Documentation latest 
- * This is the spec for the Knetik API.  Use this in conjunction with the documentation found at https://knetikcloud.com
+ * This is the spec for the Knetik API.  Use this in conjunction with the documentation found at https://knetikcloud.com.
  *
  * OpenAPI spec version: latest 
  * Contact: support@knetik.com
@@ -9,6 +9,8 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
+
+/* tslint:disable:no-unused-variable member-ordering */
 
 import { Inject, Injectable, Optional }                      from '@angular/core';
 import { Http, Headers, URLSearchParams }                    from '@angular/http';
@@ -22,11 +24,10 @@ import * as models                                           from '../model/mode
 import { BASE_PATH, COLLECTION_FORMATS }                     from '../variables';
 import { Configuration }                                     from '../configuration';
 
-/* tslint:disable:no-unused-variable member-ordering */
-
 
 @Injectable()
 export class StoreShoppingCartsApi {
+
     protected basePath = 'https://sandbox.knetikcloud.com';
     public defaultHeaders: Headers = new Headers();
     public configuration: Configuration = new Configuration();
@@ -41,8 +42,8 @@ export class StoreShoppingCartsApi {
     }
 
     /**
-     * Adds a custom discount to the cart
      * 
+     * @summary Adds a custom discount to the cart
      * @param id The id of the cart
      * @param customDiscount The details of the discount to add
      */
@@ -52,14 +53,14 @@ export class StoreShoppingCartsApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Adds a discount coupon to the cart
      * 
+     * @summary Adds a discount coupon to the cart
      * @param id The id of the cart
      * @param skuRequest The request of the sku
      */
@@ -69,14 +70,14 @@ export class StoreShoppingCartsApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Add an item to the cart
      * Currently, carts cannot contain virtual and real currency items at the same time. Furthermore, the API only support a single virtual item at the moment
+     * @summary Add an item to the cart
      * @param id The id of the cart
      * @param cartItemRequest The cart item request object
      */
@@ -86,14 +87,14 @@ export class StoreShoppingCartsApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Create a cart
-     * You don&#39;t have to have a user to create a cart but the API requires authentication to checkout
+     * You don't have to have a user to create a cart but the API requires authentication to checkout
+     * @summary Create a cart
      * @param owner Set the owner of a cart. If not specified, defaults to the calling user&#39;s id. If specified and is not the calling user&#39;s id, SHOPPING_CARTS_ADMIN permission is required
      * @param currencyCode Set the currency for the cart, by currency code. May be disallowed by site settings.
      */
@@ -103,14 +104,14 @@ export class StoreShoppingCartsApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Returns the cart with the given GUID
      * 
+     * @summary Returns the cart with the given GUID
      * @param id The id of the cart
      */
     public getCart(id: string, extraHttpRequestParams?: any): Observable<models.Cart> {
@@ -119,14 +120,14 @@ export class StoreShoppingCartsApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Get a list of carts
      * 
+     * @summary Get a list of carts
      * @param filterOwnerId Filter by the id of the owner
      * @param size The number of objects returned per page
      * @param page The number of the page returned, starting with 1
@@ -138,14 +139,14 @@ export class StoreShoppingCartsApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Returns whether a cart requires shipping
      * 
+     * @summary Returns whether a cart requires shipping
      * @param id The id of the cart
      */
     public getShippable(id: string, extraHttpRequestParams?: any): Observable<models.CartShippableResponse> {
@@ -154,14 +155,14 @@ export class StoreShoppingCartsApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Get the list of available shipping countries per vendor
      * Since a cart can have multiple vendors with different shipping options, the countries are broken down by vendors. Please see notes about the response object as the fields are variable.
+     * @summary Get the list of available shipping countries per vendor
      * @param id The id of the cart
      */
     public getShippingCountries(id: string, extraHttpRequestParams?: any): Observable<models.SampleCountriesResponse> {
@@ -170,14 +171,14 @@ export class StoreShoppingCartsApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Removes a discount coupon from the cart
      * 
+     * @summary Removes a discount coupon from the cart
      * @param id The id of the cart
      * @param code The SKU code of the coupon to remove
      */
@@ -187,14 +188,14 @@ export class StoreShoppingCartsApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Sets the currency to use for the cart
      * May be disallowed by site settings.
+     * @summary Sets the currency to use for the cart
      * @param id The id of the cart
      * @param currencyCode The code of the currency
      */
@@ -204,14 +205,14 @@ export class StoreShoppingCartsApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Sets the owner of a cart if none is set already
      * 
+     * @summary Sets the owner of a cart if none is set already
      * @param id The id of the cart
      * @param userId The id of the user
      */
@@ -221,14 +222,14 @@ export class StoreShoppingCartsApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Changes the quantity of an item already in the cart
      * A quantity of zero will remove the item from the cart altogether.
+     * @summary Changes the quantity of an item already in the cart
      * @param id The id of the cart
      * @param cartItemRequest The cart item request object
      */
@@ -238,14 +239,14 @@ export class StoreShoppingCartsApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
 
     /**
-     * Modifies or sets the order shipping address
      * 
+     * @summary Modifies or sets the order shipping address
      * @param id The id of the cart
      * @param cartShippingAddressRequest The cart shipping address request object
      */
@@ -255,7 +256,7 @@ export class StoreShoppingCartsApi {
                 if (response.status === 204) {
                     return undefined;
                 } else {
-                    return response.json();
+                    return response.json() || {};
                 }
             });
     }
@@ -302,9 +303,9 @@ export class StoreShoppingCartsApi {
             method: RequestMethod.Post,
             headers: headers,
             body: customDiscount == null ? '' : JSON.stringify(customDiscount), // https://github.com/angular/angular/issues/10612
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -354,9 +355,9 @@ export class StoreShoppingCartsApi {
             method: RequestMethod.Post,
             headers: headers,
             body: skuRequest == null ? '' : JSON.stringify(skuRequest), // https://github.com/angular/angular/issues/10612
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -406,9 +407,9 @@ export class StoreShoppingCartsApi {
             method: RequestMethod.Post,
             headers: headers,
             body: cartItemRequest == null ? '' : JSON.stringify(cartItemRequest), // https://github.com/angular/angular/issues/10612
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -458,9 +459,9 @@ export class StoreShoppingCartsApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Post,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -506,9 +507,9 @@ export class StoreShoppingCartsApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Get,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -568,9 +569,9 @@ export class StoreShoppingCartsApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Get,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -616,9 +617,9 @@ export class StoreShoppingCartsApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Get,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -664,9 +665,9 @@ export class StoreShoppingCartsApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Get,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -718,9 +719,9 @@ export class StoreShoppingCartsApi {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Delete,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -770,9 +771,9 @@ export class StoreShoppingCartsApi {
             method: RequestMethod.Put,
             headers: headers,
             body: currencyCode == null ? '' : JSON.stringify(currencyCode), // https://github.com/angular/angular/issues/10612
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -822,9 +823,9 @@ export class StoreShoppingCartsApi {
             method: RequestMethod.Put,
             headers: headers,
             body: userId == null ? '' : JSON.stringify(userId), // https://github.com/angular/angular/issues/10612
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -874,9 +875,9 @@ export class StoreShoppingCartsApi {
             method: RequestMethod.Put,
             headers: headers,
             body: cartItemRequest == null ? '' : JSON.stringify(cartItemRequest), // https://github.com/angular/angular/issues/10612
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -926,9 +927,9 @@ export class StoreShoppingCartsApi {
             method: RequestMethod.Put,
             headers: headers,
             body: cartShippingAddressRequest == null ? '' : JSON.stringify(cartShippingAddressRequest), // https://github.com/angular/angular/issues/10612
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
         });
-
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
