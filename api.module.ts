@@ -1,7 +1,7 @@
-import { NgModule, ModuleWithProviders, SkipSelf, Optional } from '@angular/core';
+import { NgModule, ModuleWithProviders } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { HttpModule } from '@angular/http';
 import { Configuration } from './configuration';
-import { HttpClient } from '@angular/common/http';
-
 
 import { AccessTokenService } from './api/accessToken.service';
 import { ActivitiesService } from './api/activities.service';
@@ -87,109 +87,16 @@ import { UtilSecurityService } from './api/utilSecurity.service';
 import { UtilVersionService } from './api/utilVersion.service';
 
 @NgModule({
-  imports:      [],
+  imports:      [ CommonModule, HttpModule ],
   declarations: [],
   exports:      [],
-  providers: [
-    AccessTokenService,
-    ActivitiesService,
-    AmazonWebServicesS3Service,
-    AuthClientsService,
-    AuthPermissionsService,
-    AuthRolesService,
-    AuthTokensService,
-    CampaignsService,
-    CampaignsChallengesService,
-    CampaignsRewardsService,
-    CategoriesService,
-    ChatService,
-    ConfigsService,
-    ContentArticlesService,
-    ContentCommentsService,
-    CurrenciesService,
-    DevicesService,
-    DispositionsService,
-    FulfillmentService,
-    GamificationAchievementsService,
-    GamificationLeaderboardsService,
-    GamificationLevelingService,
-    GamificationMetricsService,
-    GamificationTriviaService,
-    InvoicesService,
-    LocationsService,
-    LogsService,
-    MediaArtistsService,
-    MediaModerationService,
-    MediaPollsService,
-    MediaVideosService,
-    MessagingService,
-    MessagingTopicsService,
-    NotificationsService,
-    ObjectsService,
-    PaymentsService,
-    PaymentsAppleService,
-    PaymentsFattMerchantService,
-    PaymentsOptimalService,
-    PaymentsPayPalClassicService,
-    PaymentsStripeService,
-    PaymentsTransactionsService,
-    PaymentsWalletsService,
-    PaymentsXsollaService,
-    ReportingChallengesService,
-    ReportingOrdersService,
-    ReportingRevenueService,
-    ReportingSubscriptionsService,
-    ReportingUsageService,
-    ReportingUsersService,
-    RuleEngineActionsService,
-    RuleEngineEventsService,
-    RuleEngineExpressionsService,
-    RuleEngineGlobalsService,
-    RuleEngineRulesService,
-    RuleEngineTriggersService,
-    RuleEngineVariablesService,
-    SearchService,
-    SocialFacebookService,
-    SocialGoogleService,
-    StoreService,
-    StoreBundlesService,
-    StoreCouponsService,
-    StoreSalesService,
-    StoreShippingService,
-    StoreShoppingCartsService,
-    StoreSubscriptionsService,
-    StoreVendorsService,
-    TaxesService,
-    TemplatesPropertiesService,
-    UsersService,
-    UsersAddressesService,
-    UsersFriendshipsService,
-    UsersGroupsService,
-    UsersInventoryService,
-    UsersRelationshipsService,
-    UsersSubscriptionsService,
-    UtilBatchService,
-    UtilHealthService,
-    UtilMaintenanceService,
-    UtilSecurityService,
-    UtilVersionService ]
+  providers:    [ AccessTokenService, ActivitiesService, AmazonWebServicesS3Service, AuthClientsService, AuthPermissionsService, AuthRolesService, AuthTokensService, CampaignsService, CampaignsChallengesService, CampaignsRewardsService, CategoriesService, ChatService, ConfigsService, ContentArticlesService, ContentCommentsService, CurrenciesService, DevicesService, DispositionsService, FulfillmentService, GamificationAchievementsService, GamificationLeaderboardsService, GamificationLevelingService, GamificationMetricsService, GamificationTriviaService, InvoicesService, LocationsService, LogsService, MediaArtistsService, MediaModerationService, MediaPollsService, MediaVideosService, MessagingService, MessagingTopicsService, NotificationsService, ObjectsService, PaymentsService, PaymentsAppleService, PaymentsFattMerchantService, PaymentsOptimalService, PaymentsPayPalClassicService, PaymentsStripeService, PaymentsTransactionsService, PaymentsWalletsService, PaymentsXsollaService, ReportingChallengesService, ReportingOrdersService, ReportingRevenueService, ReportingSubscriptionsService, ReportingUsageService, ReportingUsersService, RuleEngineActionsService, RuleEngineEventsService, RuleEngineExpressionsService, RuleEngineGlobalsService, RuleEngineRulesService, RuleEngineTriggersService, RuleEngineVariablesService, SearchService, SocialFacebookService, SocialGoogleService, StoreService, StoreBundlesService, StoreCouponsService, StoreSalesService, StoreShippingService, StoreShoppingCartsService, StoreSubscriptionsService, StoreVendorsService, TaxesService, TemplatesPropertiesService, UsersService, UsersAddressesService, UsersFriendshipsService, UsersGroupsService, UsersInventoryService, UsersRelationshipsService, UsersSubscriptionsService, UtilBatchService, UtilHealthService, UtilMaintenanceService, UtilSecurityService, UtilVersionService ]
 })
 export class ApiModule {
-    public static forRoot(configurationFactory: () => Configuration): ModuleWithProviders {
+    public static forConfig(configurationFactory: () => Configuration): ModuleWithProviders {
         return {
             ngModule: ApiModule,
-            providers: [ { provide: Configuration, useFactory: configurationFactory } ]
-        };
-    }
-
-    constructor( @Optional() @SkipSelf() parentModule: ApiModule,
-                 @Optional() http: HttpClient) {
-        if (parentModule) {
-            throw new Error('ApiModule is already loaded. Import in your base AppModule only.');
-        }
-        if (!http) {
-            throw new Error('You need to import the HttpClientModule in your AppModule! \n' +
-            'See also https://github.com/angular/angular/issues/20575');
+            providers: [ {provide: Configuration, useFactory: configurationFactory}]
         }
     }
 }

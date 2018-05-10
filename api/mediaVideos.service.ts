@@ -728,7 +728,7 @@ export class MediaVideosService {
         const consumes: string[] = [
         ];
 
-        return this.httpClient.delete<any>(`${this.basePath}/media/videos/${encodeURIComponent(String(videoId))}/dispositions/${encodeURIComponent(String(dispositionId))}`,
+        return this.httpClient.delete<any>(`${this.basePath}/media/videos/${encodeURIComponent(String(dispositionId))}/dispositions/${encodeURIComponent(String(dispositionId))}`,
             {
                 withCredentials: this.configuration.withCredentials,
                 headers: headers,
@@ -1793,7 +1793,7 @@ export class MediaVideosService {
             headers = headers.set('Content-Type', httpContentTypeSelected);
         }
 
-        return this.httpClient.put<any>(`${this.basePath}/media/videos/${encodeURIComponent(String(videoId))}/related/${encodeURIComponent(String(id))}/relationship_details`,
+        return this.httpClient.put<any>(`${this.basePath}/media/videos/${encodeURIComponent(String(videoId))}/related/${encodeURIComponent(String(relationshipId))}/relationship_details`,
             details,
             {
                 withCredentials: this.configuration.withCredentials,
