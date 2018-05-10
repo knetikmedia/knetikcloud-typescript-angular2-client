@@ -209,8 +209,8 @@ export class UsersSubscriptionsService {
      * @param inventoryId The id of the user&#39;s inventory
      * @param the override details override
      */
-    public setUserSubscriptionPrice(userId: number, inventoryId: number, the override details?: SubscriptionPriceOverrideRequest, extraHttpRequestParams?: any): Observable<{}> {
-        return this.setUserSubscriptionPriceWithHttpInfo(userId, inventoryId, the override details, extraHttpRequestParams)
+    public setUserSubscriptionPrice(userId: number, inventoryId: number, theoverridedetails?: SubscriptionPriceOverrideRequest, extraHttpRequestParams?: any): Observable<{}> {
+        return this.setUserSubscriptionPriceWithHttpInfo(userId, inventoryId, theoverridedetails, extraHttpRequestParams)
             .map((response: Response) => {
                 if (response.status === 204) {
                     return undefined;
@@ -677,7 +677,7 @@ export class UsersSubscriptionsService {
      * @param inventoryId The id of the user&#39;s inventory
      * @param the override details override
      */
-    public setUserSubscriptionPriceWithHttpInfo(userId: number, inventoryId: number, the override details?: SubscriptionPriceOverrideRequest, extraHttpRequestParams?: any): Observable<Response> {
+    public setUserSubscriptionPriceWithHttpInfo(userId: number, inventoryId: number, theoverridedetails?: SubscriptionPriceOverrideRequest, extraHttpRequestParams?: any): Observable<Response> {
         const path = this.basePath + '/users/${user_id}/subscriptions/${inventory_id}/price-override'
                     .replace('${' + 'user_id' + '}', String(userId))
                     .replace('${' + 'inventory_id' + '}', String(inventoryId));
@@ -723,7 +723,7 @@ export class UsersSubscriptionsService {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Put,
             headers: headers,
-            body: the override details == null ? '' : JSON.stringify(the override details), // https://github.com/angular/angular/issues/10612
+            body: theoverridedetails == null ? '' : JSON.stringify(theoverridedetails), // https://github.com/angular/angular/issues/10612
             search: queryParameters,
             withCredentials:this.configuration.withCredentials
         });

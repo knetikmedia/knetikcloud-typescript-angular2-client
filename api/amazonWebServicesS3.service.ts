@@ -117,7 +117,7 @@ export class AmazonWebServicesS3Service {
      * @param expiration The number of seconds this URL will be valid. Default to 60
      */
     public getDownloadURLWithHttpInfo(bucket?: string, path?: string, expiration?: number, extraHttpRequestParams?: any): Observable<Response> {
-        const path = this.basePath + '/amazon/s3/downloadurl';
+        path = this.basePath + '/amazon/s3/downloadurl';
 
         let queryParameters = new URLSearchParams();
         let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845

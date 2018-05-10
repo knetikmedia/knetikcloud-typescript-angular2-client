@@ -10,8 +10,6 @@
  * Do not edit the class manually.
  */
 
-import { PropertyFieldResource } from './propertyFieldResource';
-
 
 export interface PropertyFieldResource {
     /**
