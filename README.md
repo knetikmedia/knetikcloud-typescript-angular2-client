@@ -2,7 +2,7 @@
 
 ### Building
 
-To install the required dependencies and to build the typescript sources run:
+To build an compile the typescript sources to javascript use:
 ```
 npm install
 npm run build
@@ -10,11 +10,11 @@ npm run build
 
 ### publishing
 
-First build the package than run ```npm publish dist``` (don't forget to specify the `dist` folder!)
+First build the package than run ```npm publish```
 
 ### consuming
 
-Navigate to the folder of your consuming project and run one of next commands.
+navigate to the folder of your consuming project and run one of next commando's.
 
 _published:_
 
@@ -22,134 +22,54 @@ _published:_
 npm install knetikcloud-typescript-angular2-client@1.0.0 --save
 ```
 
-_without publishing (not recommended):_
+_unPublished (not recommended):_
 
 ```
-npm install PATH_TO_GENERATED_PACKAGE/dist --save
+npm install PATH_TO_GENERATED_PACKAGE --save
 ```
 
 _using `npm link`:_
 
-In PATH_TO_GENERATED_PACKAGE/dist:
+In PATH_TO_GENERATED_PACKAGE:
 ```
 npm link
 ```
 
 In your project:
 ```
-npm link knetikcloud-typescript-angular2-client
+npm link knetikcloud-typescript-angular2-client@1.0.0
 ```
 
-__Note for Windows users:__ The Angular CLI has troubles to use linked npm packages.
-Please refer to this issue https://github.com/angular/angular-cli/issues/8284 for a solution / workaround.
-Published packages are not effected by this issue.
-
-
-#### General usage
-
-In your Angular project:
-
+In your angular2 project:
 
 ```
-// without configuring providers
-import { ApiModule } from 'knetikcloud-typescript-angular2-client';
-import { HttpClientModule } from '@angular/common/http';
-
-
+import { DefaultApi } from 'knetikcloud-typescript-angular2-client/api/api';
 @NgModule({
-    imports: [
-        ApiModule,
-        // make sure to import the HttpClientModule in the AppModule only,
-        // see https://github.com/angular/angular/issues/20575
-        HttpClientModule
-    ],
-    declarations: [ AppComponent ],
-    providers: [],
-    bootstrap: [ AppComponent ]
+    imports: [],
+    declarations: [],
+    exports: [],
+    providers: [AppModule]
 })
-export class AppModule {}
+export class CoreModule {}
 ```
-
 ```
-// configuring providers
-import { ApiModule, Configuration, ConfigurationParameters } from 'knetikcloud-typescript-angular2-client';
-
-export function apiConfigFactory (): Configuration => {
-  const params: ConfigurationParameters = {
-    // set configuration parameters here.
-  }
-  return new Configuration(params);
-}
-
-@NgModule({
-    imports: [ ApiModule.forRoot(apiConfigFactory) ],
-    declarations: [ AppComponent ],
-    providers: [],
-    bootstrap: [ AppComponent ]
-})
-export class AppModule {}
-```
-
-```
-import { DefaultApi } from 'knetikcloud-typescript-angular2-client';
+import { DefaultApi } from 'knetikcloud-typescript-angular2-client/api/api';
 
 export class AppComponent {
 	 constructor(private apiGateway: DefaultApi) { }
 }
 ```
 
-Note: The ApiModule is restricted to being instantiated once app wide.
-This is to ensure that all services are treated as singletons.
-
-#### Using multiple swagger files / APIs / ApiModules
-In order to use multiple `ApiModules` generated from different swagger files,
-you can create an alias name when importing the modules
-in order to avoid naming conflicts:
-```
-import { ApiModule } from 'my-api-path';
-import { ApiModule as OtherApiModule } from 'my-other-api-path';
-import { HttpClientModule } from '@angular/common/http';
-
-
-@NgModule({
-  imports: [
-    ApiModule,
-    OtherApiModule,
-    // make sure to import the HttpClientModule in the AppModule only,
-    // see https://github.com/angular/angular/issues/20575
-    HttpClientModule
-  ]
-})
-export class AppModule {
-
-}
-```
-
-
 ### Set service base path
 If different than the generated base path, during app bootstrap, you can provide the base path to your service. 
 
 ```
-import { BASE_PATH } from 'knetikcloud-typescript-angular2-client';
+import { BASE_PATH } from './path-to-swagger-gen-service/index';
 
 bootstrap(AppComponent, [
     { provide: BASE_PATH, useValue: 'https://your-web-service.com' },
 ]);
 ```
-or
-
-```
-import { BASE_PATH } from 'knetikcloud-typescript-angular2-client';
-
-@NgModule({
-    imports: [],
-    declarations: [ AppComponent ],
-    providers: [ provide: BASE_PATH, useValue: 'https://your-web-service.com' ],
-    bootstrap: [ AppComponent ]
-})
-export class AppModule {}
-```
-
 
 #### Using @angular/cli
 First extend your `src/environments/*.ts` files by adding the corresponding base path:
@@ -168,11 +88,11 @@ import { environment } from '../environments/environment';
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
   ],
   imports: [ ],
-  providers: [{ provide: BASE_PATH, useValue: environment.API_BASE_PATH }],
-  bootstrap: [ AppComponent ]
+  providers: [{ provide: BASE_PATH, useValue: useValue: environment.API_BASE_PATH }],
+  bootstrap: [AppComponent]
 })
 export class AppModule { }
 ```  
