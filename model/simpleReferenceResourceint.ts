@@ -11,16 +11,13 @@
  */
 
 
-
-export interface SimpleReferenceResourceint {
+export interface SimpleReferenceResourceint { 
     /**
      * The id of the referenced object
      */
     id: number;
-
     /**
      * The name of the referenced object
      */
-    name?: string;
-
+    readonly name?: string;
 }

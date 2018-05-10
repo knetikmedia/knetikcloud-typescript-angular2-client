@@ -9,34 +9,28 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
-
 import { UserAchievementResource } from './userAchievementResource';
 
 
-export interface UserAchievementGroupResource {
+export interface UserAchievementGroupResource { 
     /**
      * The list of achievements associated with the group
      */
     achievements: Array<UserAchievementResource>;
-
     /**
      * The name of the group.  If used by Leveling, this will represent the level name
      */
     groupName: string;
-
     /**
      * The id of the achievement progress
      */
-    id?: string;
-
+    readonly id?: string;
     /**
      * The current progress of the user on the group
      */
     progress: number;
-
     /**
      * The id of the user whose progress is being tracked
      */
     userId: number;
-
 }

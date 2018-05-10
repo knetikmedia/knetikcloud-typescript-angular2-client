@@ -11,16 +11,13 @@
  */
 
 
-
-export interface DispositionCount {
+export interface DispositionCount { 
     /**
      * The number of users that have expressed this disposition
      */
     count?: number;
-
     /**
      * The name of the disposition this count is for
      */
     name?: string;
-
 }

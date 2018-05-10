@@ -9,14 +9,12 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
-
 import { Property } from './property';
 
 
-export interface MapProperty extends Property {
+export interface MapProperty extends Property { 
     /**
      * A map/object of string to sub-property
      */
     map: { [key: string]: Property; };
-
 }

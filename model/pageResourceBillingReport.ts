@@ -9,28 +9,18 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
-
 import { BillingReport } from './billingReport';
 import { Order } from './order';
 
 
-export interface PageResourceBillingReport {
+export interface PageResourceBillingReport { 
     content?: Array<BillingReport>;
-
     first?: boolean;
-
     last?: boolean;
-
     number?: number;
-
     numberOfElements?: number;
-
     size?: number;
-
     sort?: Array<Order>;
-
     totalElements?: number;
-
     totalPages?: number;
-
 }

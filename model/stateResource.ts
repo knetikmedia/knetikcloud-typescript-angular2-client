@@ -11,26 +11,21 @@
  */
 
 
-
-export interface StateResource {
+export interface StateResource { 
     /**
      * The code of the state
      */
-    code?: string;
-
+    readonly code?: string;
     /**
      * The iso3 of the country this state is in
      */
-    countryCodeIso3?: string;
-
+    readonly countryCodeIso3?: string;
     /**
      * The unique ID for the state
      */
-    id?: number;
-
+    readonly id?: number;
     /**
      * The name of the state
      */
-    name?: string;
-
+    readonly name?: string;
 }

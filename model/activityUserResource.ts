@@ -9,54 +9,47 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
-
 import { MetricResource } from './metricResource';
 import { SimpleUserResource } from './simpleUserResource';
 
 
-export interface ActivityUserResource {
+export interface ActivityUserResource { 
     /**
      * Whether this user is the 'host' of the occurrence and has increased access to settings/etc (default: false)
      */
     host?: boolean;
-
     /**
      * The id of the activity user entry
      */
-    id?: number;
-
+    readonly id?: number;
     /**
      * The date this user last joined the occurrence, unix timestamp in seconds
      */
-    joinedDate?: number;
-
+    readonly joinedDate?: number;
     /**
      * The date this user last left the occurrence, unix timestamp in seconds. Null if still present
      */
-    leftDate?: number;
-
+    readonly leftDate?: number;
     /**
      * The metric for the user's results, after the game is over
      */
     metric?: MetricResource;
-
     /**
      * The current status of the user in the occurrence (default: present)
      */
     status?: ActivityUserResource.StatusEnum;
-
     /**
      * The user
      */
     user: SimpleUserResource;
-
 }
 export namespace ActivityUserResource {
-    export enum StatusEnum {
-        Present = <any> 'present',
-        Ready = <any> 'ready',
-        Left = <any> 'left',
-        Surrendered = <any> 'surrendered',
-        Disconnected = <any> 'disconnected'
-    }
+    export type StatusEnum = 'present' | 'ready' | 'left' | 'surrendered' | 'disconnected';
+    export const StatusEnum = {
+        Present: 'present' as StatusEnum,
+        Ready: 'ready' as StatusEnum,
+        Left: 'left' as StatusEnum,
+        Surrendered: 'surrendered' as StatusEnum,
+        Disconnected: 'disconnected' as StatusEnum
+    };
 }

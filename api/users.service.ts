@@ -9,16 +9,14 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
-
 /* tslint:disable:no-unused-variable member-ordering */
 
 import { Inject, Injectable, Optional }                      from '@angular/core';
-import { Http, Headers, URLSearchParams }                    from '@angular/http';
-import { RequestMethod, RequestOptions, RequestOptionsArgs } from '@angular/http';
-import { Response, ResponseContentType }                     from '@angular/http';
+import { HttpClient, HttpHeaders, HttpParams,
+         HttpResponse, HttpEvent }                           from '@angular/common/http';
+import { CustomHttpUrlEncodingCodec }                        from '../encoder';
 
 import { Observable }                                        from 'rxjs/Observable';
-import '../rxjs-operators';
 
 import { ChatMessageRequest } from '../model/chatMessageRequest';
 import { ChatMessageResource } from '../model/chatMessageResource';
@@ -40,32 +38,17 @@ import { Configuration }                                     from '../configurat
 export class UsersService {
 
     protected basePath = 'https://jsapi-integration.us-east-1.elasticbeanstalk.com';
-    public defaultHeaders: Headers = new Headers();
-    public configuration: Configuration = new Configuration();
+    public defaultHeaders = new HttpHeaders();
+    public configuration = new Configuration();
 
-    constructor(protected http: Http, @Optional()@Inject(BASE_PATH) basePath: string, @Optional() configuration: Configuration) {
+    constructor(protected httpClient: HttpClient, @Optional()@Inject(BASE_PATH) basePath: string, @Optional() configuration: Configuration) {
         if (basePath) {
             this.basePath = basePath;
         }
         if (configuration) {
             this.configuration = configuration;
-			this.basePath = basePath || configuration.basePath || this.basePath;
+            this.basePath = basePath || configuration.basePath || this.basePath;
         }
-    }
-
-    /**
-     * 
-     * Extends object by coping non-existing properties.
-     * @param objA object to be extended
-     * @param objB source object
-     */
-    private extendObj<T1,T2>(objA: T1, objB: T2) {
-        for(let key in objB){
-            if(objB.hasOwnProperty(key)){
-                (objA as any)[key] = (objB as any)[key];
-            }
-        }
-        return <T1&T2>objA;
     }
 
     /**
@@ -74,326 +57,12 @@ export class UsersService {
      */
     private canConsumeForm(consumes: string[]): boolean {
         const form = 'multipart/form-data';
-        for (let consume of consumes) {
+        for (const consume of consumes) {
             if (form === consume) {
                 return true;
             }
         }
         return false;
-    }
-
-    /**
-     * <b>Permissions Needed:</b> USERS_ADMIN
-     * @summary Add a tag to a user
-     * @param userId The id of the user
-     * @param tag tag
-     */
-    public addUserTag(userId: number, tag: StringWrapper, extraHttpRequestParams?: any): Observable<{}> {
-        return this.addUserTagWithHttpInfo(userId, tag, extraHttpRequestParams)
-            .map((response: Response) => {
-                if (response.status === 204) {
-                    return undefined;
-                } else {
-                    return response.json() || {};
-                }
-            });
-    }
-
-    /**
-     * User Templates define a type of user and the properties they have. <br><br><b>Permissions Needed:</b> TEMPLATE_ADMIN
-     * @summary Create a user template
-     * @param userTemplateResource The user template resource object
-     */
-    public createUserTemplate(userTemplateResource?: TemplateResource, extraHttpRequestParams?: any): Observable<TemplateResource> {
-        return this.createUserTemplateWithHttpInfo(userTemplateResource, extraHttpRequestParams)
-            .map((response: Response) => {
-                if (response.status === 204) {
-                    return undefined;
-                } else {
-                    return response.json() || {};
-                }
-            });
-    }
-
-    /**
-     * If cascade = 'detach', it will force delete the template even if it's attached to other objects. <br><br><b>Permissions Needed:</b> TEMPLATE_ADMIN
-     * @summary Delete a user template
-     * @param id The id of the template
-     * @param cascade The value needed to delete used templates
-     */
-    public deleteUserTemplate(id: string, cascade?: string, extraHttpRequestParams?: any): Observable<{}> {
-        return this.deleteUserTemplateWithHttpInfo(id, cascade, extraHttpRequestParams)
-            .map((response: Response) => {
-                if (response.status === 204) {
-                    return undefined;
-                } else {
-                    return response.json() || {};
-                }
-            });
-    }
-
-    /**
-     * <b>Permissions Needed:</b> ANY
-     * @summary Get a list of direct messages with this user
-     * @param recipientId The user id
-     * @param size The number of objects returned per page
-     * @param page The number of the page returned, starting with 1
-     */
-    public getDirectMessages1(recipientId: number, size?: number, page?: number, extraHttpRequestParams?: any): Observable<PageResourceChatMessageResource> {
-        return this.getDirectMessages1WithHttpInfo(recipientId, size, page, extraHttpRequestParams)
-            .map((response: Response) => {
-                if (response.status === 204) {
-                    return undefined;
-                } else {
-                    return response.json() || {};
-                }
-            });
-    }
-
-    /**
-     * Additional private info is included as USERS_ADMIN. <br><br><b>Permissions Needed:</b> ANY
-     * @summary Get a single user
-     * @param id The id of the user or &#39;me&#39;
-     */
-    public getUser(id: string, extraHttpRequestParams?: any): Observable<UserResource> {
-        return this.getUserWithHttpInfo(id, extraHttpRequestParams)
-            .map((response: Response) => {
-                if (response.status === 204) {
-                    return undefined;
-                } else {
-                    return response.json() || {};
-                }
-            });
-    }
-
-    /**
-     * <b>Permissions Needed:</b> USERS_ADMIN
-     * @summary List tags for a user
-     * @param userId The id of the user
-     */
-    public getUserTags(userId: number, extraHttpRequestParams?: any): Observable<Array<string>> {
-        return this.getUserTagsWithHttpInfo(userId, extraHttpRequestParams)
-            .map((response: Response) => {
-                if (response.status === 204) {
-                    return undefined;
-                } else {
-                    return response.json() || {};
-                }
-            });
-    }
-
-    /**
-     * <b>Permissions Needed:</b> TEMPLATE_ADMIN or USERS_ADMIN
-     * @summary Get a single user template
-     * @param id The id of the template
-     */
-    public getUserTemplate(id: string, extraHttpRequestParams?: any): Observable<TemplateResource> {
-        return this.getUserTemplateWithHttpInfo(id, extraHttpRequestParams)
-            .map((response: Response) => {
-                if (response.status === 204) {
-                    return undefined;
-                } else {
-                    return response.json() || {};
-                }
-            });
-    }
-
-    /**
-     * <b>Permissions Needed:</b> TEMPLATE_ADMIN or USERS_ADMIN
-     * @summary List and search user templates
-     * @param size The number of objects returned per page
-     * @param page The number of the page returned, starting with 1
-     * @param order A comma separated list of sorting requirements in priority order, each entry matching PROPERTY_NAME:[ASC|DESC]
-     */
-    public getUserTemplates(size?: number, page?: number, order?: string, extraHttpRequestParams?: any): Observable<PageResourceTemplateResource> {
-        return this.getUserTemplatesWithHttpInfo(size, page, order, extraHttpRequestParams)
-            .map((response: Response) => {
-                if (response.status === 204) {
-                    return undefined;
-                } else {
-                    return response.json() || {};
-                }
-            });
-    }
-
-    /**
-     * Additional private info is included as USERS_ADMIN. <br><br><b>Permissions Needed:</b> ANY
-     * @summary List and search users
-     * @param filterDisplayname Filter for users whose display name starts with provided string.
-     * @param filterEmail Filter for users whose email starts with provided string. Requires USERS_ADMIN permission
-     * @param filterFirstname Filter for users whose first name starts with provided string. Requires USERS_ADMIN permission
-     * @param filterFullname Filter for users whose full name starts with provided string. Requires USERS_ADMIN permission
-     * @param filterLastname Filter for users whose last name starts with provided string. Requires USERS_ADMIN permission
-     * @param filterUsername Filter for users whose username starts with the provided string. Requires USERS_ADMIN permission
-     * @param filterTag Filter for users who have a given tag
-     * @param filterGroup Filter for users in a given group, by unique name
-     * @param filterRole Filter for users with a given role
-     * @param filterLastActivity A comma separated string without spaces.  First value is the operator to search on, second value is the date, a unix timestamp in seconds.  Allowed operators: (GT, LT, EQ, GOE, LOE).
-     * @param filterIdList A comma separated list of ids.
-     * @param filterSearch Filter for users whose display_name starts with the provided string, or username if display_name is null
-     * @param size The number of objects returned per page
-     * @param page The number of the page returned, starting with 1
-     * @param order A comma separated list of sorting requirements in priority order, each entry matching PROPERTY_NAME:[ASC|DESC]
-     */
-    public getUsers(filterDisplayname?: string, filterEmail?: string, filterFirstname?: string, filterFullname?: string, filterLastname?: string, filterUsername?: string, filterTag?: string, filterGroup?: string, filterRole?: string, filterLastActivity?: string, filterIdList?: string, filterSearch?: string, size?: number, page?: number, order?: string, extraHttpRequestParams?: any): Observable<PageResourceUserBaseResource> {
-        return this.getUsersWithHttpInfo(filterDisplayname, filterEmail, filterFirstname, filterFullname, filterLastname, filterUsername, filterTag, filterGroup, filterRole, filterLastActivity, filterIdList, filterSearch, size, page, order, extraHttpRequestParams)
-            .map((response: Response) => {
-                if (response.status === 204) {
-                    return undefined;
-                } else {
-                    return response.json() || {};
-                }
-            });
-    }
-
-    /**
-     * Finish resetting a user's password using the secret provided from the password-reset endpoint.  Password should be in plain text and will be encrypted on receipt. Use SSL for security. <br><br><b>Permissions Needed:</b> ANY
-     * @summary Choose a new password after a reset
-     * @param id The id of the user
-     * @param newPasswordRequest The new password request object
-     */
-    public passwordReset(id: number, newPasswordRequest?: NewPasswordRequest, extraHttpRequestParams?: any): Observable<{}> {
-        return this.passwordResetWithHttpInfo(id, newPasswordRequest, extraHttpRequestParams)
-            .map((response: Response) => {
-                if (response.status === 204) {
-                    return undefined;
-                } else {
-                    return response.json() || {};
-                }
-            });
-    }
-
-    /**
-     * 
-     * @summary Send a user message
-     * @param recipientId The user id
-     * @param chatMessageRequest The chat message request
-     */
-    public postUserMessage(recipientId: number, chatMessageRequest?: ChatMessageRequest, extraHttpRequestParams?: any): Observable<ChatMessageResource> {
-        return this.postUserMessageWithHttpInfo(recipientId, chatMessageRequest, extraHttpRequestParams)
-            .map((response: Response) => {
-                if (response.status === 204) {
-                    return undefined;
-                } else {
-                    return response.json() || {};
-                }
-            });
-    }
-
-    /**
-     * Password should be in plain text and will be encrypted on receipt. Use SSL for security. <br><br><b>Permissions Needed:</b> ANY
-     * @summary Register a new user
-     * @param userResource The user resource object
-     */
-    public registerUser(userResource?: UserResource, extraHttpRequestParams?: any): Observable<UserResource> {
-        return this.registerUserWithHttpInfo(userResource, extraHttpRequestParams)
-            .map((response: Response) => {
-                if (response.status === 204) {
-                    return undefined;
-                } else {
-                    return response.json() || {};
-                }
-            });
-    }
-
-    /**
-     * <b>Permissions Needed:</b> USERS_ADMIN
-     * @summary Remove a tag from a user
-     * @param userId The id of the user
-     * @param tag The tag to remove
-     */
-    public removeUserTag(userId: number, tag: string, extraHttpRequestParams?: any): Observable<{}> {
-        return this.removeUserTagWithHttpInfo(userId, tag, extraHttpRequestParams)
-            .map((response: Response) => {
-                if (response.status === 204) {
-                    return undefined;
-                } else {
-                    return response.json() || {};
-                }
-            });
-    }
-
-    /**
-     * Password should be in plain text and will be encrypted on receipt. Use SSL for security. <br><br><b>Permissions Needed:</b> USERS_ADMIN or (USERS_USER and owner)
-     * @summary Set a user's password
-     * @param id The id of the user
-     * @param password The new plain text password
-     */
-    public setPassword(id: number, password?: StringWrapper, extraHttpRequestParams?: any): Observable<{}> {
-        return this.setPasswordWithHttpInfo(id, password, extraHttpRequestParams)
-            .map((response: Response) => {
-                if (response.status === 204) {
-                    return undefined;
-                } else {
-                    return response.json() || {};
-                }
-            });
-    }
-
-    /**
-     * A reset code will be generated and a 'forgot_password' BRE event will be fired with that code.  The default system rule will send an email to the selected user if an email service has been setup. You can modify that rule in BRE to send an SMS instead or any other type of notification as you see fit. <br><br><b>Permissions Needed:</b> ANY
-     * @summary Reset a user's password
-     * @param id The id of the user
-     */
-    public startPasswordReset(id: number, extraHttpRequestParams?: any): Observable<{}> {
-        return this.startPasswordResetWithHttpInfo(id, extraHttpRequestParams)
-            .map((response: Response) => {
-                if (response.status === 204) {
-                    return undefined;
-                } else {
-                    return response.json() || {};
-                }
-            });
-    }
-
-    /**
-     * A reset code will be generated and a 'forgot_password' BRE event will be fired with that code.  The default system rule will send an email to the selected user if an email service has been setup. You can modify that rule in BRE to send an SMS instead or any other type of notification as you see fit.  Must submit their email, username, or mobile phone number. <br><br><b>Permissions Needed:</b> ANY
-     * @summary Reset a user's password without user id
-     * @param passwordReset An object containing one of three methods to look up a user
-     */
-    public submitPasswordReset(passwordReset?: PasswordResetRequest, extraHttpRequestParams?: any): Observable<{}> {
-        return this.submitPasswordResetWithHttpInfo(passwordReset, extraHttpRequestParams)
-            .map((response: Response) => {
-                if (response.status === 204) {
-                    return undefined;
-                } else {
-                    return response.json() || {};
-                }
-            });
-    }
-
-    /**
-     * Password will not be edited on this endpoint, use password specific endpoints. <br><br><b>Permissions Needed:</b> USERS_ADMIN or owner
-     * @summary Update a user
-     * @param id The id of the user or &#39;me&#39;
-     * @param userResource The user resource object
-     */
-    public updateUser(id: string, userResource?: UserResource, extraHttpRequestParams?: any): Observable<{}> {
-        return this.updateUserWithHttpInfo(id, userResource, extraHttpRequestParams)
-            .map((response: Response) => {
-                if (response.status === 204) {
-                    return undefined;
-                } else {
-                    return response.json() || {};
-                }
-            });
-    }
-
-    /**
-     * <b>Permissions Needed:</b> TEMPLATE_ADMIN
-     * @summary Update a user template
-     * @param id The id of the template
-     * @param userTemplateResource The user template resource object
-     */
-    public updateUserTemplate(id: string, userTemplateResource?: TemplateResource, extraHttpRequestParams?: any): Observable<TemplateResource> {
-        return this.updateUserTemplateWithHttpInfo(id, userTemplateResource, extraHttpRequestParams)
-            .map((response: Response) => {
-                if (response.status === 204) {
-                    return undefined;
-                } else {
-                    return response.json() || {};
-                }
-            });
     }
 
 
@@ -402,115 +71,124 @@ export class UsersService {
      * &lt;b&gt;Permissions Needed:&lt;/b&gt; USERS_ADMIN
      * @param userId The id of the user
      * @param tag tag
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
      */
-    public addUserTagWithHttpInfo(userId: number, tag: StringWrapper, extraHttpRequestParams?: any): Observable<Response> {
-        const path = this.basePath + '/users/${user_id}/tags'
-                    .replace('${' + 'user_id' + '}', String(userId));
-
-        let queryParameters = new URLSearchParams();
-        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
-
-        // verify required parameter 'userId' is not null or undefined
+    public addUserTag(userId: number, tag: StringWrapper, observe?: 'body', reportProgress?: boolean): Observable<any>;
+    public addUserTag(userId: number, tag: StringWrapper, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
+    public addUserTag(userId: number, tag: StringWrapper, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
+    public addUserTag(userId: number, tag: StringWrapper, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
         if (userId === null || userId === undefined) {
             throw new Error('Required parameter userId was null or undefined when calling addUserTag.');
         }
-        // verify required parameter 'tag' is not null or undefined
         if (tag === null || tag === undefined) {
             throw new Error('Required parameter tag was null or undefined when calling addUserTag.');
         }
 
-        // to determine the Accept header
-        let produces: string[] = [
-            'application/json'
-        ];
+        let headers = this.defaultHeaders;
 
         // authentication (oauth2_client_credentials_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
         // authentication (oauth2_password_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-            
-        headers.set('Content-Type', 'application/json');
-
-        let requestOptions: RequestOptionsArgs = new RequestOptions({
-            method: RequestMethod.Post,
-            headers: headers,
-            body: tag == null ? '' : JSON.stringify(tag), // https://github.com/angular/angular/issues/10612
-            search: queryParameters,
-            withCredentials:this.configuration.withCredentials
-        });
-        // https://github.com/swagger-api/swagger-codegen/issues/4037
-        if (extraHttpRequestParams) {
-            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
+        // to determine the Accept header
+        let httpHeaderAccepts: string[] = [
+            'application/json'
+        ];
+        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers = headers.set('Accept', httpHeaderAcceptSelected);
         }
 
-        return this.http.request(path, requestOptions);
+        // to determine the Content-Type header
+        const consumes: string[] = [
+            'application/json'
+        ];
+        const httpContentTypeSelected: string | undefined = this.configuration.selectHeaderContentType(consumes);
+        if (httpContentTypeSelected != undefined) {
+            headers = headers.set('Content-Type', httpContentTypeSelected);
+        }
+
+        return this.httpClient.post<any>(`${this.basePath}/users/${encodeURIComponent(String(userId))}/tags`,
+            tag,
+            {
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
     }
 
     /**
      * Create a user template
      * User Templates define a type of user and the properties they have. &lt;br&gt;&lt;br&gt;&lt;b&gt;Permissions Needed:&lt;/b&gt; TEMPLATE_ADMIN
      * @param userTemplateResource The user template resource object
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
      */
-    public createUserTemplateWithHttpInfo(userTemplateResource?: TemplateResource, extraHttpRequestParams?: any): Observable<Response> {
-        const path = this.basePath + '/users/templates';
+    public createUserTemplate(userTemplateResource?: TemplateResource, observe?: 'body', reportProgress?: boolean): Observable<TemplateResource>;
+    public createUserTemplate(userTemplateResource?: TemplateResource, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<TemplateResource>>;
+    public createUserTemplate(userTemplateResource?: TemplateResource, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<TemplateResource>>;
+    public createUserTemplate(userTemplateResource?: TemplateResource, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
 
-        let queryParameters = new URLSearchParams();
-        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
-
-
-        // to determine the Accept header
-        let produces: string[] = [
-            'application/json'
-        ];
+        let headers = this.defaultHeaders;
 
         // authentication (oauth2_client_credentials_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
         // authentication (oauth2_password_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-            
-        headers.set('Content-Type', 'application/json');
-
-        let requestOptions: RequestOptionsArgs = new RequestOptions({
-            method: RequestMethod.Post,
-            headers: headers,
-            body: userTemplateResource == null ? '' : JSON.stringify(userTemplateResource), // https://github.com/angular/angular/issues/10612
-            search: queryParameters,
-            withCredentials:this.configuration.withCredentials
-        });
-        // https://github.com/swagger-api/swagger-codegen/issues/4037
-        if (extraHttpRequestParams) {
-            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
+        // to determine the Accept header
+        let httpHeaderAccepts: string[] = [
+            'application/json'
+        ];
+        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers = headers.set('Accept', httpHeaderAcceptSelected);
         }
 
-        return this.http.request(path, requestOptions);
+        // to determine the Content-Type header
+        const consumes: string[] = [
+            'application/json'
+        ];
+        const httpContentTypeSelected: string | undefined = this.configuration.selectHeaderContentType(consumes);
+        if (httpContentTypeSelected != undefined) {
+            headers = headers.set('Content-Type', httpContentTypeSelected);
+        }
+
+        return this.httpClient.post<TemplateResource>(`${this.basePath}/users/templates`,
+            userTemplateResource,
+            {
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
     }
 
     /**
@@ -518,59 +196,62 @@ export class UsersService {
      * If cascade &#x3D; &#39;detach&#39;, it will force delete the template even if it&#39;s attached to other objects. &lt;br&gt;&lt;br&gt;&lt;b&gt;Permissions Needed:&lt;/b&gt; TEMPLATE_ADMIN
      * @param id The id of the template
      * @param cascade The value needed to delete used templates
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
      */
-    public deleteUserTemplateWithHttpInfo(id: string, cascade?: string, extraHttpRequestParams?: any): Observable<Response> {
-        const path = this.basePath + '/users/templates/${id}'
-                    .replace('${' + 'id' + '}', String(id));
-
-        let queryParameters = new URLSearchParams();
-        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
-
-        // verify required parameter 'id' is not null or undefined
+    public deleteUserTemplate(id: string, cascade?: string, observe?: 'body', reportProgress?: boolean): Observable<any>;
+    public deleteUserTemplate(id: string, cascade?: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
+    public deleteUserTemplate(id: string, cascade?: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
+    public deleteUserTemplate(id: string, cascade?: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
         if (id === null || id === undefined) {
             throw new Error('Required parameter id was null or undefined when calling deleteUserTemplate.');
         }
-        if (cascade !== undefined) {
-            queryParameters.set('cascade', <any>cascade);
+
+        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
+        if (cascade !== undefined && cascade !== null) {
+            queryParameters = queryParameters.set('cascade', <any>cascade);
         }
 
-
-        // to determine the Accept header
-        let produces: string[] = [
-            'application/json'
-        ];
+        let headers = this.defaultHeaders;
 
         // authentication (oauth2_client_credentials_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
         // authentication (oauth2_password_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-            
-        let requestOptions: RequestOptionsArgs = new RequestOptions({
-            method: RequestMethod.Delete,
-            headers: headers,
-            search: queryParameters,
-            withCredentials:this.configuration.withCredentials
-        });
-        // https://github.com/swagger-api/swagger-codegen/issues/4037
-        if (extraHttpRequestParams) {
-            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
+        // to determine the Accept header
+        let httpHeaderAccepts: string[] = [
+            'application/json'
+        ];
+        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers = headers.set('Accept', httpHeaderAcceptSelected);
         }
 
-        return this.http.request(path, requestOptions);
+        // to determine the Content-Type header
+        const consumes: string[] = [
+        ];
+
+        return this.httpClient.delete<any>(`${this.basePath}/users/templates/${encodeURIComponent(String(id))}`,
+            {
+                params: queryParameters,
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
     }
 
     /**
@@ -579,228 +260,233 @@ export class UsersService {
      * @param recipientId The user id
      * @param size The number of objects returned per page
      * @param page The number of the page returned, starting with 1
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
      */
-    public getDirectMessages1WithHttpInfo(recipientId: number, size?: number, page?: number, extraHttpRequestParams?: any): Observable<Response> {
-        const path = this.basePath + '/users/${recipient_id}/messages'
-                    .replace('${' + 'recipient_id' + '}', String(recipientId));
-
-        let queryParameters = new URLSearchParams();
-        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
-
-        // verify required parameter 'recipientId' is not null or undefined
+    public getDirectMessages1(recipientId: number, size?: number, page?: number, observe?: 'body', reportProgress?: boolean): Observable<PageResourceChatMessageResource>;
+    public getDirectMessages1(recipientId: number, size?: number, page?: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<PageResourceChatMessageResource>>;
+    public getDirectMessages1(recipientId: number, size?: number, page?: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<PageResourceChatMessageResource>>;
+    public getDirectMessages1(recipientId: number, size?: number, page?: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
         if (recipientId === null || recipientId === undefined) {
             throw new Error('Required parameter recipientId was null or undefined when calling getDirectMessages1.');
         }
-        if (size !== undefined) {
-            queryParameters.set('size', <any>size);
+
+        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
+        if (size !== undefined && size !== null) {
+            queryParameters = queryParameters.set('size', <any>size);
+        }
+        if (page !== undefined && page !== null) {
+            queryParameters = queryParameters.set('page', <any>page);
         }
 
-        if (page !== undefined) {
-            queryParameters.set('page', <any>page);
-        }
-
-
-        // to determine the Accept header
-        let produces: string[] = [
-            'application/json'
-        ];
+        let headers = this.defaultHeaders;
 
         // authentication (oauth2_client_credentials_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
         // authentication (oauth2_password_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-            
-        let requestOptions: RequestOptionsArgs = new RequestOptions({
-            method: RequestMethod.Get,
-            headers: headers,
-            search: queryParameters,
-            withCredentials:this.configuration.withCredentials
-        });
-        // https://github.com/swagger-api/swagger-codegen/issues/4037
-        if (extraHttpRequestParams) {
-            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
+        // to determine the Accept header
+        let httpHeaderAccepts: string[] = [
+            'application/json'
+        ];
+        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers = headers.set('Accept', httpHeaderAcceptSelected);
         }
 
-        return this.http.request(path, requestOptions);
+        // to determine the Content-Type header
+        const consumes: string[] = [
+        ];
+
+        return this.httpClient.get<PageResourceChatMessageResource>(`${this.basePath}/users/${encodeURIComponent(String(recipientId))}/messages`,
+            {
+                params: queryParameters,
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
     }
 
     /**
      * Get a single user
      * Additional private info is included as USERS_ADMIN. &lt;br&gt;&lt;br&gt;&lt;b&gt;Permissions Needed:&lt;/b&gt; ANY
      * @param id The id of the user or &#39;me&#39;
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
      */
-    public getUserWithHttpInfo(id: string, extraHttpRequestParams?: any): Observable<Response> {
-        const path = this.basePath + '/users/${id}'
-                    .replace('${' + 'id' + '}', String(id));
-
-        let queryParameters = new URLSearchParams();
-        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
-
-        // verify required parameter 'id' is not null or undefined
+    public getUser(id: string, observe?: 'body', reportProgress?: boolean): Observable<UserResource>;
+    public getUser(id: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<UserResource>>;
+    public getUser(id: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<UserResource>>;
+    public getUser(id: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
         if (id === null || id === undefined) {
             throw new Error('Required parameter id was null or undefined when calling getUser.');
         }
 
-        // to determine the Accept header
-        let produces: string[] = [
-            'application/json'
-        ];
+        let headers = this.defaultHeaders;
 
         // authentication (oauth2_client_credentials_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
         // authentication (oauth2_password_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-            
-        let requestOptions: RequestOptionsArgs = new RequestOptions({
-            method: RequestMethod.Get,
-            headers: headers,
-            search: queryParameters,
-            withCredentials:this.configuration.withCredentials
-        });
-        // https://github.com/swagger-api/swagger-codegen/issues/4037
-        if (extraHttpRequestParams) {
-            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
+        // to determine the Accept header
+        let httpHeaderAccepts: string[] = [
+            'application/json'
+        ];
+        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers = headers.set('Accept', httpHeaderAcceptSelected);
         }
 
-        return this.http.request(path, requestOptions);
+        // to determine the Content-Type header
+        const consumes: string[] = [
+        ];
+
+        return this.httpClient.get<UserResource>(`${this.basePath}/users/${encodeURIComponent(String(id))}`,
+            {
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
     }
 
     /**
      * List tags for a user
      * &lt;b&gt;Permissions Needed:&lt;/b&gt; USERS_ADMIN
      * @param userId The id of the user
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
      */
-    public getUserTagsWithHttpInfo(userId: number, extraHttpRequestParams?: any): Observable<Response> {
-        const path = this.basePath + '/users/${user_id}/tags'
-                    .replace('${' + 'user_id' + '}', String(userId));
-
-        let queryParameters = new URLSearchParams();
-        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
-
-        // verify required parameter 'userId' is not null or undefined
+    public getUserTags(userId: number, observe?: 'body', reportProgress?: boolean): Observable<Array<string>>;
+    public getUserTags(userId: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Array<string>>>;
+    public getUserTags(userId: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Array<string>>>;
+    public getUserTags(userId: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
         if (userId === null || userId === undefined) {
             throw new Error('Required parameter userId was null or undefined when calling getUserTags.');
         }
 
-        // to determine the Accept header
-        let produces: string[] = [
-            'application/json'
-        ];
+        let headers = this.defaultHeaders;
 
         // authentication (oauth2_client_credentials_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
         // authentication (oauth2_password_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-            
-        let requestOptions: RequestOptionsArgs = new RequestOptions({
-            method: RequestMethod.Get,
-            headers: headers,
-            search: queryParameters,
-            withCredentials:this.configuration.withCredentials
-        });
-        // https://github.com/swagger-api/swagger-codegen/issues/4037
-        if (extraHttpRequestParams) {
-            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
+        // to determine the Accept header
+        let httpHeaderAccepts: string[] = [
+            'application/json'
+        ];
+        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers = headers.set('Accept', httpHeaderAcceptSelected);
         }
 
-        return this.http.request(path, requestOptions);
+        // to determine the Content-Type header
+        const consumes: string[] = [
+        ];
+
+        return this.httpClient.get<Array<string>>(`${this.basePath}/users/${encodeURIComponent(String(userId))}/tags`,
+            {
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
     }
 
     /**
      * Get a single user template
      * &lt;b&gt;Permissions Needed:&lt;/b&gt; TEMPLATE_ADMIN or USERS_ADMIN
      * @param id The id of the template
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
      */
-    public getUserTemplateWithHttpInfo(id: string, extraHttpRequestParams?: any): Observable<Response> {
-        const path = this.basePath + '/users/templates/${id}'
-                    .replace('${' + 'id' + '}', String(id));
-
-        let queryParameters = new URLSearchParams();
-        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
-
-        // verify required parameter 'id' is not null or undefined
+    public getUserTemplate(id: string, observe?: 'body', reportProgress?: boolean): Observable<TemplateResource>;
+    public getUserTemplate(id: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<TemplateResource>>;
+    public getUserTemplate(id: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<TemplateResource>>;
+    public getUserTemplate(id: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
         if (id === null || id === undefined) {
             throw new Error('Required parameter id was null or undefined when calling getUserTemplate.');
         }
 
-        // to determine the Accept header
-        let produces: string[] = [
-            'application/json'
-        ];
+        let headers = this.defaultHeaders;
 
         // authentication (oauth2_client_credentials_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
         // authentication (oauth2_password_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-            
-        let requestOptions: RequestOptionsArgs = new RequestOptions({
-            method: RequestMethod.Get,
-            headers: headers,
-            search: queryParameters,
-            withCredentials:this.configuration.withCredentials
-        });
-        // https://github.com/swagger-api/swagger-codegen/issues/4037
-        if (extraHttpRequestParams) {
-            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
+        // to determine the Accept header
+        let httpHeaderAccepts: string[] = [
+            'application/json'
+        ];
+        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers = headers.set('Accept', httpHeaderAcceptSelected);
         }
 
-        return this.http.request(path, requestOptions);
+        // to determine the Content-Type header
+        const consumes: string[] = [
+        ];
+
+        return this.httpClient.get<TemplateResource>(`${this.basePath}/users/templates/${encodeURIComponent(String(id))}`,
+            {
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
     }
 
     /**
@@ -809,62 +495,65 @@ export class UsersService {
      * @param size The number of objects returned per page
      * @param page The number of the page returned, starting with 1
      * @param order A comma separated list of sorting requirements in priority order, each entry matching PROPERTY_NAME:[ASC|DESC]
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
      */
-    public getUserTemplatesWithHttpInfo(size?: number, page?: number, order?: string, extraHttpRequestParams?: any): Observable<Response> {
-        const path = this.basePath + '/users/templates';
+    public getUserTemplates(size?: number, page?: number, order?: string, observe?: 'body', reportProgress?: boolean): Observable<PageResourceTemplateResource>;
+    public getUserTemplates(size?: number, page?: number, order?: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<PageResourceTemplateResource>>;
+    public getUserTemplates(size?: number, page?: number, order?: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<PageResourceTemplateResource>>;
+    public getUserTemplates(size?: number, page?: number, order?: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
 
-        let queryParameters = new URLSearchParams();
-        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
-
-        if (size !== undefined) {
-            queryParameters.set('size', <any>size);
+        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
+        if (size !== undefined && size !== null) {
+            queryParameters = queryParameters.set('size', <any>size);
+        }
+        if (page !== undefined && page !== null) {
+            queryParameters = queryParameters.set('page', <any>page);
+        }
+        if (order !== undefined && order !== null) {
+            queryParameters = queryParameters.set('order', <any>order);
         }
 
-        if (page !== undefined) {
-            queryParameters.set('page', <any>page);
-        }
-
-        if (order !== undefined) {
-            queryParameters.set('order', <any>order);
-        }
-
-
-        // to determine the Accept header
-        let produces: string[] = [
-            'application/json'
-        ];
+        let headers = this.defaultHeaders;
 
         // authentication (oauth2_client_credentials_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
         // authentication (oauth2_password_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-            
-        let requestOptions: RequestOptionsArgs = new RequestOptions({
-            method: RequestMethod.Get,
-            headers: headers,
-            search: queryParameters,
-            withCredentials:this.configuration.withCredentials
-        });
-        // https://github.com/swagger-api/swagger-codegen/issues/4037
-        if (extraHttpRequestParams) {
-            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
+        // to determine the Accept header
+        let httpHeaderAccepts: string[] = [
+            'application/json'
+        ];
+        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers = headers.set('Accept', httpHeaderAcceptSelected);
         }
 
-        return this.http.request(path, requestOptions);
+        // to determine the Content-Type header
+        const consumes: string[] = [
+        ];
+
+        return this.httpClient.get<PageResourceTemplateResource>(`${this.basePath}/users/templates`,
+            {
+                params: queryParameters,
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
     }
 
     /**
@@ -885,110 +574,101 @@ export class UsersService {
      * @param size The number of objects returned per page
      * @param page The number of the page returned, starting with 1
      * @param order A comma separated list of sorting requirements in priority order, each entry matching PROPERTY_NAME:[ASC|DESC]
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
      */
-    public getUsersWithHttpInfo(filterDisplayname?: string, filterEmail?: string, filterFirstname?: string, filterFullname?: string, filterLastname?: string, filterUsername?: string, filterTag?: string, filterGroup?: string, filterRole?: string, filterLastActivity?: string, filterIdList?: string, filterSearch?: string, size?: number, page?: number, order?: string, extraHttpRequestParams?: any): Observable<Response> {
-        const path = this.basePath + '/users';
+    public getUsers(filterDisplayname?: string, filterEmail?: string, filterFirstname?: string, filterFullname?: string, filterLastname?: string, filterUsername?: string, filterTag?: string, filterGroup?: string, filterRole?: string, filterLastActivity?: string, filterIdList?: string, filterSearch?: string, size?: number, page?: number, order?: string, observe?: 'body', reportProgress?: boolean): Observable<PageResourceUserBaseResource>;
+    public getUsers(filterDisplayname?: string, filterEmail?: string, filterFirstname?: string, filterFullname?: string, filterLastname?: string, filterUsername?: string, filterTag?: string, filterGroup?: string, filterRole?: string, filterLastActivity?: string, filterIdList?: string, filterSearch?: string, size?: number, page?: number, order?: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<PageResourceUserBaseResource>>;
+    public getUsers(filterDisplayname?: string, filterEmail?: string, filterFirstname?: string, filterFullname?: string, filterLastname?: string, filterUsername?: string, filterTag?: string, filterGroup?: string, filterRole?: string, filterLastActivity?: string, filterIdList?: string, filterSearch?: string, size?: number, page?: number, order?: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<PageResourceUserBaseResource>>;
+    public getUsers(filterDisplayname?: string, filterEmail?: string, filterFirstname?: string, filterFullname?: string, filterLastname?: string, filterUsername?: string, filterTag?: string, filterGroup?: string, filterRole?: string, filterLastActivity?: string, filterIdList?: string, filterSearch?: string, size?: number, page?: number, order?: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
 
-        let queryParameters = new URLSearchParams();
-        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
-
-        if (filterDisplayname !== undefined) {
-            queryParameters.set('filter_displayname', <any>filterDisplayname);
+        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
+        if (filterDisplayname !== undefined && filterDisplayname !== null) {
+            queryParameters = queryParameters.set('filter_displayname', <any>filterDisplayname);
+        }
+        if (filterEmail !== undefined && filterEmail !== null) {
+            queryParameters = queryParameters.set('filter_email', <any>filterEmail);
+        }
+        if (filterFirstname !== undefined && filterFirstname !== null) {
+            queryParameters = queryParameters.set('filter_firstname', <any>filterFirstname);
+        }
+        if (filterFullname !== undefined && filterFullname !== null) {
+            queryParameters = queryParameters.set('filter_fullname', <any>filterFullname);
+        }
+        if (filterLastname !== undefined && filterLastname !== null) {
+            queryParameters = queryParameters.set('filter_lastname', <any>filterLastname);
+        }
+        if (filterUsername !== undefined && filterUsername !== null) {
+            queryParameters = queryParameters.set('filter_username', <any>filterUsername);
+        }
+        if (filterTag !== undefined && filterTag !== null) {
+            queryParameters = queryParameters.set('filter_tag', <any>filterTag);
+        }
+        if (filterGroup !== undefined && filterGroup !== null) {
+            queryParameters = queryParameters.set('filter_group', <any>filterGroup);
+        }
+        if (filterRole !== undefined && filterRole !== null) {
+            queryParameters = queryParameters.set('filter_role', <any>filterRole);
+        }
+        if (filterLastActivity !== undefined && filterLastActivity !== null) {
+            queryParameters = queryParameters.set('filter_last_activity', <any>filterLastActivity);
+        }
+        if (filterIdList !== undefined && filterIdList !== null) {
+            queryParameters = queryParameters.set('filter_id_list', <any>filterIdList);
+        }
+        if (filterSearch !== undefined && filterSearch !== null) {
+            queryParameters = queryParameters.set('filter_search', <any>filterSearch);
+        }
+        if (size !== undefined && size !== null) {
+            queryParameters = queryParameters.set('size', <any>size);
+        }
+        if (page !== undefined && page !== null) {
+            queryParameters = queryParameters.set('page', <any>page);
+        }
+        if (order !== undefined && order !== null) {
+            queryParameters = queryParameters.set('order', <any>order);
         }
 
-        if (filterEmail !== undefined) {
-            queryParameters.set('filter_email', <any>filterEmail);
-        }
-
-        if (filterFirstname !== undefined) {
-            queryParameters.set('filter_firstname', <any>filterFirstname);
-        }
-
-        if (filterFullname !== undefined) {
-            queryParameters.set('filter_fullname', <any>filterFullname);
-        }
-
-        if (filterLastname !== undefined) {
-            queryParameters.set('filter_lastname', <any>filterLastname);
-        }
-
-        if (filterUsername !== undefined) {
-            queryParameters.set('filter_username', <any>filterUsername);
-        }
-
-        if (filterTag !== undefined) {
-            queryParameters.set('filter_tag', <any>filterTag);
-        }
-
-        if (filterGroup !== undefined) {
-            queryParameters.set('filter_group', <any>filterGroup);
-        }
-
-        if (filterRole !== undefined) {
-            queryParameters.set('filter_role', <any>filterRole);
-        }
-
-        if (filterLastActivity !== undefined) {
-            queryParameters.set('filter_last_activity', <any>filterLastActivity);
-        }
-
-        if (filterIdList !== undefined) {
-            queryParameters.set('filter_id_list', <any>filterIdList);
-        }
-
-        if (filterSearch !== undefined) {
-            queryParameters.set('filter_search', <any>filterSearch);
-        }
-
-        if (size !== undefined) {
-            queryParameters.set('size', <any>size);
-        }
-
-        if (page !== undefined) {
-            queryParameters.set('page', <any>page);
-        }
-
-        if (order !== undefined) {
-            queryParameters.set('order', <any>order);
-        }
-
-
-        // to determine the Accept header
-        let produces: string[] = [
-            'application/json'
-        ];
+        let headers = this.defaultHeaders;
 
         // authentication (oauth2_client_credentials_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
         // authentication (oauth2_password_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-            
-        let requestOptions: RequestOptionsArgs = new RequestOptions({
-            method: RequestMethod.Get,
-            headers: headers,
-            search: queryParameters,
-            withCredentials:this.configuration.withCredentials
-        });
-        // https://github.com/swagger-api/swagger-codegen/issues/4037
-        if (extraHttpRequestParams) {
-            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
+        // to determine the Accept header
+        let httpHeaderAccepts: string[] = [
+            'application/json'
+        ];
+        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers = headers.set('Accept', httpHeaderAcceptSelected);
         }
 
-        return this.http.request(path, requestOptions);
+        // to determine the Content-Type header
+        const consumes: string[] = [
+        ];
+
+        return this.httpClient.get<PageResourceUserBaseResource>(`${this.basePath}/users`,
+            {
+                params: queryParameters,
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
     }
 
     /**
@@ -996,58 +676,62 @@ export class UsersService {
      * Finish resetting a user&#39;s password using the secret provided from the password-reset endpoint.  Password should be in plain text and will be encrypted on receipt. Use SSL for security. &lt;br&gt;&lt;br&gt;&lt;b&gt;Permissions Needed:&lt;/b&gt; ANY
      * @param id The id of the user
      * @param newPasswordRequest The new password request object
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
      */
-    public passwordResetWithHttpInfo(id: number, newPasswordRequest?: NewPasswordRequest, extraHttpRequestParams?: any): Observable<Response> {
-        const path = this.basePath + '/users/${id}/password-reset'
-                    .replace('${' + 'id' + '}', String(id));
-
-        let queryParameters = new URLSearchParams();
-        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
-
-        // verify required parameter 'id' is not null or undefined
+    public passwordReset(id: number, newPasswordRequest?: NewPasswordRequest, observe?: 'body', reportProgress?: boolean): Observable<any>;
+    public passwordReset(id: number, newPasswordRequest?: NewPasswordRequest, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
+    public passwordReset(id: number, newPasswordRequest?: NewPasswordRequest, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
+    public passwordReset(id: number, newPasswordRequest?: NewPasswordRequest, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
         if (id === null || id === undefined) {
             throw new Error('Required parameter id was null or undefined when calling passwordReset.');
         }
 
-        // to determine the Accept header
-        let produces: string[] = [
-            'application/json'
-        ];
+        let headers = this.defaultHeaders;
 
         // authentication (oauth2_client_credentials_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
         // authentication (oauth2_password_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-            
-        headers.set('Content-Type', 'application/json');
-
-        let requestOptions: RequestOptionsArgs = new RequestOptions({
-            method: RequestMethod.Put,
-            headers: headers,
-            body: newPasswordRequest == null ? '' : JSON.stringify(newPasswordRequest), // https://github.com/angular/angular/issues/10612
-            search: queryParameters,
-            withCredentials:this.configuration.withCredentials
-        });
-        // https://github.com/swagger-api/swagger-codegen/issues/4037
-        if (extraHttpRequestParams) {
-            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
+        // to determine the Accept header
+        let httpHeaderAccepts: string[] = [
+            'application/json'
+        ];
+        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers = headers.set('Accept', httpHeaderAcceptSelected);
         }
 
-        return this.http.request(path, requestOptions);
+        // to determine the Content-Type header
+        const consumes: string[] = [
+            'application/json'
+        ];
+        const httpContentTypeSelected: string | undefined = this.configuration.selectHeaderContentType(consumes);
+        if (httpContentTypeSelected != undefined) {
+            headers = headers.set('Content-Type', httpContentTypeSelected);
+        }
+
+        return this.httpClient.put<any>(`${this.basePath}/users/${encodeURIComponent(String(id))}/password-reset`,
+            newPasswordRequest,
+            {
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
     }
 
     /**
@@ -1055,93 +739,105 @@ export class UsersService {
      * 
      * @param recipientId The user id
      * @param chatMessageRequest The chat message request
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
      */
-    public postUserMessageWithHttpInfo(recipientId: number, chatMessageRequest?: ChatMessageRequest, extraHttpRequestParams?: any): Observable<Response> {
-        const path = this.basePath + '/users/${recipient_id}/messages'
-                    .replace('${' + 'recipient_id' + '}', String(recipientId));
-
-        let queryParameters = new URLSearchParams();
-        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
-
-        // verify required parameter 'recipientId' is not null or undefined
+    public postUserMessage(recipientId: number, chatMessageRequest?: ChatMessageRequest, observe?: 'body', reportProgress?: boolean): Observable<ChatMessageResource>;
+    public postUserMessage(recipientId: number, chatMessageRequest?: ChatMessageRequest, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<ChatMessageResource>>;
+    public postUserMessage(recipientId: number, chatMessageRequest?: ChatMessageRequest, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<ChatMessageResource>>;
+    public postUserMessage(recipientId: number, chatMessageRequest?: ChatMessageRequest, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
         if (recipientId === null || recipientId === undefined) {
             throw new Error('Required parameter recipientId was null or undefined when calling postUserMessage.');
         }
 
+        let headers = this.defaultHeaders;
+
         // to determine the Accept header
-        let produces: string[] = [
+        let httpHeaderAccepts: string[] = [
             'application/json'
         ];
-
-            
-        headers.set('Content-Type', 'application/json');
-
-        let requestOptions: RequestOptionsArgs = new RequestOptions({
-            method: RequestMethod.Post,
-            headers: headers,
-            body: chatMessageRequest == null ? '' : JSON.stringify(chatMessageRequest), // https://github.com/angular/angular/issues/10612
-            search: queryParameters,
-            withCredentials:this.configuration.withCredentials
-        });
-        // https://github.com/swagger-api/swagger-codegen/issues/4037
-        if (extraHttpRequestParams) {
-            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
+        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers = headers.set('Accept', httpHeaderAcceptSelected);
         }
 
-        return this.http.request(path, requestOptions);
+        // to determine the Content-Type header
+        const consumes: string[] = [
+            'application/json'
+        ];
+        const httpContentTypeSelected: string | undefined = this.configuration.selectHeaderContentType(consumes);
+        if (httpContentTypeSelected != undefined) {
+            headers = headers.set('Content-Type', httpContentTypeSelected);
+        }
+
+        return this.httpClient.post<ChatMessageResource>(`${this.basePath}/users/${encodeURIComponent(String(recipientId))}/messages`,
+            chatMessageRequest,
+            {
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
     }
 
     /**
      * Register a new user
      * Password should be in plain text and will be encrypted on receipt. Use SSL for security. &lt;br&gt;&lt;br&gt;&lt;b&gt;Permissions Needed:&lt;/b&gt; ANY
      * @param userResource The user resource object
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
      */
-    public registerUserWithHttpInfo(userResource?: UserResource, extraHttpRequestParams?: any): Observable<Response> {
-        const path = this.basePath + '/users';
+    public registerUser(userResource?: UserResource, observe?: 'body', reportProgress?: boolean): Observable<UserResource>;
+    public registerUser(userResource?: UserResource, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<UserResource>>;
+    public registerUser(userResource?: UserResource, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<UserResource>>;
+    public registerUser(userResource?: UserResource, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
 
-        let queryParameters = new URLSearchParams();
-        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
-
-
-        // to determine the Accept header
-        let produces: string[] = [
-            'application/json'
-        ];
+        let headers = this.defaultHeaders;
 
         // authentication (oauth2_client_credentials_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
         // authentication (oauth2_password_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-            
-        headers.set('Content-Type', 'application/json');
-
-        let requestOptions: RequestOptionsArgs = new RequestOptions({
-            method: RequestMethod.Post,
-            headers: headers,
-            body: userResource == null ? '' : JSON.stringify(userResource), // https://github.com/angular/angular/issues/10612
-            search: queryParameters,
-            withCredentials:this.configuration.withCredentials
-        });
-        // https://github.com/swagger-api/swagger-codegen/issues/4037
-        if (extraHttpRequestParams) {
-            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
+        // to determine the Accept header
+        let httpHeaderAccepts: string[] = [
+            'application/json'
+        ];
+        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers = headers.set('Accept', httpHeaderAcceptSelected);
         }
 
-        return this.http.request(path, requestOptions);
+        // to determine the Content-Type header
+        const consumes: string[] = [
+            'application/json'
+        ];
+        const httpContentTypeSelected: string | undefined = this.configuration.selectHeaderContentType(consumes);
+        if (httpContentTypeSelected != undefined) {
+            headers = headers.set('Content-Type', httpContentTypeSelected);
+        }
+
+        return this.httpClient.post<UserResource>(`${this.basePath}/users`,
+            userResource,
+            {
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
     }
 
     /**
@@ -1149,60 +845,59 @@ export class UsersService {
      * &lt;b&gt;Permissions Needed:&lt;/b&gt; USERS_ADMIN
      * @param userId The id of the user
      * @param tag The tag to remove
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
      */
-    public removeUserTagWithHttpInfo(userId: number, tag: string, extraHttpRequestParams?: any): Observable<Response> {
-        const path = this.basePath + '/users/${user_id}/tags/${tag}'
-                    .replace('${' + 'user_id' + '}', String(userId))
-                    .replace('${' + 'tag' + '}', String(tag));
-
-        let queryParameters = new URLSearchParams();
-        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
-
-        // verify required parameter 'userId' is not null or undefined
+    public removeUserTag(userId: number, tag: string, observe?: 'body', reportProgress?: boolean): Observable<any>;
+    public removeUserTag(userId: number, tag: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
+    public removeUserTag(userId: number, tag: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
+    public removeUserTag(userId: number, tag: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
         if (userId === null || userId === undefined) {
             throw new Error('Required parameter userId was null or undefined when calling removeUserTag.');
         }
-        // verify required parameter 'tag' is not null or undefined
         if (tag === null || tag === undefined) {
             throw new Error('Required parameter tag was null or undefined when calling removeUserTag.');
         }
 
-        // to determine the Accept header
-        let produces: string[] = [
-            'application/json'
-        ];
+        let headers = this.defaultHeaders;
 
         // authentication (oauth2_client_credentials_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
         // authentication (oauth2_password_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-            
-        let requestOptions: RequestOptionsArgs = new RequestOptions({
-            method: RequestMethod.Delete,
-            headers: headers,
-            search: queryParameters,
-            withCredentials:this.configuration.withCredentials
-        });
-        // https://github.com/swagger-api/swagger-codegen/issues/4037
-        if (extraHttpRequestParams) {
-            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
+        // to determine the Accept header
+        let httpHeaderAccepts: string[] = [
+            'application/json'
+        ];
+        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers = headers.set('Accept', httpHeaderAcceptSelected);
         }
 
-        return this.http.request(path, requestOptions);
+        // to determine the Content-Type header
+        const consumes: string[] = [
+        ];
+
+        return this.httpClient.delete<any>(`${this.basePath}/users/${encodeURIComponent(String(userId))}/tags/${encodeURIComponent(String(tag))}`,
+            {
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
     }
 
     /**
@@ -1210,166 +905,179 @@ export class UsersService {
      * Password should be in plain text and will be encrypted on receipt. Use SSL for security. &lt;br&gt;&lt;br&gt;&lt;b&gt;Permissions Needed:&lt;/b&gt; USERS_ADMIN or (USERS_USER and owner)
      * @param id The id of the user
      * @param password The new plain text password
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
      */
-    public setPasswordWithHttpInfo(id: number, password?: StringWrapper, extraHttpRequestParams?: any): Observable<Response> {
-        const path = this.basePath + '/users/${id}/password'
-                    .replace('${' + 'id' + '}', String(id));
-
-        let queryParameters = new URLSearchParams();
-        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
-
-        // verify required parameter 'id' is not null or undefined
+    public setPassword(id: number, password?: StringWrapper, observe?: 'body', reportProgress?: boolean): Observable<any>;
+    public setPassword(id: number, password?: StringWrapper, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
+    public setPassword(id: number, password?: StringWrapper, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
+    public setPassword(id: number, password?: StringWrapper, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
         if (id === null || id === undefined) {
             throw new Error('Required parameter id was null or undefined when calling setPassword.');
         }
 
-        // to determine the Accept header
-        let produces: string[] = [
-            'application/json'
-        ];
+        let headers = this.defaultHeaders;
 
         // authentication (oauth2_client_credentials_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
         // authentication (oauth2_password_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-            
-        headers.set('Content-Type', 'application/json');
-
-        let requestOptions: RequestOptionsArgs = new RequestOptions({
-            method: RequestMethod.Put,
-            headers: headers,
-            body: password == null ? '' : JSON.stringify(password), // https://github.com/angular/angular/issues/10612
-            search: queryParameters,
-            withCredentials:this.configuration.withCredentials
-        });
-        // https://github.com/swagger-api/swagger-codegen/issues/4037
-        if (extraHttpRequestParams) {
-            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
+        // to determine the Accept header
+        let httpHeaderAccepts: string[] = [
+            'application/json'
+        ];
+        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers = headers.set('Accept', httpHeaderAcceptSelected);
         }
 
-        return this.http.request(path, requestOptions);
+        // to determine the Content-Type header
+        const consumes: string[] = [
+            'application/json'
+        ];
+        const httpContentTypeSelected: string | undefined = this.configuration.selectHeaderContentType(consumes);
+        if (httpContentTypeSelected != undefined) {
+            headers = headers.set('Content-Type', httpContentTypeSelected);
+        }
+
+        return this.httpClient.put<any>(`${this.basePath}/users/${encodeURIComponent(String(id))}/password`,
+            password,
+            {
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
     }
 
     /**
      * Reset a user&#39;s password
      * A reset code will be generated and a &#39;forgot_password&#39; BRE event will be fired with that code.  The default system rule will send an email to the selected user if an email service has been setup. You can modify that rule in BRE to send an SMS instead or any other type of notification as you see fit. &lt;br&gt;&lt;br&gt;&lt;b&gt;Permissions Needed:&lt;/b&gt; ANY
      * @param id The id of the user
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
      */
-    public startPasswordResetWithHttpInfo(id: number, extraHttpRequestParams?: any): Observable<Response> {
-        const path = this.basePath + '/users/${id}/password-reset'
-                    .replace('${' + 'id' + '}', String(id));
-
-        let queryParameters = new URLSearchParams();
-        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
-
-        // verify required parameter 'id' is not null or undefined
+    public startPasswordReset(id: number, observe?: 'body', reportProgress?: boolean): Observable<any>;
+    public startPasswordReset(id: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
+    public startPasswordReset(id: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
+    public startPasswordReset(id: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
         if (id === null || id === undefined) {
             throw new Error('Required parameter id was null or undefined when calling startPasswordReset.');
         }
 
-        // to determine the Accept header
-        let produces: string[] = [
-            'application/json'
-        ];
+        let headers = this.defaultHeaders;
 
         // authentication (oauth2_client_credentials_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
         // authentication (oauth2_password_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-            
-        let requestOptions: RequestOptionsArgs = new RequestOptions({
-            method: RequestMethod.Post,
-            headers: headers,
-            search: queryParameters,
-            withCredentials:this.configuration.withCredentials
-        });
-        // https://github.com/swagger-api/swagger-codegen/issues/4037
-        if (extraHttpRequestParams) {
-            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
+        // to determine the Accept header
+        let httpHeaderAccepts: string[] = [
+            'application/json'
+        ];
+        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers = headers.set('Accept', httpHeaderAcceptSelected);
         }
 
-        return this.http.request(path, requestOptions);
+        // to determine the Content-Type header
+        const consumes: string[] = [
+            'application/json'
+        ];
+
+        return this.httpClient.post<any>(`${this.basePath}/users/${encodeURIComponent(String(id))}/password-reset`,
+            null,
+            {
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
     }
 
     /**
      * Reset a user&#39;s password without user id
      * A reset code will be generated and a &#39;forgot_password&#39; BRE event will be fired with that code.  The default system rule will send an email to the selected user if an email service has been setup. You can modify that rule in BRE to send an SMS instead or any other type of notification as you see fit.  Must submit their email, username, or mobile phone number. &lt;br&gt;&lt;br&gt;&lt;b&gt;Permissions Needed:&lt;/b&gt; ANY
      * @param passwordReset An object containing one of three methods to look up a user
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
      */
-    public submitPasswordResetWithHttpInfo(passwordReset?: PasswordResetRequest, extraHttpRequestParams?: any): Observable<Response> {
-        const path = this.basePath + '/users/password-reset';
+    public submitPasswordReset(passwordReset?: PasswordResetRequest, observe?: 'body', reportProgress?: boolean): Observable<any>;
+    public submitPasswordReset(passwordReset?: PasswordResetRequest, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
+    public submitPasswordReset(passwordReset?: PasswordResetRequest, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
+    public submitPasswordReset(passwordReset?: PasswordResetRequest, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
 
-        let queryParameters = new URLSearchParams();
-        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
-
-
-        // to determine the Accept header
-        let produces: string[] = [
-            'application/json'
-        ];
+        let headers = this.defaultHeaders;
 
         // authentication (oauth2_client_credentials_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
         // authentication (oauth2_password_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-            
-        headers.set('Content-Type', 'application/json');
-
-        let requestOptions: RequestOptionsArgs = new RequestOptions({
-            method: RequestMethod.Post,
-            headers: headers,
-            body: passwordReset == null ? '' : JSON.stringify(passwordReset), // https://github.com/angular/angular/issues/10612
-            search: queryParameters,
-            withCredentials:this.configuration.withCredentials
-        });
-        // https://github.com/swagger-api/swagger-codegen/issues/4037
-        if (extraHttpRequestParams) {
-            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
+        // to determine the Accept header
+        let httpHeaderAccepts: string[] = [
+            'application/json'
+        ];
+        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers = headers.set('Accept', httpHeaderAcceptSelected);
         }
 
-        return this.http.request(path, requestOptions);
+        // to determine the Content-Type header
+        const consumes: string[] = [
+            'application/json'
+        ];
+        const httpContentTypeSelected: string | undefined = this.configuration.selectHeaderContentType(consumes);
+        if (httpContentTypeSelected != undefined) {
+            headers = headers.set('Content-Type', httpContentTypeSelected);
+        }
+
+        return this.httpClient.post<any>(`${this.basePath}/users/password-reset`,
+            passwordReset,
+            {
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
     }
 
     /**
@@ -1377,58 +1085,62 @@ export class UsersService {
      * Password will not be edited on this endpoint, use password specific endpoints. &lt;br&gt;&lt;br&gt;&lt;b&gt;Permissions Needed:&lt;/b&gt; USERS_ADMIN or owner
      * @param id The id of the user or &#39;me&#39;
      * @param userResource The user resource object
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
      */
-    public updateUserWithHttpInfo(id: string, userResource?: UserResource, extraHttpRequestParams?: any): Observable<Response> {
-        const path = this.basePath + '/users/${id}'
-                    .replace('${' + 'id' + '}', String(id));
-
-        let queryParameters = new URLSearchParams();
-        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
-
-        // verify required parameter 'id' is not null or undefined
+    public updateUser(id: string, userResource?: UserResource, observe?: 'body', reportProgress?: boolean): Observable<any>;
+    public updateUser(id: string, userResource?: UserResource, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
+    public updateUser(id: string, userResource?: UserResource, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
+    public updateUser(id: string, userResource?: UserResource, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
         if (id === null || id === undefined) {
             throw new Error('Required parameter id was null or undefined when calling updateUser.');
         }
 
-        // to determine the Accept header
-        let produces: string[] = [
-            'application/json'
-        ];
+        let headers = this.defaultHeaders;
 
         // authentication (oauth2_client_credentials_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
         // authentication (oauth2_password_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-            
-        headers.set('Content-Type', 'application/json');
-
-        let requestOptions: RequestOptionsArgs = new RequestOptions({
-            method: RequestMethod.Put,
-            headers: headers,
-            body: userResource == null ? '' : JSON.stringify(userResource), // https://github.com/angular/angular/issues/10612
-            search: queryParameters,
-            withCredentials:this.configuration.withCredentials
-        });
-        // https://github.com/swagger-api/swagger-codegen/issues/4037
-        if (extraHttpRequestParams) {
-            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
+        // to determine the Accept header
+        let httpHeaderAccepts: string[] = [
+            'application/json'
+        ];
+        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers = headers.set('Accept', httpHeaderAcceptSelected);
         }
 
-        return this.http.request(path, requestOptions);
+        // to determine the Content-Type header
+        const consumes: string[] = [
+            'application/json'
+        ];
+        const httpContentTypeSelected: string | undefined = this.configuration.selectHeaderContentType(consumes);
+        if (httpContentTypeSelected != undefined) {
+            headers = headers.set('Content-Type', httpContentTypeSelected);
+        }
+
+        return this.httpClient.put<any>(`${this.basePath}/users/${encodeURIComponent(String(id))}`,
+            userResource,
+            {
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
     }
 
     /**
@@ -1436,58 +1148,62 @@ export class UsersService {
      * &lt;b&gt;Permissions Needed:&lt;/b&gt; TEMPLATE_ADMIN
      * @param id The id of the template
      * @param userTemplateResource The user template resource object
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
      */
-    public updateUserTemplateWithHttpInfo(id: string, userTemplateResource?: TemplateResource, extraHttpRequestParams?: any): Observable<Response> {
-        const path = this.basePath + '/users/templates/${id}'
-                    .replace('${' + 'id' + '}', String(id));
-
-        let queryParameters = new URLSearchParams();
-        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
-
-        // verify required parameter 'id' is not null or undefined
+    public updateUserTemplate(id: string, userTemplateResource?: TemplateResource, observe?: 'body', reportProgress?: boolean): Observable<TemplateResource>;
+    public updateUserTemplate(id: string, userTemplateResource?: TemplateResource, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<TemplateResource>>;
+    public updateUserTemplate(id: string, userTemplateResource?: TemplateResource, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<TemplateResource>>;
+    public updateUserTemplate(id: string, userTemplateResource?: TemplateResource, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
         if (id === null || id === undefined) {
             throw new Error('Required parameter id was null or undefined when calling updateUserTemplate.');
         }
 
-        // to determine the Accept header
-        let produces: string[] = [
-            'application/json'
-        ];
+        let headers = this.defaultHeaders;
 
         // authentication (oauth2_client_credentials_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
         // authentication (oauth2_password_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-            
-        headers.set('Content-Type', 'application/json');
-
-        let requestOptions: RequestOptionsArgs = new RequestOptions({
-            method: RequestMethod.Put,
-            headers: headers,
-            body: userTemplateResource == null ? '' : JSON.stringify(userTemplateResource), // https://github.com/angular/angular/issues/10612
-            search: queryParameters,
-            withCredentials:this.configuration.withCredentials
-        });
-        // https://github.com/swagger-api/swagger-codegen/issues/4037
-        if (extraHttpRequestParams) {
-            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
+        // to determine the Accept header
+        let httpHeaderAccepts: string[] = [
+            'application/json'
+        ];
+        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers = headers.set('Accept', httpHeaderAcceptSelected);
         }
 
-        return this.http.request(path, requestOptions);
+        // to determine the Content-Type header
+        const consumes: string[] = [
+            'application/json'
+        ];
+        const httpContentTypeSelected: string | undefined = this.configuration.selectHeaderContentType(consumes);
+        if (httpContentTypeSelected != undefined) {
+            headers = headers.set('Content-Type', httpContentTypeSelected);
+        }
+
+        return this.httpClient.put<TemplateResource>(`${this.basePath}/users/templates/${encodeURIComponent(String(id))}`,
+            userTemplateResource,
+            {
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
     }
 
 }

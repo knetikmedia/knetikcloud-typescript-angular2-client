@@ -9,39 +9,32 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
-
 import { SimpleUserResource } from './simpleUserResource';
 
 
-export interface DispositionResource {
+export interface DispositionResource { 
     /**
      * The context of that resource. Required when passed to /dispositions rather than context specific endpoint
      */
     context?: string;
-
     /**
      * The context_id of that resource. Required when passed to /dispositions rather than context specific endpoint
      */
     contextId?: string;
-
     /**
      * The date/time this resource was created in seconds since unix epoch
      */
-    createdDate?: number;
-
+    readonly createdDate?: number;
     /**
      * The unique ID for that resource
      */
-    id?: number;
-
+    readonly id?: number;
     /**
      * The name of the disposition, 1-20 characters. (ex: like/dislike/favorite, etc)
      */
     name: string;
-
     /**
      * The user
      */
-    user?: SimpleUserResource;
-
+    readonly user?: SimpleUserResource;
 }

@@ -11,11 +11,9 @@
  */
 
 
-
-export interface InvoiceCreateRequest {
+export interface InvoiceCreateRequest { 
     /**
      * The guid of a cart to create a new invoice for
      */
     cartGuid: string;
-
 }

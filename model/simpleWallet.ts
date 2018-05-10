@@ -11,31 +11,25 @@
  */
 
 
-
-export interface SimpleWallet {
+export interface SimpleWallet { 
     /**
      * The current balance of the wallet
      */
     balance?: number;
-
     /**
      * The ISO currency code for the wallet
      */
     code?: string;
-
     /**
      * The name of the currency stored in the wallet
      */
     currencyName?: string;
-
     /**
      * The unique ID of the wallet
      */
     id?: number;
-
     /**
      * The ID of the user to whom the wallet belongs
      */
     userId?: number;
-
 }

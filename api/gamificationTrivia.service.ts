@@ -9,16 +9,14 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
-
 /* tslint:disable:no-unused-variable member-ordering */
 
 import { Inject, Injectable, Optional }                      from '@angular/core';
-import { Http, Headers, URLSearchParams }                    from '@angular/http';
-import { RequestMethod, RequestOptions, RequestOptionsArgs } from '@angular/http';
-import { Response, ResponseContentType }                     from '@angular/http';
+import { HttpClient, HttpHeaders, HttpParams,
+         HttpResponse, HttpEvent }                           from '@angular/common/http';
+import { CustomHttpUrlEncodingCodec }                        from '../encoder';
 
 import { Observable }                                        from 'rxjs/Observable';
-import '../rxjs-operators';
 
 import { AnswerResource } from '../model/answerResource';
 import { DeltaResource } from '../model/deltaResource';
@@ -39,32 +37,17 @@ import { Configuration }                                     from '../configurat
 export class GamificationTriviaService {
 
     protected basePath = 'https://jsapi-integration.us-east-1.elasticbeanstalk.com';
-    public defaultHeaders: Headers = new Headers();
-    public configuration: Configuration = new Configuration();
+    public defaultHeaders = new HttpHeaders();
+    public configuration = new Configuration();
 
-    constructor(protected http: Http, @Optional()@Inject(BASE_PATH) basePath: string, @Optional() configuration: Configuration) {
+    constructor(protected httpClient: HttpClient, @Optional()@Inject(BASE_PATH) basePath: string, @Optional() configuration: Configuration) {
         if (basePath) {
             this.basePath = basePath;
         }
         if (configuration) {
             this.configuration = configuration;
-			this.basePath = basePath || configuration.basePath || this.basePath;
+            this.basePath = basePath || configuration.basePath || this.basePath;
         }
-    }
-
-    /**
-     * 
-     * Extends object by coping non-existing properties.
-     * @param objA object to be extended
-     * @param objB source object
-     */
-    private extendObj<T1,T2>(objA: T1, objB: T2) {
-        for(let key in objB){
-            if(objB.hasOwnProperty(key)){
-                (objA as any)[key] = (objB as any)[key];
-            }
-        }
-        return <T1&T2>objA;
     }
 
     /**
@@ -73,553 +56,12 @@ export class GamificationTriviaService {
      */
     private canConsumeForm(consumes: string[]): boolean {
         const form = 'multipart/form-data';
-        for (let consume of consumes) {
+        for (const consume of consumes) {
             if (form === consume) {
                 return true;
             }
         }
         return false;
-    }
-
-    /**
-     * <b>Permissions Needed:</b> TRIVIA_ADMIN
-     * @summary Add an answer to a question
-     * @param questionId The id of the question
-     * @param answer The new answer
-     */
-    public addQuestionAnswers(questionId: string, answer?: AnswerResource, extraHttpRequestParams?: any): Observable<AnswerResource> {
-        return this.addQuestionAnswersWithHttpInfo(questionId, answer, extraHttpRequestParams)
-            .map((response: Response) => {
-                if (response.status === 204) {
-                    return undefined;
-                } else {
-                    return response.json() || {};
-                }
-            });
-    }
-
-    /**
-     * <b>Permissions Needed:</b> TRIVIA_ADMIN
-     * @summary Add a tag to a question
-     * @param id The id of the question
-     * @param tag The new tag
-     */
-    public addQuestionTag(id: string, tag?: StringWrapper, extraHttpRequestParams?: any): Observable<{}> {
-        return this.addQuestionTagWithHttpInfo(id, tag, extraHttpRequestParams)
-            .map((response: Response) => {
-                if (response.status === 204) {
-                    return undefined;
-                } else {
-                    return response.json() || {};
-                }
-            });
-    }
-
-    /**
-     * All questions that dont't have the tag and match filters will have it added. The returned number is the number of questions updated. <br><br><b>Permissions Needed:</b> TRIVIA_ADMIN
-     * @summary Add a tag to a batch of questions
-     * @param tag The tag to add
-     * @param filterSearch Filter for documents whose question, answers or tags contains provided string
-     * @param filterIdset Filter for documents whose id is in the comma separated list provided
-     * @param filterCategory Filter for questions with specified category, by id
-     * @param filterTag Filter for questions with specified tag
-     * @param filterTagset Filter for questions with specified tags (separated by comma)
-     * @param filterType Filter for questions with specified type
-     * @param filterPublished Filter for questions currenctly published or not
-     * @param filterImportId Filter for questions from a specific import job
-     */
-    public addTagToQuestionsBatch(tag?: StringWrapper, filterSearch?: string, filterIdset?: string, filterCategory?: string, filterTag?: string, filterTagset?: string, filterType?: string, filterPublished?: boolean, filterImportId?: number, extraHttpRequestParams?: any): Observable<number> {
-        return this.addTagToQuestionsBatchWithHttpInfo(tag, filterSearch, filterIdset, filterCategory, filterTag, filterTagset, filterType, filterPublished, filterImportId, extraHttpRequestParams)
-            .map((response: Response) => {
-                if (response.status === 204) {
-                    return undefined;
-                } else {
-                    return response.json() || {};
-                }
-            });
-    }
-
-    /**
-     * Set up a job to import a set of trivia questions from a cvs file at a remote url. the file will be validated asynchronously but will not be processed until started manually with the process endpoint. <br><br><b>Permissions Needed:</b> TRIVIA_ADMIN
-     * @summary Create an import job
-     * @param request The new import job
-     */
-    public createImportJob(request?: ImportJobResource, extraHttpRequestParams?: any): Observable<ImportJobResource> {
-        return this.createImportJobWithHttpInfo(request, extraHttpRequestParams)
-            .map((response: Response) => {
-                if (response.status === 204) {
-                    return undefined;
-                } else {
-                    return response.json() || {};
-                }
-            });
-    }
-
-    /**
-     * <b>Permissions Needed:</b> TRIVIA_ADMIN
-     * @summary Create a question
-     * @param question The new question
-     */
-    public createQuestion(question?: QuestionResource, extraHttpRequestParams?: any): Observable<QuestionResource> {
-        return this.createQuestionWithHttpInfo(question, extraHttpRequestParams)
-            .map((response: Response) => {
-                if (response.status === 204) {
-                    return undefined;
-                } else {
-                    return response.json() || {};
-                }
-            });
-    }
-
-    /**
-     * Question templates define a type of question and the properties they have. <br><br><b>Permissions Needed:</b> TRIVIA_ADMIN
-     * @summary Create a question template
-     * @param questionTemplateResource The question template resource object
-     */
-    public createQuestionTemplate(questionTemplateResource?: QuestionTemplateResource, extraHttpRequestParams?: any): Observable<QuestionTemplateResource> {
-        return this.createQuestionTemplateWithHttpInfo(questionTemplateResource, extraHttpRequestParams)
-            .map((response: Response) => {
-                if (response.status === 204) {
-                    return undefined;
-                } else {
-                    return response.json() || {};
-                }
-            });
-    }
-
-    /**
-     * Also deletes all questions that were imported by it. <br><br><b>Permissions Needed:</b> TRIVIA_ADMIN
-     * @summary Delete an import job
-     * @param id The id of the job
-     */
-    public deleteImportJob(id: number, extraHttpRequestParams?: any): Observable<{}> {
-        return this.deleteImportJobWithHttpInfo(id, extraHttpRequestParams)
-            .map((response: Response) => {
-                if (response.status === 204) {
-                    return undefined;
-                } else {
-                    return response.json() || {};
-                }
-            });
-    }
-
-    /**
-     * <b>Permissions Needed:</b> TRIVIA_ADMIN
-     * @summary Delete a question
-     * @param id The id of the question
-     */
-    public deleteQuestion(id: string, extraHttpRequestParams?: any): Observable<{}> {
-        return this.deleteQuestionWithHttpInfo(id, extraHttpRequestParams)
-            .map((response: Response) => {
-                if (response.status === 204) {
-                    return undefined;
-                } else {
-                    return response.json() || {};
-                }
-            });
-    }
-
-    /**
-     * <b>Permissions Needed:</b> TRIVIA_ADMIN
-     * @summary Remove an answer from a question
-     * @param questionId The id of the question
-     * @param id The id of the answer
-     */
-    public deleteQuestionAnswers(questionId: string, id: string, extraHttpRequestParams?: any): Observable<{}> {
-        return this.deleteQuestionAnswersWithHttpInfo(questionId, id, extraHttpRequestParams)
-            .map((response: Response) => {
-                if (response.status === 204) {
-                    return undefined;
-                } else {
-                    return response.json() || {};
-                }
-            });
-    }
-
-    /**
-     * If cascade = 'detach', it will force delete the template even if it's attached to other objects. <br><br><b>Permissions Needed:</b> TEMPLATE_ADMIN
-     * @summary Delete a question template
-     * @param id The id of the template
-     * @param cascade The value needed to delete used templates
-     */
-    public deleteQuestionTemplate(id: string, cascade?: string, extraHttpRequestParams?: any): Observable<{}> {
-        return this.deleteQuestionTemplateWithHttpInfo(id, cascade, extraHttpRequestParams)
-            .map((response: Response) => {
-                if (response.status === 204) {
-                    return undefined;
-                } else {
-                    return response.json() || {};
-                }
-            });
-    }
-
-    /**
-     * <b>Permissions Needed:</b> TRIVIA_ADMIN
-     * @summary Get an import job
-     * @param id The id of the job
-     */
-    public getImportJob(id: number, extraHttpRequestParams?: any): Observable<ImportJobResource> {
-        return this.getImportJobWithHttpInfo(id, extraHttpRequestParams)
-            .map((response: Response) => {
-                if (response.status === 204) {
-                    return undefined;
-                } else {
-                    return response.json() || {};
-                }
-            });
-    }
-
-    /**
-     * <b>Permissions Needed:</b> TRIVIA_ADMIN
-     * @summary Get a list of import job
-     * @param filterVendor Filter for jobs by vendor id
-     * @param filterCategory Filter for jobs by category id
-     * @param filterName Filter for jobs which name *STARTS* with the given string
-     * @param filterStatus Filter for jobs that are in a specific set of statuses (comma separated)
-     * @param size The number of objects returned per page
-     * @param page The number of the page returned, starting with 1
-     * @param order A comma separated list of sorting requirements in priority order, each entry matching PROPERTY_NAME:[ASC|DESC]
-     */
-    public getImportJobs(filterVendor?: string, filterCategory?: string, filterName?: string, filterStatus?: string, size?: number, page?: number, order?: string, extraHttpRequestParams?: any): Observable<PageResourceImportJobResource> {
-        return this.getImportJobsWithHttpInfo(filterVendor, filterCategory, filterName, filterStatus, size, page, order, extraHttpRequestParams)
-            .map((response: Response) => {
-                if (response.status === 204) {
-                    return undefined;
-                } else {
-                    return response.json() || {};
-                }
-            });
-    }
-
-    /**
-     * <b>Permissions Needed:</b> TRIVIA_ADMIN
-     * @summary Get a single question
-     * @param id The id of the question
-     */
-    public getQuestion(id: string, extraHttpRequestParams?: any): Observable<QuestionResource> {
-        return this.getQuestionWithHttpInfo(id, extraHttpRequestParams)
-            .map((response: Response) => {
-                if (response.status === 204) {
-                    return undefined;
-                } else {
-                    return response.json() || {};
-                }
-            });
-    }
-
-    /**
-     * <b>Permissions Needed:</b> TRIVIA_ADMIN
-     * @summary Get an answer for a question
-     * @param questionId The id of the question
-     * @param id The id of the answer
-     */
-    public getQuestionAnswer(questionId: string, id: string, extraHttpRequestParams?: any): Observable<AnswerResource> {
-        return this.getQuestionAnswerWithHttpInfo(questionId, id, extraHttpRequestParams)
-            .map((response: Response) => {
-                if (response.status === 204) {
-                    return undefined;
-                } else {
-                    return response.json() || {};
-                }
-            });
-    }
-
-    /**
-     * <b>Permissions Needed:</b> TRIVIA_ADMIN
-     * @summary List the answers available for a question
-     * @param questionId The id of the question
-     */
-    public getQuestionAnswers(questionId: string, extraHttpRequestParams?: any): Observable<Array<AnswerResource>> {
-        return this.getQuestionAnswersWithHttpInfo(questionId, extraHttpRequestParams)
-            .map((response: Response) => {
-                if (response.status === 204) {
-                    return undefined;
-                } else {
-                    return response.json() || {};
-                }
-            });
-    }
-
-    /**
-     * The 'since' parameter is important to avoid getting a full list of all questions. Implementors should make sure they pass the updated date of the last resource loaded, not the date of the last request, in order to avoid gaps. <br><br><b>Permissions Needed:</b> TRIVIA_ADMIN
-     * @summary List question deltas in ascending order of updated date
-     * @param since Timestamp in seconds
-     */
-    public getQuestionDeltas(since?: number, extraHttpRequestParams?: any): Observable<Array<DeltaResource>> {
-        return this.getQuestionDeltasWithHttpInfo(since, extraHttpRequestParams)
-            .map((response: Response) => {
-                if (response.status === 204) {
-                    return undefined;
-                } else {
-                    return response.json() || {};
-                }
-            });
-    }
-
-    /**
-     * <b>Permissions Needed:</b> TRIVIA_ADMIN
-     * @summary List the tags for a question
-     * @param id The id of the question
-     */
-    public getQuestionTags(id: string, extraHttpRequestParams?: any): Observable<Array<string>> {
-        return this.getQuestionTagsWithHttpInfo(id, extraHttpRequestParams)
-            .map((response: Response) => {
-                if (response.status === 204) {
-                    return undefined;
-                } else {
-                    return response.json() || {};
-                }
-            });
-    }
-
-    /**
-     * <b>Permissions Needed:</b> TEMPLATE_ADMIN or TRIVIA_ADMIN
-     * @summary Get a single question template
-     * @param id The id of the template
-     */
-    public getQuestionTemplate(id: string, extraHttpRequestParams?: any): Observable<QuestionTemplateResource> {
-        return this.getQuestionTemplateWithHttpInfo(id, extraHttpRequestParams)
-            .map((response: Response) => {
-                if (response.status === 204) {
-                    return undefined;
-                } else {
-                    return response.json() || {};
-                }
-            });
-    }
-
-    /**
-     * <b>Permissions Needed:</b> TEMPLATE_ADMIN or TRIVIA_ADMIN
-     * @summary List and search question templates
-     * @param size The number of objects returned per page
-     * @param page The number of the page returned, starting with 1
-     * @param order A comma separated list of sorting requirements in priority order, each entry matching PROPERTY_NAME:[ASC|DESC]
-     */
-    public getQuestionTemplates(size?: number, page?: number, order?: string, extraHttpRequestParams?: any): Observable<PageResourceQuestionTemplateResource> {
-        return this.getQuestionTemplatesWithHttpInfo(size, page, order, extraHttpRequestParams)
-            .map((response: Response) => {
-                if (response.status === 204) {
-                    return undefined;
-                } else {
-                    return response.json() || {};
-                }
-            });
-    }
-
-    /**
-     * <b>Permissions Needed:</b> TRIVIA_ADMIN
-     * @summary List and search questions
-     * @param size The number of objects returned per page
-     * @param page The number of the page returned, starting with 1
-     * @param order A comma separated list of sorting requirements in priority order, each entry matching PROPERTY_NAME:[ASC|DESC]
-     * @param filterSearch Filter for documents whose question, answers or tags contains provided string
-     * @param filterIdset Filter for documents whose id is in the comma separated list provided
-     * @param filterCategory Filter for questions with specified category, by id
-     * @param filterTagset Filter for questions with specified tags (separated by comma)
-     * @param filterTag Filter for questions with specified tag
-     * @param filterType Filter for questions with specified type.  Allowable values: (&#39;TEXT&#39;, &#39;IMAGE&#39;, &#39;VIDEO&#39;, &#39;AUDIO&#39;)
-     * @param filterPublished Filter for questions currenctly published or not
-     * @param filterImportId Filter for questions from a specific import job
-     */
-    public getQuestions(size?: number, page?: number, order?: string, filterSearch?: string, filterIdset?: string, filterCategory?: string, filterTagset?: string, filterTag?: string, filterType?: string, filterPublished?: boolean, filterImportId?: number, extraHttpRequestParams?: any): Observable<PageResourceQuestionResource> {
-        return this.getQuestionsWithHttpInfo(size, page, order, filterSearch, filterIdset, filterCategory, filterTagset, filterTag, filterType, filterPublished, filterImportId, extraHttpRequestParams)
-            .map((response: Response) => {
-                if (response.status === 204) {
-                    return undefined;
-                } else {
-                    return response.json() || {};
-                }
-            });
-    }
-
-    /**
-     * This is also provided by the list endpoint so you don't need to call this for pagination purposes. <br><br><b>Permissions Needed:</b> TRIVIA_ADMIN
-     * @summary Count questions based on filters
-     * @param filterSearch Filter for documents whose question, answers or tags contains provided string
-     * @param filterIdset Filter for documents whose id is in the comma separated list provided
-     * @param filterCategory Filter for questions with specified category, by id
-     * @param filterTag Filter for questions with specified tag
-     * @param filterTagset Filter for questions with specified tags (separated by comma)
-     * @param filterType Filter for questions with specified type.  Allowable values: (&#39;TEXT&#39;, &#39;IMAGE&#39;, &#39;VIDEO&#39;, &#39;AUDIO&#39;)
-     * @param filterPublished Filter for questions currenctly published or not
-     */
-    public getQuestionsCount(filterSearch?: string, filterIdset?: string, filterCategory?: string, filterTag?: string, filterTagset?: string, filterType?: string, filterPublished?: boolean, extraHttpRequestParams?: any): Observable<number> {
-        return this.getQuestionsCountWithHttpInfo(filterSearch, filterIdset, filterCategory, filterTag, filterTagset, filterType, filterPublished, extraHttpRequestParams)
-            .map((response: Response) => {
-                if (response.status === 204) {
-                    return undefined;
-                } else {
-                    return response.json() || {};
-                }
-            });
-    }
-
-    /**
-     * Will process the CSV file and add new questions asynchronously. The status of the job must be 'VALID'. <br><br><b>Permissions Needed:</b> TRIVIA_ADMIN
-     * @summary Start processing an import job
-     * @param id The id of the job
-     * @param publishNow Whether the new questions should be published live immediately
-     */
-    public processImportJob(id: number, publishNow: boolean, extraHttpRequestParams?: any): Observable<ImportJobResource> {
-        return this.processImportJobWithHttpInfo(id, publishNow, extraHttpRequestParams)
-            .map((response: Response) => {
-                if (response.status === 204) {
-                    return undefined;
-                } else {
-                    return response.json() || {};
-                }
-            });
-    }
-
-    /**
-     * <b>Permissions Needed:</b> TRIVIA_ADMIN
-     * @summary Remove a tag from a question
-     * @param id The id of the question
-     * @param tag The tag to remove
-     */
-    public removeQuestionTag(id: string, tag: string, extraHttpRequestParams?: any): Observable<{}> {
-        return this.removeQuestionTagWithHttpInfo(id, tag, extraHttpRequestParams)
-            .map((response: Response) => {
-                if (response.status === 204) {
-                    return undefined;
-                } else {
-                    return response.json() || {};
-                }
-            });
-    }
-
-    /**
-     * ll questions that have the tag and match filters will have it removed. The returned number is the number of questions updated. <br><br><b>Permissions Needed:</b> TRIVIA_ADMIN
-     * @summary Remove a tag from a batch of questions
-     * @param tag The tag to remove
-     * @param filterSearch Filter for documents whose question, answers or tags contains provided string
-     * @param filterIdset Filter for documents whose id is in the comma separated list provided
-     * @param filterCategory Filter for questions with specified category, by id
-     * @param filterTag Filter for questions with specified tag
-     * @param filterTagset Filter for questions with specified tags (separated by comma)
-     * @param filterType Filter for questions with specified type.  Allowable values: (&#39;TEXT&#39;, &#39;IMAGE&#39;, &#39;VIDEO&#39;, &#39;AUDIO&#39;)
-     * @param filterPublished Filter for questions currenctly published or not
-     * @param filterImportId Filter for questions from a specific import job
-     */
-    public removeTagToQuestionsBatch(tag: string, filterSearch?: string, filterIdset?: string, filterCategory?: string, filterTag?: string, filterTagset?: string, filterType?: string, filterPublished?: boolean, filterImportId?: number, extraHttpRequestParams?: any): Observable<number> {
-        return this.removeTagToQuestionsBatchWithHttpInfo(tag, filterSearch, filterIdset, filterCategory, filterTag, filterTagset, filterType, filterPublished, filterImportId, extraHttpRequestParams)
-            .map((response: Response) => {
-                if (response.status === 204) {
-                    return undefined;
-                } else {
-                    return response.json() || {};
-                }
-            });
-    }
-
-    /**
-     * For performance reasons, search & category filters are mutually exclusive. If category is specified, search filter will be ignored in order to do fast matches for typeahead. <br><br><b>Permissions Needed:</b> TRIVIA_ADMIN
-     * @summary List and search tags by the beginning of the string
-     * @param filterSearch Filter for tags starting with the given text
-     * @param filterCategory Filter for tags on questions from a specific category
-     * @param filterImportId Filter for tags on questions from a specific import job
-     */
-    public searchQuestionTags(filterSearch?: string, filterCategory?: string, filterImportId?: number, extraHttpRequestParams?: any): Observable<Array<string>> {
-        return this.searchQuestionTagsWithHttpInfo(filterSearch, filterCategory, filterImportId, extraHttpRequestParams)
-            .map((response: Response) => {
-                if (response.status === 204) {
-                    return undefined;
-                } else {
-                    return response.json() || {};
-                }
-            });
-    }
-
-    /**
-     * Changes should be made before process is started for there to be any effect. <br><br><b>Permissions Needed:</b> TRIVIA_ADMIN
-     * @summary Update an import job
-     * @param id The id of the job
-     * @param request The updated job
-     */
-    public updateImportJob(id: number, request?: ImportJobResource, extraHttpRequestParams?: any): Observable<ImportJobResource> {
-        return this.updateImportJobWithHttpInfo(id, request, extraHttpRequestParams)
-            .map((response: Response) => {
-                if (response.status === 204) {
-                    return undefined;
-                } else {
-                    return response.json() || {};
-                }
-            });
-    }
-
-    /**
-     * <b>Permissions Needed:</b> TRIVIA_ADMIN
-     * @summary Update a question
-     * @param id The id of the question
-     * @param question The updated question
-     */
-    public updateQuestion(id: string, question?: QuestionResource, extraHttpRequestParams?: any): Observable<QuestionResource> {
-        return this.updateQuestionWithHttpInfo(id, question, extraHttpRequestParams)
-            .map((response: Response) => {
-                if (response.status === 204) {
-                    return undefined;
-                } else {
-                    return response.json() || {};
-                }
-            });
-    }
-
-    /**
-     * <b>Permissions Needed:</b> TRIVIA_ADMIN
-     * @summary Update an answer for a question
-     * @param questionId The id of the question
-     * @param id The id of the answer
-     * @param answer The updated answer
-     */
-    public updateQuestionAnswer(questionId: string, id: string, answer?: AnswerResource, extraHttpRequestParams?: any): Observable<{}> {
-        return this.updateQuestionAnswerWithHttpInfo(questionId, id, answer, extraHttpRequestParams)
-            .map((response: Response) => {
-                if (response.status === 204) {
-                    return undefined;
-                } else {
-                    return response.json() || {};
-                }
-            });
-    }
-
-    /**
-     * <b>Permissions Needed:</b> TEMPLATE_ADMIN
-     * @summary Update a question template
-     * @param id The id of the template
-     * @param questionTemplateResource The question template resource object
-     */
-    public updateQuestionTemplate(id: string, questionTemplateResource?: QuestionTemplateResource, extraHttpRequestParams?: any): Observable<QuestionTemplateResource> {
-        return this.updateQuestionTemplateWithHttpInfo(id, questionTemplateResource, extraHttpRequestParams)
-            .map((response: Response) => {
-                if (response.status === 204) {
-                    return undefined;
-                } else {
-                    return response.json() || {};
-                }
-            });
-    }
-
-    /**
-     * Will update all questions that match filters used (or all questions in system if no filters used). Body should match a question resource with only those properties you wish to set. Null values will be ignored. Returned number is how many were updated. <br><br><b>Permissions Needed:</b> TRIVIA_ADMIN
-     * @summary Bulk update questions
-     * @param question New values for a set of question fields
-     * @param filterSearch Filter for documents whose question, answers or tags contains provided string
-     * @param filterIdset Filter for documents whose id is in the comma separated list provided
-     * @param filterCategory Filter for questions with specified category, by id
-     * @param filterTagset Filter for questions with specified tags (separated by comma)
-     * @param filterType Filter for questions with specified type.  Allowable values: (&#39;TEXT&#39;, &#39;IMAGE&#39;, &#39;VIDEO&#39;, &#39;AUDIO&#39;)
-     * @param filterPublished Filter for questions currenctly published or not
-     * @param filterImportId Filter for questions from a specific import job
-     */
-    public updateQuestionsInBulk(question?: QuestionResource, filterSearch?: string, filterIdset?: string, filterCategory?: string, filterTagset?: string, filterType?: string, filterPublished?: boolean, filterImportId?: number, extraHttpRequestParams?: any): Observable<number> {
-        return this.updateQuestionsInBulkWithHttpInfo(question, filterSearch, filterIdset, filterCategory, filterTagset, filterType, filterPublished, filterImportId, extraHttpRequestParams)
-            .map((response: Response) => {
-                if (response.status === 204) {
-                    return undefined;
-                } else {
-                    return response.json() || {};
-                }
-            });
     }
 
 
@@ -628,58 +70,62 @@ export class GamificationTriviaService {
      * &lt;b&gt;Permissions Needed:&lt;/b&gt; TRIVIA_ADMIN
      * @param questionId The id of the question
      * @param answer The new answer
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
      */
-    public addQuestionAnswersWithHttpInfo(questionId: string, answer?: AnswerResource, extraHttpRequestParams?: any): Observable<Response> {
-        const path = this.basePath + '/trivia/questions/${question_id}/answers'
-                    .replace('${' + 'question_id' + '}', String(questionId));
-
-        let queryParameters = new URLSearchParams();
-        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
-
-        // verify required parameter 'questionId' is not null or undefined
+    public addQuestionAnswers(questionId: string, answer?: AnswerResource, observe?: 'body', reportProgress?: boolean): Observable<AnswerResource>;
+    public addQuestionAnswers(questionId: string, answer?: AnswerResource, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<AnswerResource>>;
+    public addQuestionAnswers(questionId: string, answer?: AnswerResource, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<AnswerResource>>;
+    public addQuestionAnswers(questionId: string, answer?: AnswerResource, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
         if (questionId === null || questionId === undefined) {
             throw new Error('Required parameter questionId was null or undefined when calling addQuestionAnswers.');
         }
 
-        // to determine the Accept header
-        let produces: string[] = [
-            'application/json'
-        ];
+        let headers = this.defaultHeaders;
 
         // authentication (oauth2_client_credentials_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
         // authentication (oauth2_password_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-            
-        headers.set('Content-Type', 'application/json');
-
-        let requestOptions: RequestOptionsArgs = new RequestOptions({
-            method: RequestMethod.Post,
-            headers: headers,
-            body: answer == null ? '' : JSON.stringify(answer), // https://github.com/angular/angular/issues/10612
-            search: queryParameters,
-            withCredentials:this.configuration.withCredentials
-        });
-        // https://github.com/swagger-api/swagger-codegen/issues/4037
-        if (extraHttpRequestParams) {
-            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
+        // to determine the Accept header
+        let httpHeaderAccepts: string[] = [
+            'application/json'
+        ];
+        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers = headers.set('Accept', httpHeaderAcceptSelected);
         }
 
-        return this.http.request(path, requestOptions);
+        // to determine the Content-Type header
+        const consumes: string[] = [
+            'application/json'
+        ];
+        const httpContentTypeSelected: string | undefined = this.configuration.selectHeaderContentType(consumes);
+        if (httpContentTypeSelected != undefined) {
+            headers = headers.set('Content-Type', httpContentTypeSelected);
+        }
+
+        return this.httpClient.post<AnswerResource>(`${this.basePath}/trivia/questions/${encodeURIComponent(String(questionId))}/answers`,
+            answer,
+            {
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
     }
 
     /**
@@ -687,58 +133,62 @@ export class GamificationTriviaService {
      * &lt;b&gt;Permissions Needed:&lt;/b&gt; TRIVIA_ADMIN
      * @param id The id of the question
      * @param tag The new tag
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
      */
-    public addQuestionTagWithHttpInfo(id: string, tag?: StringWrapper, extraHttpRequestParams?: any): Observable<Response> {
-        const path = this.basePath + '/trivia/questions/${id}/tags'
-                    .replace('${' + 'id' + '}', String(id));
-
-        let queryParameters = new URLSearchParams();
-        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
-
-        // verify required parameter 'id' is not null or undefined
+    public addQuestionTag(id: string, tag?: StringWrapper, observe?: 'body', reportProgress?: boolean): Observable<any>;
+    public addQuestionTag(id: string, tag?: StringWrapper, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
+    public addQuestionTag(id: string, tag?: StringWrapper, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
+    public addQuestionTag(id: string, tag?: StringWrapper, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
         if (id === null || id === undefined) {
             throw new Error('Required parameter id was null or undefined when calling addQuestionTag.');
         }
 
-        // to determine the Accept header
-        let produces: string[] = [
-            'application/json'
-        ];
+        let headers = this.defaultHeaders;
 
         // authentication (oauth2_client_credentials_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
         // authentication (oauth2_password_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-            
-        headers.set('Content-Type', 'application/json');
-
-        let requestOptions: RequestOptionsArgs = new RequestOptions({
-            method: RequestMethod.Post,
-            headers: headers,
-            body: tag == null ? '' : JSON.stringify(tag), // https://github.com/angular/angular/issues/10612
-            search: queryParameters,
-            withCredentials:this.configuration.withCredentials
-        });
-        // https://github.com/swagger-api/swagger-codegen/issues/4037
-        if (extraHttpRequestParams) {
-            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
+        // to determine the Accept header
+        let httpHeaderAccepts: string[] = [
+            'application/json'
+        ];
+        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers = headers.set('Accept', httpHeaderAcceptSelected);
         }
 
-        return this.http.request(path, requestOptions);
+        // to determine the Content-Type header
+        const consumes: string[] = [
+            'application/json'
+        ];
+        const httpContentTypeSelected: string | undefined = this.configuration.selectHeaderContentType(consumes);
+        if (httpContentTypeSelected != undefined) {
+            headers = headers.set('Content-Type', httpContentTypeSelected);
+        }
+
+        return this.httpClient.post<any>(`${this.basePath}/trivia/questions/${encodeURIComponent(String(id))}/tags`,
+            tag,
+            {
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
     }
 
     /**
@@ -753,354 +203,375 @@ export class GamificationTriviaService {
      * @param filterType Filter for questions with specified type
      * @param filterPublished Filter for questions currenctly published or not
      * @param filterImportId Filter for questions from a specific import job
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
      */
-    public addTagToQuestionsBatchWithHttpInfo(tag?: StringWrapper, filterSearch?: string, filterIdset?: string, filterCategory?: string, filterTag?: string, filterTagset?: string, filterType?: string, filterPublished?: boolean, filterImportId?: number, extraHttpRequestParams?: any): Observable<Response> {
-        const path = this.basePath + '/trivia/questions/tags';
+    public addTagToQuestionsBatch(tag?: StringWrapper, filterSearch?: string, filterIdset?: string, filterCategory?: string, filterTag?: string, filterTagset?: string, filterType?: 'TEXT' | 'IMAGE' | 'VIDEO' | 'AUDIO', filterPublished?: boolean, filterImportId?: number, observe?: 'body', reportProgress?: boolean): Observable<number>;
+    public addTagToQuestionsBatch(tag?: StringWrapper, filterSearch?: string, filterIdset?: string, filterCategory?: string, filterTag?: string, filterTagset?: string, filterType?: 'TEXT' | 'IMAGE' | 'VIDEO' | 'AUDIO', filterPublished?: boolean, filterImportId?: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<number>>;
+    public addTagToQuestionsBatch(tag?: StringWrapper, filterSearch?: string, filterIdset?: string, filterCategory?: string, filterTag?: string, filterTagset?: string, filterType?: 'TEXT' | 'IMAGE' | 'VIDEO' | 'AUDIO', filterPublished?: boolean, filterImportId?: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<number>>;
+    public addTagToQuestionsBatch(tag?: StringWrapper, filterSearch?: string, filterIdset?: string, filterCategory?: string, filterTag?: string, filterTagset?: string, filterType?: 'TEXT' | 'IMAGE' | 'VIDEO' | 'AUDIO', filterPublished?: boolean, filterImportId?: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
 
-        let queryParameters = new URLSearchParams();
-        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
-
-        if (filterSearch !== undefined) {
-            queryParameters.set('filter_search', <any>filterSearch);
+        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
+        if (filterSearch !== undefined && filterSearch !== null) {
+            queryParameters = queryParameters.set('filter_search', <any>filterSearch);
+        }
+        if (filterIdset !== undefined && filterIdset !== null) {
+            queryParameters = queryParameters.set('filter_idset', <any>filterIdset);
+        }
+        if (filterCategory !== undefined && filterCategory !== null) {
+            queryParameters = queryParameters.set('filter_category', <any>filterCategory);
+        }
+        if (filterTag !== undefined && filterTag !== null) {
+            queryParameters = queryParameters.set('filter_tag', <any>filterTag);
+        }
+        if (filterTagset !== undefined && filterTagset !== null) {
+            queryParameters = queryParameters.set('filter_tagset', <any>filterTagset);
+        }
+        if (filterType !== undefined && filterType !== null) {
+            queryParameters = queryParameters.set('filter_type', <any>filterType);
+        }
+        if (filterPublished !== undefined && filterPublished !== null) {
+            queryParameters = queryParameters.set('filter_published', <any>filterPublished);
+        }
+        if (filterImportId !== undefined && filterImportId !== null) {
+            queryParameters = queryParameters.set('filter_import_id', <any>filterImportId);
         }
 
-        if (filterIdset !== undefined) {
-            queryParameters.set('filter_idset', <any>filterIdset);
-        }
-
-        if (filterCategory !== undefined) {
-            queryParameters.set('filter_category', <any>filterCategory);
-        }
-
-        if (filterTag !== undefined) {
-            queryParameters.set('filter_tag', <any>filterTag);
-        }
-
-        if (filterTagset !== undefined) {
-            queryParameters.set('filter_tagset', <any>filterTagset);
-        }
-
-        if (filterType !== undefined) {
-            queryParameters.set('filter_type', <any>filterType);
-        }
-
-        if (filterPublished !== undefined) {
-            queryParameters.set('filter_published', <any>filterPublished);
-        }
-
-        if (filterImportId !== undefined) {
-            queryParameters.set('filter_import_id', <any>filterImportId);
-        }
-
-
-        // to determine the Accept header
-        let produces: string[] = [
-            'application/json'
-        ];
+        let headers = this.defaultHeaders;
 
         // authentication (oauth2_client_credentials_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
         // authentication (oauth2_password_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-            
-        headers.set('Content-Type', 'application/json');
-
-        let requestOptions: RequestOptionsArgs = new RequestOptions({
-            method: RequestMethod.Post,
-            headers: headers,
-            body: tag == null ? '' : JSON.stringify(tag), // https://github.com/angular/angular/issues/10612
-            search: queryParameters,
-            withCredentials:this.configuration.withCredentials
-        });
-        // https://github.com/swagger-api/swagger-codegen/issues/4037
-        if (extraHttpRequestParams) {
-            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
+        // to determine the Accept header
+        let httpHeaderAccepts: string[] = [
+            'application/json'
+        ];
+        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers = headers.set('Accept', httpHeaderAcceptSelected);
         }
 
-        return this.http.request(path, requestOptions);
+        // to determine the Content-Type header
+        const consumes: string[] = [
+            'application/json'
+        ];
+        const httpContentTypeSelected: string | undefined = this.configuration.selectHeaderContentType(consumes);
+        if (httpContentTypeSelected != undefined) {
+            headers = headers.set('Content-Type', httpContentTypeSelected);
+        }
+
+        return this.httpClient.post<number>(`${this.basePath}/trivia/questions/tags`,
+            tag,
+            {
+                params: queryParameters,
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
     }
 
     /**
      * Create an import job
      * Set up a job to import a set of trivia questions from a cvs file at a remote url. the file will be validated asynchronously but will not be processed until started manually with the process endpoint. &lt;br&gt;&lt;br&gt;&lt;b&gt;Permissions Needed:&lt;/b&gt; TRIVIA_ADMIN
      * @param request The new import job
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
      */
-    public createImportJobWithHttpInfo(request?: ImportJobResource, extraHttpRequestParams?: any): Observable<Response> {
-        const path = this.basePath + '/trivia/import';
+    public createImportJob(request?: ImportJobResource, observe?: 'body', reportProgress?: boolean): Observable<ImportJobResource>;
+    public createImportJob(request?: ImportJobResource, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<ImportJobResource>>;
+    public createImportJob(request?: ImportJobResource, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<ImportJobResource>>;
+    public createImportJob(request?: ImportJobResource, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
 
-        let queryParameters = new URLSearchParams();
-        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
-
-
-        // to determine the Accept header
-        let produces: string[] = [
-            'application/json'
-        ];
+        let headers = this.defaultHeaders;
 
         // authentication (oauth2_client_credentials_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
         // authentication (oauth2_password_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-            
-        headers.set('Content-Type', 'application/json');
-
-        let requestOptions: RequestOptionsArgs = new RequestOptions({
-            method: RequestMethod.Post,
-            headers: headers,
-            body: request == null ? '' : JSON.stringify(request), // https://github.com/angular/angular/issues/10612
-            search: queryParameters,
-            withCredentials:this.configuration.withCredentials
-        });
-        // https://github.com/swagger-api/swagger-codegen/issues/4037
-        if (extraHttpRequestParams) {
-            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
+        // to determine the Accept header
+        let httpHeaderAccepts: string[] = [
+            'application/json'
+        ];
+        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers = headers.set('Accept', httpHeaderAcceptSelected);
         }
 
-        return this.http.request(path, requestOptions);
+        // to determine the Content-Type header
+        const consumes: string[] = [
+            'application/json'
+        ];
+        const httpContentTypeSelected: string | undefined = this.configuration.selectHeaderContentType(consumes);
+        if (httpContentTypeSelected != undefined) {
+            headers = headers.set('Content-Type', httpContentTypeSelected);
+        }
+
+        return this.httpClient.post<ImportJobResource>(`${this.basePath}/trivia/import`,
+            request,
+            {
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
     }
 
     /**
      * Create a question
      * &lt;b&gt;Permissions Needed:&lt;/b&gt; TRIVIA_ADMIN
      * @param question The new question
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
      */
-    public createQuestionWithHttpInfo(question?: QuestionResource, extraHttpRequestParams?: any): Observable<Response> {
-        const path = this.basePath + '/trivia/questions';
+    public createQuestion(question?: QuestionResource, observe?: 'body', reportProgress?: boolean): Observable<QuestionResource>;
+    public createQuestion(question?: QuestionResource, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<QuestionResource>>;
+    public createQuestion(question?: QuestionResource, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<QuestionResource>>;
+    public createQuestion(question?: QuestionResource, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
 
-        let queryParameters = new URLSearchParams();
-        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
-
-
-        // to determine the Accept header
-        let produces: string[] = [
-            'application/json'
-        ];
+        let headers = this.defaultHeaders;
 
         // authentication (oauth2_client_credentials_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
         // authentication (oauth2_password_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-            
-        headers.set('Content-Type', 'application/json');
-
-        let requestOptions: RequestOptionsArgs = new RequestOptions({
-            method: RequestMethod.Post,
-            headers: headers,
-            body: question == null ? '' : JSON.stringify(question), // https://github.com/angular/angular/issues/10612
-            search: queryParameters,
-            withCredentials:this.configuration.withCredentials
-        });
-        // https://github.com/swagger-api/swagger-codegen/issues/4037
-        if (extraHttpRequestParams) {
-            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
+        // to determine the Accept header
+        let httpHeaderAccepts: string[] = [
+            'application/json'
+        ];
+        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers = headers.set('Accept', httpHeaderAcceptSelected);
         }
 
-        return this.http.request(path, requestOptions);
+        // to determine the Content-Type header
+        const consumes: string[] = [
+            'application/json'
+        ];
+        const httpContentTypeSelected: string | undefined = this.configuration.selectHeaderContentType(consumes);
+        if (httpContentTypeSelected != undefined) {
+            headers = headers.set('Content-Type', httpContentTypeSelected);
+        }
+
+        return this.httpClient.post<QuestionResource>(`${this.basePath}/trivia/questions`,
+            question,
+            {
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
     }
 
     /**
      * Create a question template
      * Question templates define a type of question and the properties they have. &lt;br&gt;&lt;br&gt;&lt;b&gt;Permissions Needed:&lt;/b&gt; TRIVIA_ADMIN
      * @param questionTemplateResource The question template resource object
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
      */
-    public createQuestionTemplateWithHttpInfo(questionTemplateResource?: QuestionTemplateResource, extraHttpRequestParams?: any): Observable<Response> {
-        const path = this.basePath + '/trivia/questions/templates';
+    public createQuestionTemplate(questionTemplateResource?: QuestionTemplateResource, observe?: 'body', reportProgress?: boolean): Observable<QuestionTemplateResource>;
+    public createQuestionTemplate(questionTemplateResource?: QuestionTemplateResource, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<QuestionTemplateResource>>;
+    public createQuestionTemplate(questionTemplateResource?: QuestionTemplateResource, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<QuestionTemplateResource>>;
+    public createQuestionTemplate(questionTemplateResource?: QuestionTemplateResource, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
 
-        let queryParameters = new URLSearchParams();
-        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
-
-
-        // to determine the Accept header
-        let produces: string[] = [
-            'application/json'
-        ];
+        let headers = this.defaultHeaders;
 
         // authentication (oauth2_client_credentials_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
         // authentication (oauth2_password_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-            
-        headers.set('Content-Type', 'application/json');
-
-        let requestOptions: RequestOptionsArgs = new RequestOptions({
-            method: RequestMethod.Post,
-            headers: headers,
-            body: questionTemplateResource == null ? '' : JSON.stringify(questionTemplateResource), // https://github.com/angular/angular/issues/10612
-            search: queryParameters,
-            withCredentials:this.configuration.withCredentials
-        });
-        // https://github.com/swagger-api/swagger-codegen/issues/4037
-        if (extraHttpRequestParams) {
-            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
+        // to determine the Accept header
+        let httpHeaderAccepts: string[] = [
+            'application/json'
+        ];
+        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers = headers.set('Accept', httpHeaderAcceptSelected);
         }
 
-        return this.http.request(path, requestOptions);
+        // to determine the Content-Type header
+        const consumes: string[] = [
+            'application/json'
+        ];
+        const httpContentTypeSelected: string | undefined = this.configuration.selectHeaderContentType(consumes);
+        if (httpContentTypeSelected != undefined) {
+            headers = headers.set('Content-Type', httpContentTypeSelected);
+        }
+
+        return this.httpClient.post<QuestionTemplateResource>(`${this.basePath}/trivia/questions/templates`,
+            questionTemplateResource,
+            {
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
     }
 
     /**
      * Delete an import job
      * Also deletes all questions that were imported by it. &lt;br&gt;&lt;br&gt;&lt;b&gt;Permissions Needed:&lt;/b&gt; TRIVIA_ADMIN
      * @param id The id of the job
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
      */
-    public deleteImportJobWithHttpInfo(id: number, extraHttpRequestParams?: any): Observable<Response> {
-        const path = this.basePath + '/trivia/import/${id}'
-                    .replace('${' + 'id' + '}', String(id));
-
-        let queryParameters = new URLSearchParams();
-        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
-
-        // verify required parameter 'id' is not null or undefined
+    public deleteImportJob(id: number, observe?: 'body', reportProgress?: boolean): Observable<any>;
+    public deleteImportJob(id: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
+    public deleteImportJob(id: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
+    public deleteImportJob(id: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
         if (id === null || id === undefined) {
             throw new Error('Required parameter id was null or undefined when calling deleteImportJob.');
         }
 
-        // to determine the Accept header
-        let produces: string[] = [
-            'application/json'
-        ];
+        let headers = this.defaultHeaders;
 
         // authentication (oauth2_client_credentials_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
         // authentication (oauth2_password_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-            
-        let requestOptions: RequestOptionsArgs = new RequestOptions({
-            method: RequestMethod.Delete,
-            headers: headers,
-            search: queryParameters,
-            withCredentials:this.configuration.withCredentials
-        });
-        // https://github.com/swagger-api/swagger-codegen/issues/4037
-        if (extraHttpRequestParams) {
-            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
+        // to determine the Accept header
+        let httpHeaderAccepts: string[] = [
+            'application/json'
+        ];
+        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers = headers.set('Accept', httpHeaderAcceptSelected);
         }
 
-        return this.http.request(path, requestOptions);
+        // to determine the Content-Type header
+        const consumes: string[] = [
+        ];
+
+        return this.httpClient.delete<any>(`${this.basePath}/trivia/import/${encodeURIComponent(String(id))}`,
+            {
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
     }
 
     /**
      * Delete a question
      * &lt;b&gt;Permissions Needed:&lt;/b&gt; TRIVIA_ADMIN
      * @param id The id of the question
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
      */
-    public deleteQuestionWithHttpInfo(id: string, extraHttpRequestParams?: any): Observable<Response> {
-        const path = this.basePath + '/trivia/questions/${id}'
-                    .replace('${' + 'id' + '}', String(id));
-
-        let queryParameters = new URLSearchParams();
-        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
-
-        // verify required parameter 'id' is not null or undefined
+    public deleteQuestion(id: string, observe?: 'body', reportProgress?: boolean): Observable<any>;
+    public deleteQuestion(id: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
+    public deleteQuestion(id: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
+    public deleteQuestion(id: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
         if (id === null || id === undefined) {
             throw new Error('Required parameter id was null or undefined when calling deleteQuestion.');
         }
 
-        // to determine the Accept header
-        let produces: string[] = [
-            'application/json'
-        ];
+        let headers = this.defaultHeaders;
 
         // authentication (oauth2_client_credentials_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
         // authentication (oauth2_password_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-            
-        let requestOptions: RequestOptionsArgs = new RequestOptions({
-            method: RequestMethod.Delete,
-            headers: headers,
-            search: queryParameters,
-            withCredentials:this.configuration.withCredentials
-        });
-        // https://github.com/swagger-api/swagger-codegen/issues/4037
-        if (extraHttpRequestParams) {
-            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
+        // to determine the Accept header
+        let httpHeaderAccepts: string[] = [
+            'application/json'
+        ];
+        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers = headers.set('Accept', httpHeaderAcceptSelected);
         }
 
-        return this.http.request(path, requestOptions);
+        // to determine the Content-Type header
+        const consumes: string[] = [
+        ];
+
+        return this.httpClient.delete<any>(`${this.basePath}/trivia/questions/${encodeURIComponent(String(id))}`,
+            {
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
     }
 
     /**
@@ -1108,60 +579,59 @@ export class GamificationTriviaService {
      * &lt;b&gt;Permissions Needed:&lt;/b&gt; TRIVIA_ADMIN
      * @param questionId The id of the question
      * @param id The id of the answer
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
      */
-    public deleteQuestionAnswersWithHttpInfo(questionId: string, id: string, extraHttpRequestParams?: any): Observable<Response> {
-        const path = this.basePath + '/trivia/questions/${question_id}/answers/${id}'
-                    .replace('${' + 'question_id' + '}', String(questionId))
-                    .replace('${' + 'id' + '}', String(id));
-
-        let queryParameters = new URLSearchParams();
-        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
-
-        // verify required parameter 'questionId' is not null or undefined
+    public deleteQuestionAnswers(questionId: string, id: string, observe?: 'body', reportProgress?: boolean): Observable<any>;
+    public deleteQuestionAnswers(questionId: string, id: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
+    public deleteQuestionAnswers(questionId: string, id: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
+    public deleteQuestionAnswers(questionId: string, id: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
         if (questionId === null || questionId === undefined) {
             throw new Error('Required parameter questionId was null or undefined when calling deleteQuestionAnswers.');
         }
-        // verify required parameter 'id' is not null or undefined
         if (id === null || id === undefined) {
             throw new Error('Required parameter id was null or undefined when calling deleteQuestionAnswers.');
         }
 
-        // to determine the Accept header
-        let produces: string[] = [
-            'application/json'
-        ];
+        let headers = this.defaultHeaders;
 
         // authentication (oauth2_client_credentials_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
         // authentication (oauth2_password_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-            
-        let requestOptions: RequestOptionsArgs = new RequestOptions({
-            method: RequestMethod.Delete,
-            headers: headers,
-            search: queryParameters,
-            withCredentials:this.configuration.withCredentials
-        });
-        // https://github.com/swagger-api/swagger-codegen/issues/4037
-        if (extraHttpRequestParams) {
-            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
+        // to determine the Accept header
+        let httpHeaderAccepts: string[] = [
+            'application/json'
+        ];
+        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers = headers.set('Accept', httpHeaderAcceptSelected);
         }
 
-        return this.http.request(path, requestOptions);
+        // to determine the Content-Type header
+        const consumes: string[] = [
+        ];
+
+        return this.httpClient.delete<any>(`${this.basePath}/trivia/questions/${encodeURIComponent(String(questionId))}/answers/${encodeURIComponent(String(id))}`,
+            {
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
     }
 
     /**
@@ -1169,114 +639,118 @@ export class GamificationTriviaService {
      * If cascade &#x3D; &#39;detach&#39;, it will force delete the template even if it&#39;s attached to other objects. &lt;br&gt;&lt;br&gt;&lt;b&gt;Permissions Needed:&lt;/b&gt; TEMPLATE_ADMIN
      * @param id The id of the template
      * @param cascade The value needed to delete used templates
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
      */
-    public deleteQuestionTemplateWithHttpInfo(id: string, cascade?: string, extraHttpRequestParams?: any): Observable<Response> {
-        const path = this.basePath + '/trivia/questions/templates/${id}'
-                    .replace('${' + 'id' + '}', String(id));
-
-        let queryParameters = new URLSearchParams();
-        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
-
-        // verify required parameter 'id' is not null or undefined
+    public deleteQuestionTemplate(id: string, cascade?: string, observe?: 'body', reportProgress?: boolean): Observable<any>;
+    public deleteQuestionTemplate(id: string, cascade?: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
+    public deleteQuestionTemplate(id: string, cascade?: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
+    public deleteQuestionTemplate(id: string, cascade?: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
         if (id === null || id === undefined) {
             throw new Error('Required parameter id was null or undefined when calling deleteQuestionTemplate.');
         }
-        if (cascade !== undefined) {
-            queryParameters.set('cascade', <any>cascade);
+
+        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
+        if (cascade !== undefined && cascade !== null) {
+            queryParameters = queryParameters.set('cascade', <any>cascade);
         }
 
-
-        // to determine the Accept header
-        let produces: string[] = [
-            'application/json'
-        ];
+        let headers = this.defaultHeaders;
 
         // authentication (oauth2_client_credentials_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
         // authentication (oauth2_password_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-            
-        let requestOptions: RequestOptionsArgs = new RequestOptions({
-            method: RequestMethod.Delete,
-            headers: headers,
-            search: queryParameters,
-            withCredentials:this.configuration.withCredentials
-        });
-        // https://github.com/swagger-api/swagger-codegen/issues/4037
-        if (extraHttpRequestParams) {
-            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
+        // to determine the Accept header
+        let httpHeaderAccepts: string[] = [
+            'application/json'
+        ];
+        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers = headers.set('Accept', httpHeaderAcceptSelected);
         }
 
-        return this.http.request(path, requestOptions);
+        // to determine the Content-Type header
+        const consumes: string[] = [
+        ];
+
+        return this.httpClient.delete<any>(`${this.basePath}/trivia/questions/templates/${encodeURIComponent(String(id))}`,
+            {
+                params: queryParameters,
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
     }
 
     /**
      * Get an import job
      * &lt;b&gt;Permissions Needed:&lt;/b&gt; TRIVIA_ADMIN
      * @param id The id of the job
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
      */
-    public getImportJobWithHttpInfo(id: number, extraHttpRequestParams?: any): Observable<Response> {
-        const path = this.basePath + '/trivia/import/${id}'
-                    .replace('${' + 'id' + '}', String(id));
-
-        let queryParameters = new URLSearchParams();
-        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
-
-        // verify required parameter 'id' is not null or undefined
+    public getImportJob(id: number, observe?: 'body', reportProgress?: boolean): Observable<ImportJobResource>;
+    public getImportJob(id: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<ImportJobResource>>;
+    public getImportJob(id: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<ImportJobResource>>;
+    public getImportJob(id: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
         if (id === null || id === undefined) {
             throw new Error('Required parameter id was null or undefined when calling getImportJob.');
         }
 
-        // to determine the Accept header
-        let produces: string[] = [
-            'application/json'
-        ];
+        let headers = this.defaultHeaders;
 
         // authentication (oauth2_client_credentials_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
         // authentication (oauth2_password_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-            
-        let requestOptions: RequestOptionsArgs = new RequestOptions({
-            method: RequestMethod.Get,
-            headers: headers,
-            search: queryParameters,
-            withCredentials:this.configuration.withCredentials
-        });
-        // https://github.com/swagger-api/swagger-codegen/issues/4037
-        if (extraHttpRequestParams) {
-            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
+        // to determine the Accept header
+        let httpHeaderAccepts: string[] = [
+            'application/json'
+        ];
+        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers = headers.set('Accept', httpHeaderAcceptSelected);
         }
 
-        return this.http.request(path, requestOptions);
+        // to determine the Content-Type header
+        const consumes: string[] = [
+        ];
+
+        return this.httpClient.get<ImportJobResource>(`${this.basePath}/trivia/import/${encodeURIComponent(String(id))}`,
+            {
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
     }
 
     /**
@@ -1289,133 +763,133 @@ export class GamificationTriviaService {
      * @param size The number of objects returned per page
      * @param page The number of the page returned, starting with 1
      * @param order A comma separated list of sorting requirements in priority order, each entry matching PROPERTY_NAME:[ASC|DESC]
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
      */
-    public getImportJobsWithHttpInfo(filterVendor?: string, filterCategory?: string, filterName?: string, filterStatus?: string, size?: number, page?: number, order?: string, extraHttpRequestParams?: any): Observable<Response> {
-        const path = this.basePath + '/trivia/import';
+    public getImportJobs(filterVendor?: string, filterCategory?: string, filterName?: string, filterStatus?: string, size?: number, page?: number, order?: string, observe?: 'body', reportProgress?: boolean): Observable<PageResourceImportJobResource>;
+    public getImportJobs(filterVendor?: string, filterCategory?: string, filterName?: string, filterStatus?: string, size?: number, page?: number, order?: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<PageResourceImportJobResource>>;
+    public getImportJobs(filterVendor?: string, filterCategory?: string, filterName?: string, filterStatus?: string, size?: number, page?: number, order?: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<PageResourceImportJobResource>>;
+    public getImportJobs(filterVendor?: string, filterCategory?: string, filterName?: string, filterStatus?: string, size?: number, page?: number, order?: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
 
-        let queryParameters = new URLSearchParams();
-        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
-
-        if (filterVendor !== undefined) {
-            queryParameters.set('filter_vendor', <any>filterVendor);
+        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
+        if (filterVendor !== undefined && filterVendor !== null) {
+            queryParameters = queryParameters.set('filter_vendor', <any>filterVendor);
+        }
+        if (filterCategory !== undefined && filterCategory !== null) {
+            queryParameters = queryParameters.set('filter_category', <any>filterCategory);
+        }
+        if (filterName !== undefined && filterName !== null) {
+            queryParameters = queryParameters.set('filter_name', <any>filterName);
+        }
+        if (filterStatus !== undefined && filterStatus !== null) {
+            queryParameters = queryParameters.set('filter_status', <any>filterStatus);
+        }
+        if (size !== undefined && size !== null) {
+            queryParameters = queryParameters.set('size', <any>size);
+        }
+        if (page !== undefined && page !== null) {
+            queryParameters = queryParameters.set('page', <any>page);
+        }
+        if (order !== undefined && order !== null) {
+            queryParameters = queryParameters.set('order', <any>order);
         }
 
-        if (filterCategory !== undefined) {
-            queryParameters.set('filter_category', <any>filterCategory);
-        }
-
-        if (filterName !== undefined) {
-            queryParameters.set('filter_name', <any>filterName);
-        }
-
-        if (filterStatus !== undefined) {
-            queryParameters.set('filter_status', <any>filterStatus);
-        }
-
-        if (size !== undefined) {
-            queryParameters.set('size', <any>size);
-        }
-
-        if (page !== undefined) {
-            queryParameters.set('page', <any>page);
-        }
-
-        if (order !== undefined) {
-            queryParameters.set('order', <any>order);
-        }
-
-
-        // to determine the Accept header
-        let produces: string[] = [
-            'application/json'
-        ];
+        let headers = this.defaultHeaders;
 
         // authentication (oauth2_client_credentials_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
         // authentication (oauth2_password_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-            
-        let requestOptions: RequestOptionsArgs = new RequestOptions({
-            method: RequestMethod.Get,
-            headers: headers,
-            search: queryParameters,
-            withCredentials:this.configuration.withCredentials
-        });
-        // https://github.com/swagger-api/swagger-codegen/issues/4037
-        if (extraHttpRequestParams) {
-            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
+        // to determine the Accept header
+        let httpHeaderAccepts: string[] = [
+            'application/json'
+        ];
+        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers = headers.set('Accept', httpHeaderAcceptSelected);
         }
 
-        return this.http.request(path, requestOptions);
+        // to determine the Content-Type header
+        const consumes: string[] = [
+        ];
+
+        return this.httpClient.get<PageResourceImportJobResource>(`${this.basePath}/trivia/import`,
+            {
+                params: queryParameters,
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
     }
 
     /**
      * Get a single question
      * &lt;b&gt;Permissions Needed:&lt;/b&gt; TRIVIA_ADMIN
      * @param id The id of the question
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
      */
-    public getQuestionWithHttpInfo(id: string, extraHttpRequestParams?: any): Observable<Response> {
-        const path = this.basePath + '/trivia/questions/${id}'
-                    .replace('${' + 'id' + '}', String(id));
-
-        let queryParameters = new URLSearchParams();
-        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
-
-        // verify required parameter 'id' is not null or undefined
+    public getQuestion(id: string, observe?: 'body', reportProgress?: boolean): Observable<QuestionResource>;
+    public getQuestion(id: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<QuestionResource>>;
+    public getQuestion(id: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<QuestionResource>>;
+    public getQuestion(id: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
         if (id === null || id === undefined) {
             throw new Error('Required parameter id was null or undefined when calling getQuestion.');
         }
 
-        // to determine the Accept header
-        let produces: string[] = [
-            'application/json'
-        ];
+        let headers = this.defaultHeaders;
 
         // authentication (oauth2_client_credentials_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
         // authentication (oauth2_password_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-            
-        let requestOptions: RequestOptionsArgs = new RequestOptions({
-            method: RequestMethod.Get,
-            headers: headers,
-            search: queryParameters,
-            withCredentials:this.configuration.withCredentials
-        });
-        // https://github.com/swagger-api/swagger-codegen/issues/4037
-        if (extraHttpRequestParams) {
-            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
+        // to determine the Accept header
+        let httpHeaderAccepts: string[] = [
+            'application/json'
+        ];
+        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers = headers.set('Accept', httpHeaderAcceptSelected);
         }
 
-        return this.http.request(path, requestOptions);
+        // to determine the Content-Type header
+        const consumes: string[] = [
+        ];
+
+        return this.httpClient.get<QuestionResource>(`${this.basePath}/trivia/questions/${encodeURIComponent(String(id))}`,
+            {
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
     }
 
     /**
@@ -1423,279 +897,286 @@ export class GamificationTriviaService {
      * &lt;b&gt;Permissions Needed:&lt;/b&gt; TRIVIA_ADMIN
      * @param questionId The id of the question
      * @param id The id of the answer
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
      */
-    public getQuestionAnswerWithHttpInfo(questionId: string, id: string, extraHttpRequestParams?: any): Observable<Response> {
-        const path = this.basePath + '/trivia/questions/${question_id}/answers/${id}'
-                    .replace('${' + 'question_id' + '}', String(questionId))
-                    .replace('${' + 'id' + '}', String(id));
-
-        let queryParameters = new URLSearchParams();
-        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
-
-        // verify required parameter 'questionId' is not null or undefined
+    public getQuestionAnswer(questionId: string, id: string, observe?: 'body', reportProgress?: boolean): Observable<AnswerResource>;
+    public getQuestionAnswer(questionId: string, id: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<AnswerResource>>;
+    public getQuestionAnswer(questionId: string, id: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<AnswerResource>>;
+    public getQuestionAnswer(questionId: string, id: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
         if (questionId === null || questionId === undefined) {
             throw new Error('Required parameter questionId was null or undefined when calling getQuestionAnswer.');
         }
-        // verify required parameter 'id' is not null or undefined
         if (id === null || id === undefined) {
             throw new Error('Required parameter id was null or undefined when calling getQuestionAnswer.');
         }
 
-        // to determine the Accept header
-        let produces: string[] = [
-            'application/json'
-        ];
+        let headers = this.defaultHeaders;
 
         // authentication (oauth2_client_credentials_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
         // authentication (oauth2_password_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-            
-        let requestOptions: RequestOptionsArgs = new RequestOptions({
-            method: RequestMethod.Get,
-            headers: headers,
-            search: queryParameters,
-            withCredentials:this.configuration.withCredentials
-        });
-        // https://github.com/swagger-api/swagger-codegen/issues/4037
-        if (extraHttpRequestParams) {
-            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
+        // to determine the Accept header
+        let httpHeaderAccepts: string[] = [
+            'application/json'
+        ];
+        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers = headers.set('Accept', httpHeaderAcceptSelected);
         }
 
-        return this.http.request(path, requestOptions);
+        // to determine the Content-Type header
+        const consumes: string[] = [
+        ];
+
+        return this.httpClient.get<AnswerResource>(`${this.basePath}/trivia/questions/${encodeURIComponent(String(questionId))}/answers/${encodeURIComponent(String(id))}`,
+            {
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
     }
 
     /**
      * List the answers available for a question
      * &lt;b&gt;Permissions Needed:&lt;/b&gt; TRIVIA_ADMIN
      * @param questionId The id of the question
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
      */
-    public getQuestionAnswersWithHttpInfo(questionId: string, extraHttpRequestParams?: any): Observable<Response> {
-        const path = this.basePath + '/trivia/questions/${question_id}/answers'
-                    .replace('${' + 'question_id' + '}', String(questionId));
-
-        let queryParameters = new URLSearchParams();
-        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
-
-        // verify required parameter 'questionId' is not null or undefined
+    public getQuestionAnswers(questionId: string, observe?: 'body', reportProgress?: boolean): Observable<Array<AnswerResource>>;
+    public getQuestionAnswers(questionId: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Array<AnswerResource>>>;
+    public getQuestionAnswers(questionId: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Array<AnswerResource>>>;
+    public getQuestionAnswers(questionId: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
         if (questionId === null || questionId === undefined) {
             throw new Error('Required parameter questionId was null or undefined when calling getQuestionAnswers.');
         }
 
-        // to determine the Accept header
-        let produces: string[] = [
-            'application/json'
-        ];
+        let headers = this.defaultHeaders;
 
         // authentication (oauth2_client_credentials_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
         // authentication (oauth2_password_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-            
-        let requestOptions: RequestOptionsArgs = new RequestOptions({
-            method: RequestMethod.Get,
-            headers: headers,
-            search: queryParameters,
-            withCredentials:this.configuration.withCredentials
-        });
-        // https://github.com/swagger-api/swagger-codegen/issues/4037
-        if (extraHttpRequestParams) {
-            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
+        // to determine the Accept header
+        let httpHeaderAccepts: string[] = [
+            'application/json'
+        ];
+        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers = headers.set('Accept', httpHeaderAcceptSelected);
         }
 
-        return this.http.request(path, requestOptions);
+        // to determine the Content-Type header
+        const consumes: string[] = [
+        ];
+
+        return this.httpClient.get<Array<AnswerResource>>(`${this.basePath}/trivia/questions/${encodeURIComponent(String(questionId))}/answers`,
+            {
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
     }
 
     /**
      * List question deltas in ascending order of updated date
      * The &#39;since&#39; parameter is important to avoid getting a full list of all questions. Implementors should make sure they pass the updated date of the last resource loaded, not the date of the last request, in order to avoid gaps. &lt;br&gt;&lt;br&gt;&lt;b&gt;Permissions Needed:&lt;/b&gt; TRIVIA_ADMIN
      * @param since Timestamp in seconds
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
      */
-    public getQuestionDeltasWithHttpInfo(since?: number, extraHttpRequestParams?: any): Observable<Response> {
-        const path = this.basePath + '/trivia/questions/delta';
+    public getQuestionDeltas(since?: number, observe?: 'body', reportProgress?: boolean): Observable<Array<DeltaResource>>;
+    public getQuestionDeltas(since?: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Array<DeltaResource>>>;
+    public getQuestionDeltas(since?: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Array<DeltaResource>>>;
+    public getQuestionDeltas(since?: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
 
-        let queryParameters = new URLSearchParams();
-        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
-
-        if (since !== undefined) {
-            queryParameters.set('since', <any>since);
+        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
+        if (since !== undefined && since !== null) {
+            queryParameters = queryParameters.set('since', <any>since);
         }
 
-
-        // to determine the Accept header
-        let produces: string[] = [
-            'application/json'
-        ];
+        let headers = this.defaultHeaders;
 
         // authentication (oauth2_client_credentials_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
         // authentication (oauth2_password_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-            
-        let requestOptions: RequestOptionsArgs = new RequestOptions({
-            method: RequestMethod.Get,
-            headers: headers,
-            search: queryParameters,
-            withCredentials:this.configuration.withCredentials
-        });
-        // https://github.com/swagger-api/swagger-codegen/issues/4037
-        if (extraHttpRequestParams) {
-            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
+        // to determine the Accept header
+        let httpHeaderAccepts: string[] = [
+            'application/json'
+        ];
+        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers = headers.set('Accept', httpHeaderAcceptSelected);
         }
 
-        return this.http.request(path, requestOptions);
+        // to determine the Content-Type header
+        const consumes: string[] = [
+        ];
+
+        return this.httpClient.get<Array<DeltaResource>>(`${this.basePath}/trivia/questions/delta`,
+            {
+                params: queryParameters,
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
     }
 
     /**
      * List the tags for a question
      * &lt;b&gt;Permissions Needed:&lt;/b&gt; TRIVIA_ADMIN
      * @param id The id of the question
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
      */
-    public getQuestionTagsWithHttpInfo(id: string, extraHttpRequestParams?: any): Observable<Response> {
-        const path = this.basePath + '/trivia/questions/${id}/tags'
-                    .replace('${' + 'id' + '}', String(id));
-
-        let queryParameters = new URLSearchParams();
-        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
-
-        // verify required parameter 'id' is not null or undefined
+    public getQuestionTags(id: string, observe?: 'body', reportProgress?: boolean): Observable<Array<string>>;
+    public getQuestionTags(id: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Array<string>>>;
+    public getQuestionTags(id: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Array<string>>>;
+    public getQuestionTags(id: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
         if (id === null || id === undefined) {
             throw new Error('Required parameter id was null or undefined when calling getQuestionTags.');
         }
 
-        // to determine the Accept header
-        let produces: string[] = [
-            'application/json'
-        ];
+        let headers = this.defaultHeaders;
 
         // authentication (oauth2_client_credentials_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
         // authentication (oauth2_password_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-            
-        let requestOptions: RequestOptionsArgs = new RequestOptions({
-            method: RequestMethod.Get,
-            headers: headers,
-            search: queryParameters,
-            withCredentials:this.configuration.withCredentials
-        });
-        // https://github.com/swagger-api/swagger-codegen/issues/4037
-        if (extraHttpRequestParams) {
-            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
+        // to determine the Accept header
+        let httpHeaderAccepts: string[] = [
+            'application/json'
+        ];
+        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers = headers.set('Accept', httpHeaderAcceptSelected);
         }
 
-        return this.http.request(path, requestOptions);
+        // to determine the Content-Type header
+        const consumes: string[] = [
+        ];
+
+        return this.httpClient.get<Array<string>>(`${this.basePath}/trivia/questions/${encodeURIComponent(String(id))}/tags`,
+            {
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
     }
 
     /**
      * Get a single question template
      * &lt;b&gt;Permissions Needed:&lt;/b&gt; TEMPLATE_ADMIN or TRIVIA_ADMIN
      * @param id The id of the template
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
      */
-    public getQuestionTemplateWithHttpInfo(id: string, extraHttpRequestParams?: any): Observable<Response> {
-        const path = this.basePath + '/trivia/questions/templates/${id}'
-                    .replace('${' + 'id' + '}', String(id));
-
-        let queryParameters = new URLSearchParams();
-        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
-
-        // verify required parameter 'id' is not null or undefined
+    public getQuestionTemplate(id: string, observe?: 'body', reportProgress?: boolean): Observable<QuestionTemplateResource>;
+    public getQuestionTemplate(id: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<QuestionTemplateResource>>;
+    public getQuestionTemplate(id: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<QuestionTemplateResource>>;
+    public getQuestionTemplate(id: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
         if (id === null || id === undefined) {
             throw new Error('Required parameter id was null or undefined when calling getQuestionTemplate.');
         }
 
-        // to determine the Accept header
-        let produces: string[] = [
-            'application/json'
-        ];
+        let headers = this.defaultHeaders;
 
         // authentication (oauth2_client_credentials_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
         // authentication (oauth2_password_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-            
-        let requestOptions: RequestOptionsArgs = new RequestOptions({
-            method: RequestMethod.Get,
-            headers: headers,
-            search: queryParameters,
-            withCredentials:this.configuration.withCredentials
-        });
-        // https://github.com/swagger-api/swagger-codegen/issues/4037
-        if (extraHttpRequestParams) {
-            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
+        // to determine the Accept header
+        let httpHeaderAccepts: string[] = [
+            'application/json'
+        ];
+        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers = headers.set('Accept', httpHeaderAcceptSelected);
         }
 
-        return this.http.request(path, requestOptions);
+        // to determine the Content-Type header
+        const consumes: string[] = [
+        ];
+
+        return this.httpClient.get<QuestionTemplateResource>(`${this.basePath}/trivia/questions/templates/${encodeURIComponent(String(id))}`,
+            {
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
     }
 
     /**
@@ -1704,62 +1185,65 @@ export class GamificationTriviaService {
      * @param size The number of objects returned per page
      * @param page The number of the page returned, starting with 1
      * @param order A comma separated list of sorting requirements in priority order, each entry matching PROPERTY_NAME:[ASC|DESC]
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
      */
-    public getQuestionTemplatesWithHttpInfo(size?: number, page?: number, order?: string, extraHttpRequestParams?: any): Observable<Response> {
-        const path = this.basePath + '/trivia/questions/templates';
+    public getQuestionTemplates(size?: number, page?: number, order?: string, observe?: 'body', reportProgress?: boolean): Observable<PageResourceQuestionTemplateResource>;
+    public getQuestionTemplates(size?: number, page?: number, order?: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<PageResourceQuestionTemplateResource>>;
+    public getQuestionTemplates(size?: number, page?: number, order?: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<PageResourceQuestionTemplateResource>>;
+    public getQuestionTemplates(size?: number, page?: number, order?: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
 
-        let queryParameters = new URLSearchParams();
-        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
-
-        if (size !== undefined) {
-            queryParameters.set('size', <any>size);
+        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
+        if (size !== undefined && size !== null) {
+            queryParameters = queryParameters.set('size', <any>size);
+        }
+        if (page !== undefined && page !== null) {
+            queryParameters = queryParameters.set('page', <any>page);
+        }
+        if (order !== undefined && order !== null) {
+            queryParameters = queryParameters.set('order', <any>order);
         }
 
-        if (page !== undefined) {
-            queryParameters.set('page', <any>page);
-        }
-
-        if (order !== undefined) {
-            queryParameters.set('order', <any>order);
-        }
-
-
-        // to determine the Accept header
-        let produces: string[] = [
-            'application/json'
-        ];
+        let headers = this.defaultHeaders;
 
         // authentication (oauth2_client_credentials_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
         // authentication (oauth2_password_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-            
-        let requestOptions: RequestOptionsArgs = new RequestOptions({
-            method: RequestMethod.Get,
-            headers: headers,
-            search: queryParameters,
-            withCredentials:this.configuration.withCredentials
-        });
-        // https://github.com/swagger-api/swagger-codegen/issues/4037
-        if (extraHttpRequestParams) {
-            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
+        // to determine the Accept header
+        let httpHeaderAccepts: string[] = [
+            'application/json'
+        ];
+        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers = headers.set('Accept', httpHeaderAcceptSelected);
         }
 
-        return this.http.request(path, requestOptions);
+        // to determine the Content-Type header
+        const consumes: string[] = [
+        ];
+
+        return this.httpClient.get<PageResourceQuestionTemplateResource>(`${this.basePath}/trivia/questions/templates`,
+            {
+                params: queryParameters,
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
     }
 
     /**
@@ -1776,94 +1260,89 @@ export class GamificationTriviaService {
      * @param filterType Filter for questions with specified type.  Allowable values: (&#39;TEXT&#39;, &#39;IMAGE&#39;, &#39;VIDEO&#39;, &#39;AUDIO&#39;)
      * @param filterPublished Filter for questions currenctly published or not
      * @param filterImportId Filter for questions from a specific import job
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
      */
-    public getQuestionsWithHttpInfo(size?: number, page?: number, order?: string, filterSearch?: string, filterIdset?: string, filterCategory?: string, filterTagset?: string, filterTag?: string, filterType?: string, filterPublished?: boolean, filterImportId?: number, extraHttpRequestParams?: any): Observable<Response> {
-        const path = this.basePath + '/trivia/questions';
+    public getQuestions(size?: number, page?: number, order?: string, filterSearch?: string, filterIdset?: string, filterCategory?: string, filterTagset?: string, filterTag?: string, filterType?: string, filterPublished?: boolean, filterImportId?: number, observe?: 'body', reportProgress?: boolean): Observable<PageResourceQuestionResource>;
+    public getQuestions(size?: number, page?: number, order?: string, filterSearch?: string, filterIdset?: string, filterCategory?: string, filterTagset?: string, filterTag?: string, filterType?: string, filterPublished?: boolean, filterImportId?: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<PageResourceQuestionResource>>;
+    public getQuestions(size?: number, page?: number, order?: string, filterSearch?: string, filterIdset?: string, filterCategory?: string, filterTagset?: string, filterTag?: string, filterType?: string, filterPublished?: boolean, filterImportId?: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<PageResourceQuestionResource>>;
+    public getQuestions(size?: number, page?: number, order?: string, filterSearch?: string, filterIdset?: string, filterCategory?: string, filterTagset?: string, filterTag?: string, filterType?: string, filterPublished?: boolean, filterImportId?: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
 
-        let queryParameters = new URLSearchParams();
-        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
-
-        if (size !== undefined) {
-            queryParameters.set('size', <any>size);
+        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
+        if (size !== undefined && size !== null) {
+            queryParameters = queryParameters.set('size', <any>size);
+        }
+        if (page !== undefined && page !== null) {
+            queryParameters = queryParameters.set('page', <any>page);
+        }
+        if (order !== undefined && order !== null) {
+            queryParameters = queryParameters.set('order', <any>order);
+        }
+        if (filterSearch !== undefined && filterSearch !== null) {
+            queryParameters = queryParameters.set('filter_search', <any>filterSearch);
+        }
+        if (filterIdset !== undefined && filterIdset !== null) {
+            queryParameters = queryParameters.set('filter_idset', <any>filterIdset);
+        }
+        if (filterCategory !== undefined && filterCategory !== null) {
+            queryParameters = queryParameters.set('filter_category', <any>filterCategory);
+        }
+        if (filterTagset !== undefined && filterTagset !== null) {
+            queryParameters = queryParameters.set('filter_tagset', <any>filterTagset);
+        }
+        if (filterTag !== undefined && filterTag !== null) {
+            queryParameters = queryParameters.set('filter_tag', <any>filterTag);
+        }
+        if (filterType !== undefined && filterType !== null) {
+            queryParameters = queryParameters.set('filter_type', <any>filterType);
+        }
+        if (filterPublished !== undefined && filterPublished !== null) {
+            queryParameters = queryParameters.set('filter_published', <any>filterPublished);
+        }
+        if (filterImportId !== undefined && filterImportId !== null) {
+            queryParameters = queryParameters.set('filter_import_id', <any>filterImportId);
         }
 
-        if (page !== undefined) {
-            queryParameters.set('page', <any>page);
-        }
-
-        if (order !== undefined) {
-            queryParameters.set('order', <any>order);
-        }
-
-        if (filterSearch !== undefined) {
-            queryParameters.set('filter_search', <any>filterSearch);
-        }
-
-        if (filterIdset !== undefined) {
-            queryParameters.set('filter_idset', <any>filterIdset);
-        }
-
-        if (filterCategory !== undefined) {
-            queryParameters.set('filter_category', <any>filterCategory);
-        }
-
-        if (filterTagset !== undefined) {
-            queryParameters.set('filter_tagset', <any>filterTagset);
-        }
-
-        if (filterTag !== undefined) {
-            queryParameters.set('filter_tag', <any>filterTag);
-        }
-
-        if (filterType !== undefined) {
-            queryParameters.set('filter_type', <any>filterType);
-        }
-
-        if (filterPublished !== undefined) {
-            queryParameters.set('filter_published', <any>filterPublished);
-        }
-
-        if (filterImportId !== undefined) {
-            queryParameters.set('filter_import_id', <any>filterImportId);
-        }
-
-
-        // to determine the Accept header
-        let produces: string[] = [
-            'application/json'
-        ];
+        let headers = this.defaultHeaders;
 
         // authentication (oauth2_client_credentials_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
         // authentication (oauth2_password_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-            
-        let requestOptions: RequestOptionsArgs = new RequestOptions({
-            method: RequestMethod.Get,
-            headers: headers,
-            search: queryParameters,
-            withCredentials:this.configuration.withCredentials
-        });
-        // https://github.com/swagger-api/swagger-codegen/issues/4037
-        if (extraHttpRequestParams) {
-            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
+        // to determine the Accept header
+        let httpHeaderAccepts: string[] = [
+            'application/json'
+        ];
+        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers = headers.set('Accept', httpHeaderAcceptSelected);
         }
 
-        return this.http.request(path, requestOptions);
+        // to determine the Content-Type header
+        const consumes: string[] = [
+        ];
+
+        return this.httpClient.get<PageResourceQuestionResource>(`${this.basePath}/trivia/questions`,
+            {
+                params: queryParameters,
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
     }
 
     /**
@@ -1876,78 +1355,77 @@ export class GamificationTriviaService {
      * @param filterTagset Filter for questions with specified tags (separated by comma)
      * @param filterType Filter for questions with specified type.  Allowable values: (&#39;TEXT&#39;, &#39;IMAGE&#39;, &#39;VIDEO&#39;, &#39;AUDIO&#39;)
      * @param filterPublished Filter for questions currenctly published or not
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
      */
-    public getQuestionsCountWithHttpInfo(filterSearch?: string, filterIdset?: string, filterCategory?: string, filterTag?: string, filterTagset?: string, filterType?: string, filterPublished?: boolean, extraHttpRequestParams?: any): Observable<Response> {
-        const path = this.basePath + '/trivia/questions/count';
+    public getQuestionsCount(filterSearch?: string, filterIdset?: string, filterCategory?: string, filterTag?: string, filterTagset?: string, filterType?: string, filterPublished?: boolean, observe?: 'body', reportProgress?: boolean): Observable<number>;
+    public getQuestionsCount(filterSearch?: string, filterIdset?: string, filterCategory?: string, filterTag?: string, filterTagset?: string, filterType?: string, filterPublished?: boolean, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<number>>;
+    public getQuestionsCount(filterSearch?: string, filterIdset?: string, filterCategory?: string, filterTag?: string, filterTagset?: string, filterType?: string, filterPublished?: boolean, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<number>>;
+    public getQuestionsCount(filterSearch?: string, filterIdset?: string, filterCategory?: string, filterTag?: string, filterTagset?: string, filterType?: string, filterPublished?: boolean, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
 
-        let queryParameters = new URLSearchParams();
-        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
-
-        if (filterSearch !== undefined) {
-            queryParameters.set('filter_search', <any>filterSearch);
+        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
+        if (filterSearch !== undefined && filterSearch !== null) {
+            queryParameters = queryParameters.set('filter_search', <any>filterSearch);
+        }
+        if (filterIdset !== undefined && filterIdset !== null) {
+            queryParameters = queryParameters.set('filter_idset', <any>filterIdset);
+        }
+        if (filterCategory !== undefined && filterCategory !== null) {
+            queryParameters = queryParameters.set('filter_category', <any>filterCategory);
+        }
+        if (filterTag !== undefined && filterTag !== null) {
+            queryParameters = queryParameters.set('filter_tag', <any>filterTag);
+        }
+        if (filterTagset !== undefined && filterTagset !== null) {
+            queryParameters = queryParameters.set('filter_tagset', <any>filterTagset);
+        }
+        if (filterType !== undefined && filterType !== null) {
+            queryParameters = queryParameters.set('filter_type', <any>filterType);
+        }
+        if (filterPublished !== undefined && filterPublished !== null) {
+            queryParameters = queryParameters.set('filter_published', <any>filterPublished);
         }
 
-        if (filterIdset !== undefined) {
-            queryParameters.set('filter_idset', <any>filterIdset);
-        }
-
-        if (filterCategory !== undefined) {
-            queryParameters.set('filter_category', <any>filterCategory);
-        }
-
-        if (filterTag !== undefined) {
-            queryParameters.set('filter_tag', <any>filterTag);
-        }
-
-        if (filterTagset !== undefined) {
-            queryParameters.set('filter_tagset', <any>filterTagset);
-        }
-
-        if (filterType !== undefined) {
-            queryParameters.set('filter_type', <any>filterType);
-        }
-
-        if (filterPublished !== undefined) {
-            queryParameters.set('filter_published', <any>filterPublished);
-        }
-
-
-        // to determine the Accept header
-        let produces: string[] = [
-            'application/json'
-        ];
+        let headers = this.defaultHeaders;
 
         // authentication (oauth2_client_credentials_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
         // authentication (oauth2_password_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-            
-        let requestOptions: RequestOptionsArgs = new RequestOptions({
-            method: RequestMethod.Get,
-            headers: headers,
-            search: queryParameters,
-            withCredentials:this.configuration.withCredentials
-        });
-        // https://github.com/swagger-api/swagger-codegen/issues/4037
-        if (extraHttpRequestParams) {
-            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
+        // to determine the Accept header
+        let httpHeaderAccepts: string[] = [
+            'application/json'
+        ];
+        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers = headers.set('Accept', httpHeaderAcceptSelected);
         }
 
-        return this.http.request(path, requestOptions);
+        // to determine the Content-Type header
+        const consumes: string[] = [
+        ];
+
+        return this.httpClient.get<number>(`${this.basePath}/trivia/questions/count`,
+            {
+                params: queryParameters,
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
     }
 
     /**
@@ -1955,63 +1433,67 @@ export class GamificationTriviaService {
      * Will process the CSV file and add new questions asynchronously. The status of the job must be &#39;VALID&#39;. &lt;br&gt;&lt;br&gt;&lt;b&gt;Permissions Needed:&lt;/b&gt; TRIVIA_ADMIN
      * @param id The id of the job
      * @param publishNow Whether the new questions should be published live immediately
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
      */
-    public processImportJobWithHttpInfo(id: number, publishNow: boolean, extraHttpRequestParams?: any): Observable<Response> {
-        const path = this.basePath + '/trivia/import/${id}/process'
-                    .replace('${' + 'id' + '}', String(id));
-
-        let queryParameters = new URLSearchParams();
-        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
-
-        // verify required parameter 'id' is not null or undefined
+    public processImportJob(id: number, publishNow: boolean, observe?: 'body', reportProgress?: boolean): Observable<ImportJobResource>;
+    public processImportJob(id: number, publishNow: boolean, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<ImportJobResource>>;
+    public processImportJob(id: number, publishNow: boolean, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<ImportJobResource>>;
+    public processImportJob(id: number, publishNow: boolean, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
         if (id === null || id === undefined) {
             throw new Error('Required parameter id was null or undefined when calling processImportJob.');
         }
-        // verify required parameter 'publishNow' is not null or undefined
         if (publishNow === null || publishNow === undefined) {
             throw new Error('Required parameter publishNow was null or undefined when calling processImportJob.');
         }
-        if (publishNow !== undefined) {
-            queryParameters.set('publish_now', <any>publishNow);
+
+        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
+        if (publishNow !== undefined && publishNow !== null) {
+            queryParameters = queryParameters.set('publish_now', <any>publishNow);
         }
 
-
-        // to determine the Accept header
-        let produces: string[] = [
-            'application/json'
-        ];
+        let headers = this.defaultHeaders;
 
         // authentication (oauth2_client_credentials_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
         // authentication (oauth2_password_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-            
-        let requestOptions: RequestOptionsArgs = new RequestOptions({
-            method: RequestMethod.Post,
-            headers: headers,
-            search: queryParameters,
-            withCredentials:this.configuration.withCredentials
-        });
-        // https://github.com/swagger-api/swagger-codegen/issues/4037
-        if (extraHttpRequestParams) {
-            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
+        // to determine the Accept header
+        let httpHeaderAccepts: string[] = [
+            'application/json'
+        ];
+        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers = headers.set('Accept', httpHeaderAcceptSelected);
         }
 
-        return this.http.request(path, requestOptions);
+        // to determine the Content-Type header
+        const consumes: string[] = [
+            'application/json'
+        ];
+
+        return this.httpClient.post<ImportJobResource>(`${this.basePath}/trivia/import/${encodeURIComponent(String(id))}/process`,
+            null,
+            {
+                params: queryParameters,
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
     }
 
     /**
@@ -2019,60 +1501,59 @@ export class GamificationTriviaService {
      * &lt;b&gt;Permissions Needed:&lt;/b&gt; TRIVIA_ADMIN
      * @param id The id of the question
      * @param tag The tag to remove
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
      */
-    public removeQuestionTagWithHttpInfo(id: string, tag: string, extraHttpRequestParams?: any): Observable<Response> {
-        const path = this.basePath + '/trivia/questions/${id}/tags/${tag}'
-                    .replace('${' + 'id' + '}', String(id))
-                    .replace('${' + 'tag' + '}', String(tag));
-
-        let queryParameters = new URLSearchParams();
-        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
-
-        // verify required parameter 'id' is not null or undefined
+    public removeQuestionTag(id: string, tag: string, observe?: 'body', reportProgress?: boolean): Observable<any>;
+    public removeQuestionTag(id: string, tag: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
+    public removeQuestionTag(id: string, tag: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
+    public removeQuestionTag(id: string, tag: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
         if (id === null || id === undefined) {
             throw new Error('Required parameter id was null or undefined when calling removeQuestionTag.');
         }
-        // verify required parameter 'tag' is not null or undefined
         if (tag === null || tag === undefined) {
             throw new Error('Required parameter tag was null or undefined when calling removeQuestionTag.');
         }
 
-        // to determine the Accept header
-        let produces: string[] = [
-            'application/json'
-        ];
+        let headers = this.defaultHeaders;
 
         // authentication (oauth2_client_credentials_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
         // authentication (oauth2_password_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-            
-        let requestOptions: RequestOptionsArgs = new RequestOptions({
-            method: RequestMethod.Delete,
-            headers: headers,
-            search: queryParameters,
-            withCredentials:this.configuration.withCredentials
-        });
-        // https://github.com/swagger-api/swagger-codegen/issues/4037
-        if (extraHttpRequestParams) {
-            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
+        // to determine the Accept header
+        let httpHeaderAccepts: string[] = [
+            'application/json'
+        ];
+        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers = headers.set('Accept', httpHeaderAcceptSelected);
         }
 
-        return this.http.request(path, requestOptions);
+        // to determine the Content-Type header
+        const consumes: string[] = [
+        ];
+
+        return this.httpClient.delete<any>(`${this.basePath}/trivia/questions/${encodeURIComponent(String(id))}/tags/${encodeURIComponent(String(tag))}`,
+            {
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
     }
 
     /**
@@ -2087,87 +1568,83 @@ export class GamificationTriviaService {
      * @param filterType Filter for questions with specified type.  Allowable values: (&#39;TEXT&#39;, &#39;IMAGE&#39;, &#39;VIDEO&#39;, &#39;AUDIO&#39;)
      * @param filterPublished Filter for questions currenctly published or not
      * @param filterImportId Filter for questions from a specific import job
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
      */
-    public removeTagToQuestionsBatchWithHttpInfo(tag: string, filterSearch?: string, filterIdset?: string, filterCategory?: string, filterTag?: string, filterTagset?: string, filterType?: string, filterPublished?: boolean, filterImportId?: number, extraHttpRequestParams?: any): Observable<Response> {
-        const path = this.basePath + '/trivia/questions/tags/${tag}'
-                    .replace('${' + 'tag' + '}', String(tag));
-
-        let queryParameters = new URLSearchParams();
-        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
-
-        // verify required parameter 'tag' is not null or undefined
+    public removeTagToQuestionsBatch(tag: string, filterSearch?: string, filterIdset?: string, filterCategory?: string, filterTag?: string, filterTagset?: string, filterType?: string, filterPublished?: boolean, filterImportId?: number, observe?: 'body', reportProgress?: boolean): Observable<number>;
+    public removeTagToQuestionsBatch(tag: string, filterSearch?: string, filterIdset?: string, filterCategory?: string, filterTag?: string, filterTagset?: string, filterType?: string, filterPublished?: boolean, filterImportId?: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<number>>;
+    public removeTagToQuestionsBatch(tag: string, filterSearch?: string, filterIdset?: string, filterCategory?: string, filterTag?: string, filterTagset?: string, filterType?: string, filterPublished?: boolean, filterImportId?: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<number>>;
+    public removeTagToQuestionsBatch(tag: string, filterSearch?: string, filterIdset?: string, filterCategory?: string, filterTag?: string, filterTagset?: string, filterType?: string, filterPublished?: boolean, filterImportId?: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
         if (tag === null || tag === undefined) {
             throw new Error('Required parameter tag was null or undefined when calling removeTagToQuestionsBatch.');
         }
-        if (filterSearch !== undefined) {
-            queryParameters.set('filter_search', <any>filterSearch);
+
+        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
+        if (filterSearch !== undefined && filterSearch !== null) {
+            queryParameters = queryParameters.set('filter_search', <any>filterSearch);
+        }
+        if (filterIdset !== undefined && filterIdset !== null) {
+            queryParameters = queryParameters.set('filter_idset', <any>filterIdset);
+        }
+        if (filterCategory !== undefined && filterCategory !== null) {
+            queryParameters = queryParameters.set('filter_category', <any>filterCategory);
+        }
+        if (filterTag !== undefined && filterTag !== null) {
+            queryParameters = queryParameters.set('filter_tag', <any>filterTag);
+        }
+        if (filterTagset !== undefined && filterTagset !== null) {
+            queryParameters = queryParameters.set('filter_tagset', <any>filterTagset);
+        }
+        if (filterType !== undefined && filterType !== null) {
+            queryParameters = queryParameters.set('filter_type', <any>filterType);
+        }
+        if (filterPublished !== undefined && filterPublished !== null) {
+            queryParameters = queryParameters.set('filter_published', <any>filterPublished);
+        }
+        if (filterImportId !== undefined && filterImportId !== null) {
+            queryParameters = queryParameters.set('filter_import_id', <any>filterImportId);
         }
 
-        if (filterIdset !== undefined) {
-            queryParameters.set('filter_idset', <any>filterIdset);
-        }
-
-        if (filterCategory !== undefined) {
-            queryParameters.set('filter_category', <any>filterCategory);
-        }
-
-        if (filterTag !== undefined) {
-            queryParameters.set('filter_tag', <any>filterTag);
-        }
-
-        if (filterTagset !== undefined) {
-            queryParameters.set('filter_tagset', <any>filterTagset);
-        }
-
-        if (filterType !== undefined) {
-            queryParameters.set('filter_type', <any>filterType);
-        }
-
-        if (filterPublished !== undefined) {
-            queryParameters.set('filter_published', <any>filterPublished);
-        }
-
-        if (filterImportId !== undefined) {
-            queryParameters.set('filter_import_id', <any>filterImportId);
-        }
-
-
-        // to determine the Accept header
-        let produces: string[] = [
-            'application/json'
-        ];
+        let headers = this.defaultHeaders;
 
         // authentication (oauth2_client_credentials_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
         // authentication (oauth2_password_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-            
-        let requestOptions: RequestOptionsArgs = new RequestOptions({
-            method: RequestMethod.Delete,
-            headers: headers,
-            search: queryParameters,
-            withCredentials:this.configuration.withCredentials
-        });
-        // https://github.com/swagger-api/swagger-codegen/issues/4037
-        if (extraHttpRequestParams) {
-            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
+        // to determine the Accept header
+        let httpHeaderAccepts: string[] = [
+            'application/json'
+        ];
+        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers = headers.set('Accept', httpHeaderAcceptSelected);
         }
 
-        return this.http.request(path, requestOptions);
+        // to determine the Content-Type header
+        const consumes: string[] = [
+        ];
+
+        return this.httpClient.delete<number>(`${this.basePath}/trivia/questions/tags/${encodeURIComponent(String(tag))}`,
+            {
+                params: queryParameters,
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
     }
 
     /**
@@ -2176,62 +1653,65 @@ export class GamificationTriviaService {
      * @param filterSearch Filter for tags starting with the given text
      * @param filterCategory Filter for tags on questions from a specific category
      * @param filterImportId Filter for tags on questions from a specific import job
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
      */
-    public searchQuestionTagsWithHttpInfo(filterSearch?: string, filterCategory?: string, filterImportId?: number, extraHttpRequestParams?: any): Observable<Response> {
-        const path = this.basePath + '/trivia/tags';
+    public searchQuestionTags(filterSearch?: string, filterCategory?: string, filterImportId?: number, observe?: 'body', reportProgress?: boolean): Observable<Array<string>>;
+    public searchQuestionTags(filterSearch?: string, filterCategory?: string, filterImportId?: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Array<string>>>;
+    public searchQuestionTags(filterSearch?: string, filterCategory?: string, filterImportId?: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Array<string>>>;
+    public searchQuestionTags(filterSearch?: string, filterCategory?: string, filterImportId?: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
 
-        let queryParameters = new URLSearchParams();
-        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
-
-        if (filterSearch !== undefined) {
-            queryParameters.set('filter_search', <any>filterSearch);
+        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
+        if (filterSearch !== undefined && filterSearch !== null) {
+            queryParameters = queryParameters.set('filter_search', <any>filterSearch);
+        }
+        if (filterCategory !== undefined && filterCategory !== null) {
+            queryParameters = queryParameters.set('filter_category', <any>filterCategory);
+        }
+        if (filterImportId !== undefined && filterImportId !== null) {
+            queryParameters = queryParameters.set('filter_import_id', <any>filterImportId);
         }
 
-        if (filterCategory !== undefined) {
-            queryParameters.set('filter_category', <any>filterCategory);
-        }
-
-        if (filterImportId !== undefined) {
-            queryParameters.set('filter_import_id', <any>filterImportId);
-        }
-
-
-        // to determine the Accept header
-        let produces: string[] = [
-            'application/json'
-        ];
+        let headers = this.defaultHeaders;
 
         // authentication (oauth2_client_credentials_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
         // authentication (oauth2_password_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-            
-        let requestOptions: RequestOptionsArgs = new RequestOptions({
-            method: RequestMethod.Get,
-            headers: headers,
-            search: queryParameters,
-            withCredentials:this.configuration.withCredentials
-        });
-        // https://github.com/swagger-api/swagger-codegen/issues/4037
-        if (extraHttpRequestParams) {
-            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
+        // to determine the Accept header
+        let httpHeaderAccepts: string[] = [
+            'application/json'
+        ];
+        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers = headers.set('Accept', httpHeaderAcceptSelected);
         }
 
-        return this.http.request(path, requestOptions);
+        // to determine the Content-Type header
+        const consumes: string[] = [
+        ];
+
+        return this.httpClient.get<Array<string>>(`${this.basePath}/trivia/tags`,
+            {
+                params: queryParameters,
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
     }
 
     /**
@@ -2239,58 +1719,62 @@ export class GamificationTriviaService {
      * Changes should be made before process is started for there to be any effect. &lt;br&gt;&lt;br&gt;&lt;b&gt;Permissions Needed:&lt;/b&gt; TRIVIA_ADMIN
      * @param id The id of the job
      * @param request The updated job
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
      */
-    public updateImportJobWithHttpInfo(id: number, request?: ImportJobResource, extraHttpRequestParams?: any): Observable<Response> {
-        const path = this.basePath + '/trivia/import/${id}'
-                    .replace('${' + 'id' + '}', String(id));
-
-        let queryParameters = new URLSearchParams();
-        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
-
-        // verify required parameter 'id' is not null or undefined
+    public updateImportJob(id: number, request?: ImportJobResource, observe?: 'body', reportProgress?: boolean): Observable<ImportJobResource>;
+    public updateImportJob(id: number, request?: ImportJobResource, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<ImportJobResource>>;
+    public updateImportJob(id: number, request?: ImportJobResource, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<ImportJobResource>>;
+    public updateImportJob(id: number, request?: ImportJobResource, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
         if (id === null || id === undefined) {
             throw new Error('Required parameter id was null or undefined when calling updateImportJob.');
         }
 
-        // to determine the Accept header
-        let produces: string[] = [
-            'application/json'
-        ];
+        let headers = this.defaultHeaders;
 
         // authentication (oauth2_client_credentials_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
         // authentication (oauth2_password_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-            
-        headers.set('Content-Type', 'application/json');
-
-        let requestOptions: RequestOptionsArgs = new RequestOptions({
-            method: RequestMethod.Put,
-            headers: headers,
-            body: request == null ? '' : JSON.stringify(request), // https://github.com/angular/angular/issues/10612
-            search: queryParameters,
-            withCredentials:this.configuration.withCredentials
-        });
-        // https://github.com/swagger-api/swagger-codegen/issues/4037
-        if (extraHttpRequestParams) {
-            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
+        // to determine the Accept header
+        let httpHeaderAccepts: string[] = [
+            'application/json'
+        ];
+        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers = headers.set('Accept', httpHeaderAcceptSelected);
         }
 
-        return this.http.request(path, requestOptions);
+        // to determine the Content-Type header
+        const consumes: string[] = [
+            'application/json'
+        ];
+        const httpContentTypeSelected: string | undefined = this.configuration.selectHeaderContentType(consumes);
+        if (httpContentTypeSelected != undefined) {
+            headers = headers.set('Content-Type', httpContentTypeSelected);
+        }
+
+        return this.httpClient.put<ImportJobResource>(`${this.basePath}/trivia/import/${encodeURIComponent(String(id))}`,
+            request,
+            {
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
     }
 
     /**
@@ -2298,58 +1782,62 @@ export class GamificationTriviaService {
      * &lt;b&gt;Permissions Needed:&lt;/b&gt; TRIVIA_ADMIN
      * @param id The id of the question
      * @param question The updated question
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
      */
-    public updateQuestionWithHttpInfo(id: string, question?: QuestionResource, extraHttpRequestParams?: any): Observable<Response> {
-        const path = this.basePath + '/trivia/questions/${id}'
-                    .replace('${' + 'id' + '}', String(id));
-
-        let queryParameters = new URLSearchParams();
-        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
-
-        // verify required parameter 'id' is not null or undefined
+    public updateQuestion(id: string, question?: QuestionResource, observe?: 'body', reportProgress?: boolean): Observable<QuestionResource>;
+    public updateQuestion(id: string, question?: QuestionResource, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<QuestionResource>>;
+    public updateQuestion(id: string, question?: QuestionResource, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<QuestionResource>>;
+    public updateQuestion(id: string, question?: QuestionResource, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
         if (id === null || id === undefined) {
             throw new Error('Required parameter id was null or undefined when calling updateQuestion.');
         }
 
-        // to determine the Accept header
-        let produces: string[] = [
-            'application/json'
-        ];
+        let headers = this.defaultHeaders;
 
         // authentication (oauth2_client_credentials_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
         // authentication (oauth2_password_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-            
-        headers.set('Content-Type', 'application/json');
-
-        let requestOptions: RequestOptionsArgs = new RequestOptions({
-            method: RequestMethod.Put,
-            headers: headers,
-            body: question == null ? '' : JSON.stringify(question), // https://github.com/angular/angular/issues/10612
-            search: queryParameters,
-            withCredentials:this.configuration.withCredentials
-        });
-        // https://github.com/swagger-api/swagger-codegen/issues/4037
-        if (extraHttpRequestParams) {
-            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
+        // to determine the Accept header
+        let httpHeaderAccepts: string[] = [
+            'application/json'
+        ];
+        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers = headers.set('Accept', httpHeaderAcceptSelected);
         }
 
-        return this.http.request(path, requestOptions);
+        // to determine the Content-Type header
+        const consumes: string[] = [
+            'application/json'
+        ];
+        const httpContentTypeSelected: string | undefined = this.configuration.selectHeaderContentType(consumes);
+        if (httpContentTypeSelected != undefined) {
+            headers = headers.set('Content-Type', httpContentTypeSelected);
+        }
+
+        return this.httpClient.put<QuestionResource>(`${this.basePath}/trivia/questions/${encodeURIComponent(String(id))}`,
+            question,
+            {
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
     }
 
     /**
@@ -2358,63 +1846,65 @@ export class GamificationTriviaService {
      * @param questionId The id of the question
      * @param id The id of the answer
      * @param answer The updated answer
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
      */
-    public updateQuestionAnswerWithHttpInfo(questionId: string, id: string, answer?: AnswerResource, extraHttpRequestParams?: any): Observable<Response> {
-        const path = this.basePath + '/trivia/questions/${question_id}/answers/${id}'
-                    .replace('${' + 'question_id' + '}', String(questionId))
-                    .replace('${' + 'id' + '}', String(id));
-
-        let queryParameters = new URLSearchParams();
-        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
-
-        // verify required parameter 'questionId' is not null or undefined
+    public updateQuestionAnswer(questionId: string, id: string, answer?: AnswerResource, observe?: 'body', reportProgress?: boolean): Observable<any>;
+    public updateQuestionAnswer(questionId: string, id: string, answer?: AnswerResource, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
+    public updateQuestionAnswer(questionId: string, id: string, answer?: AnswerResource, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
+    public updateQuestionAnswer(questionId: string, id: string, answer?: AnswerResource, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
         if (questionId === null || questionId === undefined) {
             throw new Error('Required parameter questionId was null or undefined when calling updateQuestionAnswer.');
         }
-        // verify required parameter 'id' is not null or undefined
         if (id === null || id === undefined) {
             throw new Error('Required parameter id was null or undefined when calling updateQuestionAnswer.');
         }
 
-        // to determine the Accept header
-        let produces: string[] = [
-            'application/json'
-        ];
+        let headers = this.defaultHeaders;
 
         // authentication (oauth2_client_credentials_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
         // authentication (oauth2_password_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-            
-        headers.set('Content-Type', 'application/json');
-
-        let requestOptions: RequestOptionsArgs = new RequestOptions({
-            method: RequestMethod.Put,
-            headers: headers,
-            body: answer == null ? '' : JSON.stringify(answer), // https://github.com/angular/angular/issues/10612
-            search: queryParameters,
-            withCredentials:this.configuration.withCredentials
-        });
-        // https://github.com/swagger-api/swagger-codegen/issues/4037
-        if (extraHttpRequestParams) {
-            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
+        // to determine the Accept header
+        let httpHeaderAccepts: string[] = [
+            'application/json'
+        ];
+        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers = headers.set('Accept', httpHeaderAcceptSelected);
         }
 
-        return this.http.request(path, requestOptions);
+        // to determine the Content-Type header
+        const consumes: string[] = [
+            'application/json'
+        ];
+        const httpContentTypeSelected: string | undefined = this.configuration.selectHeaderContentType(consumes);
+        if (httpContentTypeSelected != undefined) {
+            headers = headers.set('Content-Type', httpContentTypeSelected);
+        }
+
+        return this.httpClient.put<any>(`${this.basePath}/trivia/questions/${encodeURIComponent(String(questionId))}/answers/${encodeURIComponent(String(id))}`,
+            answer,
+            {
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
     }
 
     /**
@@ -2422,58 +1912,62 @@ export class GamificationTriviaService {
      * &lt;b&gt;Permissions Needed:&lt;/b&gt; TEMPLATE_ADMIN
      * @param id The id of the template
      * @param questionTemplateResource The question template resource object
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
      */
-    public updateQuestionTemplateWithHttpInfo(id: string, questionTemplateResource?: QuestionTemplateResource, extraHttpRequestParams?: any): Observable<Response> {
-        const path = this.basePath + '/trivia/questions/templates/${id}'
-                    .replace('${' + 'id' + '}', String(id));
-
-        let queryParameters = new URLSearchParams();
-        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
-
-        // verify required parameter 'id' is not null or undefined
+    public updateQuestionTemplate(id: string, questionTemplateResource?: QuestionTemplateResource, observe?: 'body', reportProgress?: boolean): Observable<QuestionTemplateResource>;
+    public updateQuestionTemplate(id: string, questionTemplateResource?: QuestionTemplateResource, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<QuestionTemplateResource>>;
+    public updateQuestionTemplate(id: string, questionTemplateResource?: QuestionTemplateResource, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<QuestionTemplateResource>>;
+    public updateQuestionTemplate(id: string, questionTemplateResource?: QuestionTemplateResource, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
         if (id === null || id === undefined) {
             throw new Error('Required parameter id was null or undefined when calling updateQuestionTemplate.');
         }
 
-        // to determine the Accept header
-        let produces: string[] = [
-            'application/json'
-        ];
+        let headers = this.defaultHeaders;
 
         // authentication (oauth2_client_credentials_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
         // authentication (oauth2_password_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-            
-        headers.set('Content-Type', 'application/json');
-
-        let requestOptions: RequestOptionsArgs = new RequestOptions({
-            method: RequestMethod.Put,
-            headers: headers,
-            body: questionTemplateResource == null ? '' : JSON.stringify(questionTemplateResource), // https://github.com/angular/angular/issues/10612
-            search: queryParameters,
-            withCredentials:this.configuration.withCredentials
-        });
-        // https://github.com/swagger-api/swagger-codegen/issues/4037
-        if (extraHttpRequestParams) {
-            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
+        // to determine the Accept header
+        let httpHeaderAccepts: string[] = [
+            'application/json'
+        ];
+        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers = headers.set('Accept', httpHeaderAcceptSelected);
         }
 
-        return this.http.request(path, requestOptions);
+        // to determine the Content-Type header
+        const consumes: string[] = [
+            'application/json'
+        ];
+        const httpContentTypeSelected: string | undefined = this.configuration.selectHeaderContentType(consumes);
+        if (httpContentTypeSelected != undefined) {
+            headers = headers.set('Content-Type', httpContentTypeSelected);
+        }
+
+        return this.httpClient.put<QuestionTemplateResource>(`${this.basePath}/trivia/questions/templates/${encodeURIComponent(String(id))}`,
+            questionTemplateResource,
+            {
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
     }
 
     /**
@@ -2487,81 +1981,83 @@ export class GamificationTriviaService {
      * @param filterType Filter for questions with specified type.  Allowable values: (&#39;TEXT&#39;, &#39;IMAGE&#39;, &#39;VIDEO&#39;, &#39;AUDIO&#39;)
      * @param filterPublished Filter for questions currenctly published or not
      * @param filterImportId Filter for questions from a specific import job
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
      */
-    public updateQuestionsInBulkWithHttpInfo(question?: QuestionResource, filterSearch?: string, filterIdset?: string, filterCategory?: string, filterTagset?: string, filterType?: string, filterPublished?: boolean, filterImportId?: number, extraHttpRequestParams?: any): Observable<Response> {
-        const path = this.basePath + '/trivia/questions';
+    public updateQuestionsInBulk(question?: QuestionResource, filterSearch?: string, filterIdset?: string, filterCategory?: string, filterTagset?: string, filterType?: string, filterPublished?: boolean, filterImportId?: number, observe?: 'body', reportProgress?: boolean): Observable<number>;
+    public updateQuestionsInBulk(question?: QuestionResource, filterSearch?: string, filterIdset?: string, filterCategory?: string, filterTagset?: string, filterType?: string, filterPublished?: boolean, filterImportId?: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<number>>;
+    public updateQuestionsInBulk(question?: QuestionResource, filterSearch?: string, filterIdset?: string, filterCategory?: string, filterTagset?: string, filterType?: string, filterPublished?: boolean, filterImportId?: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<number>>;
+    public updateQuestionsInBulk(question?: QuestionResource, filterSearch?: string, filterIdset?: string, filterCategory?: string, filterTagset?: string, filterType?: string, filterPublished?: boolean, filterImportId?: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
 
-        let queryParameters = new URLSearchParams();
-        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
-
-        if (filterSearch !== undefined) {
-            queryParameters.set('filter_search', <any>filterSearch);
+        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
+        if (filterSearch !== undefined && filterSearch !== null) {
+            queryParameters = queryParameters.set('filter_search', <any>filterSearch);
+        }
+        if (filterIdset !== undefined && filterIdset !== null) {
+            queryParameters = queryParameters.set('filter_idset', <any>filterIdset);
+        }
+        if (filterCategory !== undefined && filterCategory !== null) {
+            queryParameters = queryParameters.set('filter_category', <any>filterCategory);
+        }
+        if (filterTagset !== undefined && filterTagset !== null) {
+            queryParameters = queryParameters.set('filter_tagset', <any>filterTagset);
+        }
+        if (filterType !== undefined && filterType !== null) {
+            queryParameters = queryParameters.set('filter_type', <any>filterType);
+        }
+        if (filterPublished !== undefined && filterPublished !== null) {
+            queryParameters = queryParameters.set('filter_published', <any>filterPublished);
+        }
+        if (filterImportId !== undefined && filterImportId !== null) {
+            queryParameters = queryParameters.set('filter_import_id', <any>filterImportId);
         }
 
-        if (filterIdset !== undefined) {
-            queryParameters.set('filter_idset', <any>filterIdset);
-        }
-
-        if (filterCategory !== undefined) {
-            queryParameters.set('filter_category', <any>filterCategory);
-        }
-
-        if (filterTagset !== undefined) {
-            queryParameters.set('filter_tagset', <any>filterTagset);
-        }
-
-        if (filterType !== undefined) {
-            queryParameters.set('filter_type', <any>filterType);
-        }
-
-        if (filterPublished !== undefined) {
-            queryParameters.set('filter_published', <any>filterPublished);
-        }
-
-        if (filterImportId !== undefined) {
-            queryParameters.set('filter_import_id', <any>filterImportId);
-        }
-
-
-        // to determine the Accept header
-        let produces: string[] = [
-            'application/json'
-        ];
+        let headers = this.defaultHeaders;
 
         // authentication (oauth2_client_credentials_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
         // authentication (oauth2_password_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-            
-        headers.set('Content-Type', 'application/json');
-
-        let requestOptions: RequestOptionsArgs = new RequestOptions({
-            method: RequestMethod.Put,
-            headers: headers,
-            body: question == null ? '' : JSON.stringify(question), // https://github.com/angular/angular/issues/10612
-            search: queryParameters,
-            withCredentials:this.configuration.withCredentials
-        });
-        // https://github.com/swagger-api/swagger-codegen/issues/4037
-        if (extraHttpRequestParams) {
-            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
+        // to determine the Accept header
+        let httpHeaderAccepts: string[] = [
+            'application/json'
+        ];
+        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers = headers.set('Accept', httpHeaderAcceptSelected);
         }
 
-        return this.http.request(path, requestOptions);
+        // to determine the Content-Type header
+        const consumes: string[] = [
+            'application/json'
+        ];
+        const httpContentTypeSelected: string | undefined = this.configuration.selectHeaderContentType(consumes);
+        if (httpContentTypeSelected != undefined) {
+            headers = headers.set('Content-Type', httpContentTypeSelected);
+        }
+
+        return this.httpClient.put<number>(`${this.basePath}/trivia/questions`,
+            question,
+            {
+                params: queryParameters,
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
     }
 
 }

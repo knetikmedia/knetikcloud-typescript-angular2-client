@@ -11,21 +11,17 @@
  */
 
 
-
-export interface NestedCategory {
+export interface NestedCategory { 
     /**
      * Whether the category is active
      */
-    active?: boolean;
-
+    readonly active?: boolean;
     /**
      * The id of the category
      */
     id: string;
-
     /**
      * The name of the category
      */
-    name?: string;
-
+    readonly name?: string;
 }

@@ -9,15 +9,13 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
-
 import { FileProperty } from './fileProperty';
 import { Property } from './property';
 
 
-export interface FileGroupProperty extends Property {
+export interface FileGroupProperty extends Property { 
     /**
      * The list of files
      */
     files?: Array<FileProperty>;
-
 }

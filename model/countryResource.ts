@@ -11,21 +11,17 @@
  */
 
 
-
-export interface CountryResource {
+export interface CountryResource { 
     /**
      * The iso2 of the country
      */
-    iso2?: string;
-
+    readonly iso2?: string;
     /**
      * The iso3 of the country
      */
-    iso3?: string;
-
+    readonly iso3?: string;
     /**
      * The name of the country resource
      */
-    name?: string;
-
+    readonly name?: string;
 }

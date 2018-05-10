@@ -11,22 +11,13 @@
  */
 
 
-
-export interface Topic {
+export interface Topic { 
     createdDate?: number;
-
     displayName?: string;
-
     id?: string;
-
     locked?: boolean;
-
     tags?: Array<string>;
-
     topicMap?: any;
-
     updatedDate?: number;
-
     userCount?: number;
-
 }

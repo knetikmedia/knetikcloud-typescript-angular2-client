@@ -11,21 +11,17 @@
  */
 
 
-
-export interface BatchReturn {
+export interface BatchReturn { 
     /**
      * The result body
      */
-    body?: any;
-
+    readonly body?: any;
     /**
      * The HTTP response code
      */
-    code?: number;
-
+    readonly code?: number;
     /**
      * Full URI of REST call
      */
-    uri?: string;
-
+    readonly uri?: string;
 }

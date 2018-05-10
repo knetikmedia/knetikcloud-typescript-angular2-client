@@ -9,28 +9,18 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
-
 import { Order } from './order';
 import { StoreItemTemplateResource } from './storeItemTemplateResource';
 
 
-export interface PageResourceStoreItemTemplateResource {
+export interface PageResourceStoreItemTemplateResource { 
     content?: Array<StoreItemTemplateResource>;
-
     first?: boolean;
-
     last?: boolean;
-
     number?: number;
-
     numberOfElements?: number;
-
     size?: number;
-
     sort?: Array<Order>;
-
     totalElements?: number;
-
     totalPages?: number;
-
 }

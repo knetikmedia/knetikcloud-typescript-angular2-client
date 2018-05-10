@@ -9,44 +9,36 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
-
 import { SimpleUserResource } from './simpleUserResource';
 
 
-export interface FlagResource {
+export interface FlagResource { 
     /**
      * The context of that resource
      */
     context: string;
-
     /**
      * The context_id of that resource
      */
     contextId: string;
-
     /**
      * The date/time this resource was created in seconds since epoch
      */
-    createdDate?: number;
-
+    readonly createdDate?: number;
     /**
      * The unique ID for that resource
      */
-    id?: number;
-
+    readonly id?: number;
     /**
      * The flag reason of that resource
      */
     reason?: string;
-
     /**
      * The date/time this resource was last updated in seconds since epoch
      */
-    updatedDate?: number;
-
+    readonly updatedDate?: number;
     /**
      * The basic user resource
      */
-    user?: SimpleUserResource;
-
+    readonly user?: SimpleUserResource;
 }

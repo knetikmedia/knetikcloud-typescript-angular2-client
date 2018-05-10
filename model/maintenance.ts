@@ -11,21 +11,17 @@
  */
 
 
-
-export interface Maintenance {
+export interface Maintenance { 
     /**
      * Whether access to the system has been locked
      */
     accessLocked: boolean;
-
     /**
      * A simple object of any schema for client side use and processing
      */
     details?: any;
-
     /**
      * User displayable message about the maintenance
      */
     message: string;
-
 }

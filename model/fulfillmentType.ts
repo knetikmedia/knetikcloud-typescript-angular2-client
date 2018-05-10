@@ -11,26 +11,21 @@
  */
 
 
-
-export interface FulfillmentType {
+export interface FulfillmentType { 
     /**
      * Whether the type is core and cannot be altered/deleted, read-only
      */
     core?: boolean;
-
     /**
      * A description of the type
      */
     description?: string;
-
     /**
      * The unique id of the type, read-only
      */
     id?: number;
-
     /**
      * The name of the type
      */
     name: string;
-
 }

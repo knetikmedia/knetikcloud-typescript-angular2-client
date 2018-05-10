@@ -11,21 +11,17 @@
  */
 
 
-
-export interface ResourceTypeDescription {
+export interface ResourceTypeDescription { 
     /**
      * The field on the resource that the id is in
      */
     idField: string;
-
     /**
      * The unique name for the resource in swagger. This serves as the unique identifier. Cannot be changed after creation
      */
     name: string;
-
     /**
      * The base path of the service
      */
     servicePath: string;
-
 }

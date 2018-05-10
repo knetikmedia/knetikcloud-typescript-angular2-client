@@ -11,41 +11,33 @@
  */
 
 
-
-export interface TopicResource {
+export interface TopicResource { 
     /**
      * The created date of the topic
      */
     createdDate?: number;
-
     /**
      * The display name of the topic
      */
     displayName?: string;
-
     /**
      * The unique ID for this topic
      */
     id?: string;
-
     /**
      * Whether this topic is locked or not.
      */
     locked?: boolean;
-
     /**
      * Random tags to facilitate search
      */
-    tags?: Array<string>;
-
+    readonly tags?: Array<string>;
     /**
      * The last time the topic was updated
      */
     updatedDate?: number;
-
     /**
      * The subscribed user count of the topic
      */
     userCount?: number;
-
 }

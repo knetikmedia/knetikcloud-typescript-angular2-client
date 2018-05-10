@@ -11,26 +11,21 @@
  */
 
 
-
-export interface SelectedSettingResource {
+export interface SelectedSettingResource { 
     /**
      * The unique ID for the setting
      */
     key: string;
-
     /**
      * The textual name of the setting
      */
     keyName: string;
-
     /**
      * The unique ID for the option. Must match one of the options from this setting in the activity, if not part of a challenge
      */
     value: string;
-
     /**
      * The textual name of the option
      */
     valueName: string;
-
 }

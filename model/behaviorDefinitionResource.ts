@@ -9,30 +9,25 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
-
 import { Behavior } from './behavior';
 import { PropertyFieldResource } from './propertyFieldResource';
 
 
-export interface BehaviorDefinitionResource {
+export interface BehaviorDefinitionResource { 
     /**
      * Description of the behavior
      */
     description?: string;
-
     /**
      * Pre-requisite behaviors that an item must have in order to also have this behavior
      */
     prerequisiteBehaviors?: Array<Behavior>;
-
     /**
      * Configurable properties of the behavior
      */
     properties: Array<PropertyFieldResource>;
-
     /**
      * The behavior type
      */
     typeHint: string;
-
 }

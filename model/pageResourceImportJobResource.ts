@@ -9,28 +9,18 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
-
 import { ImportJobResource } from './importJobResource';
 import { Order } from './order';
 
 
-export interface PageResourceImportJobResource {
+export interface PageResourceImportJobResource { 
     content?: Array<ImportJobResource>;
-
     first?: boolean;
-
     last?: boolean;
-
     number?: number;
-
     numberOfElements?: number;
-
     size?: number;
-
     sort?: Array<Order>;
-
     totalElements?: number;
-
     totalPages?: number;
-
 }

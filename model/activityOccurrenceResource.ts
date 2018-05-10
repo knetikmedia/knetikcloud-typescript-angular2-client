@@ -9,7 +9,6 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
-
 import { ActivityEntitlementResource } from './activityEntitlementResource';
 import { ActivityUserResource } from './activityUserResource';
 import { CoreActivityOccurrenceSettings } from './coreActivityOccurrenceSettings';
@@ -20,101 +19,87 @@ import { SimpleUserResource } from './simpleUserResource';
 /**
  * A occurrence of an activity (the actual game for example). Used to track scores, participants, and provide settings
  */
-export interface ActivityOccurrenceResource {
+export interface ActivityOccurrenceResource { 
     /**
      * The id of the activity
      */
     activityId: number;
-
     /**
      * The ids of banned users that cannot join the occurrence. See occurrence-user delete endpoint
      */
-    bans?: Array<number>;
-
+    readonly bans?: Array<number>;
     /**
      * The id of the challenge activity (as part of the event, required if eventId set)
      */
     challengeActivityId?: number;
-
     /**
      * Defines core settings about the activity occurrence that affect how it behaves in the system. Validated against core settings in activity/challenge-activity.
      */
     coreSettings?: CoreActivityOccurrenceSettings;
-
     /**
      * The date this occurrence was created, unix timestamp in seconds
      */
-    createdDate?: number;
-
+    readonly createdDate?: number;
     /**
      * The entitlement item required to enter the occurrence. Required if not part of an event. Must come from the set of entitlement items listed in the activity
      */
     entitlement?: ActivityEntitlementResource;
-
     /**
      * The id of the event
      */
     eventId?: number;
-
     /**
      * The host of the occurrence, if not a participant (will be left out of users array). Must be the caller that creates the occurrence unless admin. Requires activity/challenge to allow host_option of 'non_player' if not admin as well
      */
     host?: SimpleUserResource;
-
     /**
      * The id of the activity occurrence
      */
-    id?: number;
-
+    readonly id?: number;
     /**
      * Indicate if the rewards have been given out already
      */
-    rewardStatus?: ActivityOccurrenceResource.RewardStatusEnum;
-
+    readonly rewardStatus?: ActivityOccurrenceResource.RewardStatusEnum;
     /**
      * The values selected from the available settings defined for the activity. Ex: difficulty: hard. Can be left out if the activity is played during an event and the settings are already set at the event level. Ex: every monday, difficulty: hard, number of questions: 10, category: sport. Otherwise, the set must exactly match those of the activity.
      */
     settings?: Array<SelectedSettingResource>;
-
     /**
      * Whether this occurrence will be ran as a simulation. Simulations will not be rewarded. Useful for bot play or trials
      */
     simulated?: boolean;
-
     /**
      * The date this occurrence was started, unix timestamp in seconds. null if not yet started
      */
-    startDate?: number;
-
+    readonly startDate?: number;
     /**
      * The current status of the occurrence (default: OPEN)
      */
     status?: ActivityOccurrenceResource.StatusEnum;
-
     /**
      * The date this occurrence was last updated, unix timestamp in seconds
      */
-    updatedDate?: number;
-
+    readonly updatedDate?: number;
     /**
      * The list of users participating in this occurrence. Can only be set directly with ACTIVITIES_ADMIN permission
      */
     users?: Array<ActivityUserResource>;
-
 }
 export namespace ActivityOccurrenceResource {
-    export enum RewardStatusEnum {
-        Pending = <any> 'pending',
-        Failed = <any> 'failed',
-        Complete = <any> 'complete',
-        Partial = <any> 'partial'
-    }
-    export enum StatusEnum {
-        SETUP = <any> 'SETUP',
-        OPEN = <any> 'OPEN',
-        LAUNCHING = <any> 'LAUNCHING',
-        PLAYING = <any> 'PLAYING',
-        FINISHED = <any> 'FINISHED',
-        ABANDONED = <any> 'ABANDONED'
-    }
+    export type RewardStatusEnum = 'pending' | 'failed' | 'complete' | 'partial';
+    export const RewardStatusEnum = {
+        Pending: 'pending' as RewardStatusEnum,
+        Failed: 'failed' as RewardStatusEnum,
+        Complete: 'complete' as RewardStatusEnum,
+        Partial: 'partial' as RewardStatusEnum
+    };
+    export type StatusEnum = 'SETUP' | 'OPEN' | 'LAUNCHING' | 'PLAYING' | 'FINISHED' | 'ABANDONED';
+    export const StatusEnum = {
+        SETUP: 'SETUP' as StatusEnum,
+        OPEN: 'OPEN' as StatusEnum,
+        LAUNCHING: 'LAUNCHING' as StatusEnum,
+        PLAYING: 'PLAYING' as StatusEnum,
+        FINISHED: 'FINISHED' as StatusEnum,
+        ABANDONED: 'ABANDONED' as StatusEnum
+    };
 }

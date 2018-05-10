@@ -11,16 +11,13 @@
  */
 
 
-
-export interface WalletTotalResponse {
+export interface WalletTotalResponse { 
     /**
      * The currency code
      */
     currencyCode?: string;
-
     /**
      * The sum of all wallets in the system for this currency
      */
     total?: number;
-
 }

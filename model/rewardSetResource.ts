@@ -9,60 +9,49 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
-
 import { RewardCurrencyResource } from './rewardCurrencyResource';
 import { RewardItemResource } from './rewardItemResource';
 
 
-export interface RewardSetResource {
+export interface RewardSetResource { 
     /**
      * The date/time this resource was created in seconds since unix epoch
      */
-    createdDate?: number;
-
+    readonly createdDate?: number;
     /**
      * The currency to give as rewards
      */
     currencyRewards?: Array<RewardCurrencyResource>;
-
     /**
      * The assigned unique ID for this reward set
      */
-    id?: number;
-
+    readonly id?: number;
     /**
      * The items to give as rewards
      */
     itemRewards?: Array<RewardItemResource>;
-
     /**
      * A longer describe the reward set, usually included in details
      */
     longDescription?: string;
-
     /**
      * The maximum placing that will receive a reward
      */
-    maxPlacing?: number;
-
+    readonly maxPlacing?: number;
     /**
      * The user friendly name for this reward set
      */
     name: string;
-
     /**
      * A short paragraph to describe the reward set, usually included in listings.  Max 255 characters
      */
     shortDescription?: string;
-
     /**
      * A provided unique key for this reward set
      */
     uniqueKey?: string;
-
     /**
      * The date/time this resource was last updated in seconds since unix epoch
      */
-    updatedDate?: number;
-
+    readonly updatedDate?: number;
 }

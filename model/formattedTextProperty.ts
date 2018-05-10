@@ -9,14 +9,12 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
-
 import { Property } from './property';
 
 
-export interface FormattedTextProperty extends Property {
+export interface FormattedTextProperty extends Property { 
     /**
      * The value
      */
     value?: string;
-
 }

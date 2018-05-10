@@ -9,80 +9,65 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
-
 import { Behavior } from './behavior';
 import { Property } from './property';
 
 
-export interface Item {
+export interface Item { 
     /**
      * A map of additional properties, keyed on the property name.  Must match the names and types defined in the template for this item type, or be an extra not from the template
      */
     additionalProperties?: { [key: string]: Property; };
-
     /**
      * The behaviors linked to the item, describing various options and interactions. May not be included in item lists
      */
     behaviors?: Array<Behavior>;
-
     /**
      * A category for filtering items
      */
     category?: string;
-
     /**
      * The date the item was created, unix timestamp in seconds
      */
-    createdDate?: number;
-
+    readonly createdDate?: number;
     /**
      * The id of the item
      */
-    id?: number;
-
+    readonly id?: number;
     /**
      * A long description of the item
      */
     longDescription?: string;
-
     /**
      * The name of the item
      */
     name: string;
-
     /**
      * A short description of the item, max 255 chars
      */
     shortDescription?: string;
-
     /**
      * A number to use in sorting items.  Default 500
      */
     sort?: number;
-
     /**
      * List of tags used for filtering items
      */
     tags?: Array<string>;
-
     /**
      * An item template this item is validated against.  May be null and no validation of additional_properties will be done.  Default = null
      */
     template?: string;
-
     /**
      * The type of the item
      */
     typeHint: string;
-
     /**
      * The unique key for the item
      */
     uniqueKey?: string;
-
     /**
      * The date the item was last updated, unix timestamp in seconds
      */
-    updatedDate?: number;
-
+    readonly updatedDate?: number;
 }

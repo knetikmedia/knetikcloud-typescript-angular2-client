@@ -11,46 +11,37 @@
  */
 
 
-
-export interface UserLevelingResource {
+export interface UserLevelingResource { 
     /**
      * The name of the last tier the user has qualified for
      */
     lastTierName: string;
-
     /**
      * The progress level of the last tier the user has qualified for
      */
     lastTierProgress: number;
-
     /**
      * The name of the level schema
      */
     levelName: string;
-
     /**
      * The name of the next tier the user can qualify for
      */
     nextTierName: string;
-
     /**
      * The progress needed to qualify for the next tier
      */
     nextTierProgress: number;
-
     /**
      * The amount of progress the user has
      */
     progress: number;
-
     /**
      * The names of the tiers the user has qualified for
      */
     tierNames: Array<string>;
-
     /**
      * The ID of the user
      */
     userId: number;
-
 }

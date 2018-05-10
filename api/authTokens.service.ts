@@ -9,16 +9,14 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
-
 /* tslint:disable:no-unused-variable member-ordering */
 
 import { Inject, Injectable, Optional }                      from '@angular/core';
-import { Http, Headers, URLSearchParams }                    from '@angular/http';
-import { RequestMethod, RequestOptions, RequestOptionsArgs } from '@angular/http';
-import { Response, ResponseContentType }                     from '@angular/http';
+import { HttpClient, HttpHeaders, HttpParams,
+         HttpResponse, HttpEvent }                           from '@angular/common/http';
+import { CustomHttpUrlEncodingCodec }                        from '../encoder';
 
 import { Observable }                                        from 'rxjs/Observable';
-import '../rxjs-operators';
 
 import { OauthAccessTokenResource } from '../model/oauthAccessTokenResource';
 import { PageResourceOauthAccessTokenResource } from '../model/pageResourceOauthAccessTokenResource';
@@ -32,32 +30,17 @@ import { Configuration }                                     from '../configurat
 export class AuthTokensService {
 
     protected basePath = 'https://jsapi-integration.us-east-1.elasticbeanstalk.com';
-    public defaultHeaders: Headers = new Headers();
-    public configuration: Configuration = new Configuration();
+    public defaultHeaders = new HttpHeaders();
+    public configuration = new Configuration();
 
-    constructor(protected http: Http, @Optional()@Inject(BASE_PATH) basePath: string, @Optional() configuration: Configuration) {
+    constructor(protected httpClient: HttpClient, @Optional()@Inject(BASE_PATH) basePath: string, @Optional() configuration: Configuration) {
         if (basePath) {
             this.basePath = basePath;
         }
         if (configuration) {
             this.configuration = configuration;
-			this.basePath = basePath || configuration.basePath || this.basePath;
+            this.basePath = basePath || configuration.basePath || this.basePath;
         }
-    }
-
-    /**
-     * 
-     * Extends object by coping non-existing properties.
-     * @param objA object to be extended
-     * @param objB source object
-     */
-    private extendObj<T1,T2>(objA: T1, objB: T2) {
-        for(let key in objB){
-            if(objB.hasOwnProperty(key)){
-                (objA as any)[key] = (objB as any)[key];
-            }
-        }
-        return <T1&T2>objA;
     }
 
     /**
@@ -66,66 +49,12 @@ export class AuthTokensService {
      */
     private canConsumeForm(consumes: string[]): boolean {
         const form = 'multipart/form-data';
-        for (let consume of consumes) {
+        for (const consume of consumes) {
             if (form === consume) {
                 return true;
             }
         }
         return false;
-    }
-
-    /**
-     * <b>Permissions Needed:</b> TOKENS_ADMIN
-     * @summary Delete tokens by username, client id, or both
-     * @param username The username of the user
-     * @param clientId The id of the client
-     */
-    public deleteTokens(username?: string, clientId?: string, extraHttpRequestParams?: any): Observable<{}> {
-        return this.deleteTokensWithHttpInfo(username, clientId, extraHttpRequestParams)
-            .map((response: Response) => {
-                if (response.status === 204) {
-                    return undefined;
-                } else {
-                    return response.json() || {};
-                }
-            });
-    }
-
-    /**
-     * <b>Permissions Needed:</b> TOKENS_ADMIN
-     * @summary Get a single token by username and client id
-     * @param username The username of the user
-     * @param clientId The id of the client
-     */
-    public getToken(username: string, clientId: string, extraHttpRequestParams?: any): Observable<OauthAccessTokenResource> {
-        return this.getTokenWithHttpInfo(username, clientId, extraHttpRequestParams)
-            .map((response: Response) => {
-                if (response.status === 204) {
-                    return undefined;
-                } else {
-                    return response.json() || {};
-                }
-            });
-    }
-
-    /**
-     * Token value not shown. <br><br><b>Permissions Needed:</b> TOKENS_ADMIN
-     * @summary List usernames and client ids
-     * @param filterClientId Filters for token whose client id matches provided string
-     * @param filterUsername Filters for token whose username matches provided string
-     * @param size The number of objects returned per page
-     * @param page The number of the page returned, starting with 1
-     * @param order A comma separated list of sorting requirements in priority order, each entry matching PROPERTY_NAME:[ASC|DESC]
-     */
-    public getTokens(filterClientId?: string, filterUsername?: string, size?: number, page?: number, order?: string, extraHttpRequestParams?: any): Observable<PageResourceOauthAccessTokenResource> {
-        return this.getTokensWithHttpInfo(filterClientId, filterUsername, size, page, order, extraHttpRequestParams)
-            .map((response: Response) => {
-                if (response.status === 204) {
-                    return undefined;
-                } else {
-                    return response.json() || {};
-                }
-            });
     }
 
 
@@ -134,58 +63,62 @@ export class AuthTokensService {
      * &lt;b&gt;Permissions Needed:&lt;/b&gt; TOKENS_ADMIN
      * @param username The username of the user
      * @param clientId The id of the client
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
      */
-    public deleteTokensWithHttpInfo(username?: string, clientId?: string, extraHttpRequestParams?: any): Observable<Response> {
-        const path = this.basePath + '/auth/tokens';
+    public deleteTokens(username?: string, clientId?: string, observe?: 'body', reportProgress?: boolean): Observable<any>;
+    public deleteTokens(username?: string, clientId?: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
+    public deleteTokens(username?: string, clientId?: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
+    public deleteTokens(username?: string, clientId?: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
 
-        let queryParameters = new URLSearchParams();
-        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
-
-        if (username !== undefined) {
-            queryParameters.set('username', <any>username);
+        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
+        if (username !== undefined && username !== null) {
+            queryParameters = queryParameters.set('username', <any>username);
+        }
+        if (clientId !== undefined && clientId !== null) {
+            queryParameters = queryParameters.set('client_id', <any>clientId);
         }
 
-        if (clientId !== undefined) {
-            queryParameters.set('client_id', <any>clientId);
-        }
-
-
-        // to determine the Accept header
-        let produces: string[] = [
-            'application/json'
-        ];
+        let headers = this.defaultHeaders;
 
         // authentication (oauth2_client_credentials_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
         // authentication (oauth2_password_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-            
-        let requestOptions: RequestOptionsArgs = new RequestOptions({
-            method: RequestMethod.Delete,
-            headers: headers,
-            search: queryParameters,
-            withCredentials:this.configuration.withCredentials
-        });
-        // https://github.com/swagger-api/swagger-codegen/issues/4037
-        if (extraHttpRequestParams) {
-            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
+        // to determine the Accept header
+        let httpHeaderAccepts: string[] = [
+            'application/json'
+        ];
+        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers = headers.set('Accept', httpHeaderAcceptSelected);
         }
 
-        return this.http.request(path, requestOptions);
+        // to determine the Content-Type header
+        const consumes: string[] = [
+        ];
+
+        return this.httpClient.delete<any>(`${this.basePath}/auth/tokens`,
+            {
+                params: queryParameters,
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
     }
 
     /**
@@ -193,60 +126,59 @@ export class AuthTokensService {
      * &lt;b&gt;Permissions Needed:&lt;/b&gt; TOKENS_ADMIN
      * @param username The username of the user
      * @param clientId The id of the client
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
      */
-    public getTokenWithHttpInfo(username: string, clientId: string, extraHttpRequestParams?: any): Observable<Response> {
-        const path = this.basePath + '/auth/tokens/${username}/${client_id}'
-                    .replace('${' + 'username' + '}', String(username))
-                    .replace('${' + 'client_id' + '}', String(clientId));
-
-        let queryParameters = new URLSearchParams();
-        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
-
-        // verify required parameter 'username' is not null or undefined
+    public getToken(username: string, clientId: string, observe?: 'body', reportProgress?: boolean): Observable<OauthAccessTokenResource>;
+    public getToken(username: string, clientId: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<OauthAccessTokenResource>>;
+    public getToken(username: string, clientId: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<OauthAccessTokenResource>>;
+    public getToken(username: string, clientId: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
         if (username === null || username === undefined) {
             throw new Error('Required parameter username was null or undefined when calling getToken.');
         }
-        // verify required parameter 'clientId' is not null or undefined
         if (clientId === null || clientId === undefined) {
             throw new Error('Required parameter clientId was null or undefined when calling getToken.');
         }
 
-        // to determine the Accept header
-        let produces: string[] = [
-            'application/json'
-        ];
+        let headers = this.defaultHeaders;
 
         // authentication (oauth2_client_credentials_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
         // authentication (oauth2_password_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-            
-        let requestOptions: RequestOptionsArgs = new RequestOptions({
-            method: RequestMethod.Get,
-            headers: headers,
-            search: queryParameters,
-            withCredentials:this.configuration.withCredentials
-        });
-        // https://github.com/swagger-api/swagger-codegen/issues/4037
-        if (extraHttpRequestParams) {
-            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
+        // to determine the Accept header
+        let httpHeaderAccepts: string[] = [
+            'application/json'
+        ];
+        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers = headers.set('Accept', httpHeaderAcceptSelected);
         }
 
-        return this.http.request(path, requestOptions);
+        // to determine the Content-Type header
+        const consumes: string[] = [
+        ];
+
+        return this.httpClient.get<OauthAccessTokenResource>(`${this.basePath}/auth/tokens/${encodeURIComponent(String(username))}/${encodeURIComponent(String(clientId))}`,
+            {
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
     }
 
     /**
@@ -257,70 +189,71 @@ export class AuthTokensService {
      * @param size The number of objects returned per page
      * @param page The number of the page returned, starting with 1
      * @param order A comma separated list of sorting requirements in priority order, each entry matching PROPERTY_NAME:[ASC|DESC]
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
      */
-    public getTokensWithHttpInfo(filterClientId?: string, filterUsername?: string, size?: number, page?: number, order?: string, extraHttpRequestParams?: any): Observable<Response> {
-        const path = this.basePath + '/auth/tokens';
+    public getTokens(filterClientId?: string, filterUsername?: string, size?: number, page?: number, order?: string, observe?: 'body', reportProgress?: boolean): Observable<PageResourceOauthAccessTokenResource>;
+    public getTokens(filterClientId?: string, filterUsername?: string, size?: number, page?: number, order?: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<PageResourceOauthAccessTokenResource>>;
+    public getTokens(filterClientId?: string, filterUsername?: string, size?: number, page?: number, order?: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<PageResourceOauthAccessTokenResource>>;
+    public getTokens(filterClientId?: string, filterUsername?: string, size?: number, page?: number, order?: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
 
-        let queryParameters = new URLSearchParams();
-        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
-
-        if (filterClientId !== undefined) {
-            queryParameters.set('filter_client_id', <any>filterClientId);
+        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
+        if (filterClientId !== undefined && filterClientId !== null) {
+            queryParameters = queryParameters.set('filter_client_id', <any>filterClientId);
+        }
+        if (filterUsername !== undefined && filterUsername !== null) {
+            queryParameters = queryParameters.set('filter_username', <any>filterUsername);
+        }
+        if (size !== undefined && size !== null) {
+            queryParameters = queryParameters.set('size', <any>size);
+        }
+        if (page !== undefined && page !== null) {
+            queryParameters = queryParameters.set('page', <any>page);
+        }
+        if (order !== undefined && order !== null) {
+            queryParameters = queryParameters.set('order', <any>order);
         }
 
-        if (filterUsername !== undefined) {
-            queryParameters.set('filter_username', <any>filterUsername);
-        }
-
-        if (size !== undefined) {
-            queryParameters.set('size', <any>size);
-        }
-
-        if (page !== undefined) {
-            queryParameters.set('page', <any>page);
-        }
-
-        if (order !== undefined) {
-            queryParameters.set('order', <any>order);
-        }
-
-
-        // to determine the Accept header
-        let produces: string[] = [
-            'application/json'
-        ];
+        let headers = this.defaultHeaders;
 
         // authentication (oauth2_client_credentials_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
         // authentication (oauth2_password_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-            
-        let requestOptions: RequestOptionsArgs = new RequestOptions({
-            method: RequestMethod.Get,
-            headers: headers,
-            search: queryParameters,
-            withCredentials:this.configuration.withCredentials
-        });
-        // https://github.com/swagger-api/swagger-codegen/issues/4037
-        if (extraHttpRequestParams) {
-            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
+        // to determine the Accept header
+        let httpHeaderAccepts: string[] = [
+            'application/json'
+        ];
+        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers = headers.set('Accept', httpHeaderAcceptSelected);
         }
 
-        return this.http.request(path, requestOptions);
+        // to determine the Content-Type header
+        const consumes: string[] = [
+        ];
+
+        return this.httpClient.get<PageResourceOauthAccessTokenResource>(`${this.basePath}/auth/tokens`,
+            {
+                params: queryParameters,
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
     }
 
 }

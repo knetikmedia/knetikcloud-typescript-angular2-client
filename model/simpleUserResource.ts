@@ -11,26 +11,21 @@
  */
 
 
-
-export interface SimpleUserResource {
+export interface SimpleUserResource { 
     /**
      * The url of the user's avatar image
      */
-    avatarUrl?: string;
-
+    readonly avatarUrl?: string;
     /**
      * The public username of the user
      */
-    displayName?: string;
-
+    readonly displayName?: string;
     /**
      * The id of the user
      */
     id: number;
-
     /**
      * The username of the user
      */
-    username?: string;
-
+    readonly username?: string;
 }

@@ -11,10 +11,7 @@
  */
 
 
-
-export interface ArgumentResource {
+export interface ArgumentResource { 
     name?: string;
-
     type?: string;
-
 }

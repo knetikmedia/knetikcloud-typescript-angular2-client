@@ -11,21 +11,17 @@
  */
 
 
-
-export interface BareChallengeActivityResource {
+export interface BareChallengeActivityResource { 
     /**
      * The id of the activity
      */
     activityId: number;
-
     /**
      * The id of the challenge
      */
     challengeId: number;
-
     /**
      * The unique ID for this resource
      */
-    id?: number;
-
+    readonly id?: number;
 }

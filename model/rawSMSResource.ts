@@ -11,21 +11,17 @@
  */
 
 
-
-export interface RawSMSResource {
+export interface RawSMSResource { 
     /**
      * The phone number to attribute the outgoing message to. Optional if the config text.out_number is set.
      */
     from?: string;
-
     /**
      * A list of user ids to send the message to.
      */
     recipients: Array<number>;
-
     /**
      * The body of the outgoing text message.
      */
     text: string;
-
 }

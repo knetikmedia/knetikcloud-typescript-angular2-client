@@ -9,16 +9,14 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
-
 /* tslint:disable:no-unused-variable member-ordering */
 
 import { Inject, Injectable, Optional }                      from '@angular/core';
-import { Http, Headers, URLSearchParams }                    from '@angular/http';
-import { RequestMethod, RequestOptions, RequestOptionsArgs } from '@angular/http';
-import { Response, ResponseContentType }                     from '@angular/http';
+import { HttpClient, HttpHeaders, HttpParams,
+         HttpResponse, HttpEvent }                           from '@angular/common/http';
+import { CustomHttpUrlEncodingCodec }                        from '../encoder';
 
 import { Observable }                                        from 'rxjs/Observable';
-import '../rxjs-operators';
 
 import { AddressResource } from '../model/addressResource';
 import { InvoiceCreateRequest } from '../model/invoiceCreateRequest';
@@ -38,32 +36,17 @@ import { Configuration }                                     from '../configurat
 export class InvoicesService {
 
     protected basePath = 'https://jsapi-integration.us-east-1.elasticbeanstalk.com';
-    public defaultHeaders: Headers = new Headers();
-    public configuration: Configuration = new Configuration();
+    public defaultHeaders = new HttpHeaders();
+    public configuration = new Configuration();
 
-    constructor(protected http: Http, @Optional()@Inject(BASE_PATH) basePath: string, @Optional() configuration: Configuration) {
+    constructor(protected httpClient: HttpClient, @Optional()@Inject(BASE_PATH) basePath: string, @Optional() configuration: Configuration) {
         if (basePath) {
             this.basePath = basePath;
         }
         if (configuration) {
             this.configuration = configuration;
-			this.basePath = basePath || configuration.basePath || this.basePath;
+            this.basePath = basePath || configuration.basePath || this.basePath;
         }
-    }
-
-    /**
-     * 
-     * Extends object by coping non-existing properties.
-     * @param objA object to be extended
-     * @param objB source object
-     */
-    private extendObj<T1,T2>(objA: T1, objB: T2) {
-        for(let key in objB){
-            if(objB.hasOwnProperty(key)){
-                (objA as any)[key] = (objB as any)[key];
-            }
-        }
-        return <T1&T2>objA;
     }
 
     /**
@@ -72,7 +55,7 @@ export class InvoicesService {
      */
     private canConsumeForm(consumes: string[]): boolean {
         const form = 'multipart/form-data';
-        for (let consume of consumes) {
+        for (const consume of consumes) {
             if (form === consume) {
                 return true;
             }
@@ -80,396 +63,172 @@ export class InvoicesService {
         return false;
     }
 
-    /**
-     * Create an invoice(s) by providing a cart GUID. Note that there may be multiple invoices created, one per vendor. <br><br><b>Permissions Needed:</b> INVOICES_USER or INVOICES_ADMIN
-     * @summary Create an invoice
-     * @param req Invoice to be created
-     */
-    public createInvoice(req?: InvoiceCreateRequest, extraHttpRequestParams?: any): Observable<Array<InvoiceResource>> {
-        return this.createInvoiceWithHttpInfo(req, extraHttpRequestParams)
-            .map((response: Response) => {
-                if (response.status === 204) {
-                    return undefined;
-                } else {
-                    return response.json() || {};
-                }
-            });
-    }
-
-    /**
-     * <b>Permissions Needed:</b> ANY
-     * @summary Lists available fulfillment statuses
-     */
-    public getFulFillmentStatuses(extraHttpRequestParams?: any): Observable<Array<string>> {
-        return this.getFulFillmentStatusesWithHttpInfo(extraHttpRequestParams)
-            .map((response: Response) => {
-                if (response.status === 204) {
-                    return undefined;
-                } else {
-                    return response.json() || {};
-                }
-            });
-    }
-
-    /**
-     * <b>Permissions Needed:</b> INVOICES_USER and owner, or INVOICES_ADMIN
-     * @summary Retrieve an invoice
-     * @param id The id of the invoice
-     */
-    public getInvoice(id: number, extraHttpRequestParams?: any): Observable<InvoiceResource> {
-        return this.getInvoiceWithHttpInfo(id, extraHttpRequestParams)
-            .map((response: Response) => {
-                if (response.status === 204) {
-                    return undefined;
-                } else {
-                    return response.json() || {};
-                }
-            });
-    }
-
-    /**
-     * <b>Permissions Needed:</b> INVOICES_USER and owner, or INVOICES_ADMIN
-     * @summary List invoice logs
-     * @param id The id of the invoice
-     * @param size The number of objects returned per page
-     * @param page The number of the page returned, starting with 1
-     */
-    public getInvoiceLogs(id: number, size?: number, page?: number, extraHttpRequestParams?: any): Observable<PageResourceInvoiceLogEntry> {
-        return this.getInvoiceLogsWithHttpInfo(id, size, page, extraHttpRequestParams)
-            .map((response: Response) => {
-                if (response.status === 204) {
-                    return undefined;
-                } else {
-                    return response.json() || {};
-                }
-            });
-    }
-
-    /**
-     * Without INVOICES_ADMIN permission the results are automatically filtered for only the logged in user's invoices. It is recomended however that filter_user be added to avoid issues for admin users accidentally getting additional invoices. <br><br><b>Permissions Needed:</b> INVOICES_USER and owner, or INVOICES_ADMIN
-     * @summary Retrieve invoices
-     * @param filterUser The id of a user to get invoices for. Automtically added if not being called with admin permissions.
-     * @param filterEmail Filters invoices by customer&#39;s email. Admins only.
-     * @param filterFulfillmentStatus Filters invoices by fulfillment status type. Can be a comma separated list of statuses
-     * @param filterPaymentStatus Filters invoices by payment status type. Can be a comma separated list of statuses
-     * @param filterItemName Filters invoices by item name containing the given string
-     * @param filterExternalRef Filters invoices by external reference.
-     * @param filterCreatedDate Filters invoices by creation date. Multiple values possible for range search. Format: filter_created_date&#x3D;OP,ts&amp;... where OP in (GT, LT, GOE, LOE, EQ) and ts is a unix timestamp in seconds. Ex: filter_created_date&#x3D;GT,1452154258,LT,1554254874
-     * @param filterVendorIds Filters invoices for ones from one of the vendors whose id is in the given comma separated list
-     * @param filterCurrency Filters invoices by currency. ISO3 currency code
-     * @param filterShippingStateName Filters invoices by shipping address: Exact match state name
-     * @param filterShippingCountryName Filters invoices by shipping address: Exact match country name
-     * @param filterShipping Filters invoices by shipping price. Multiple values possible for range search. Format: filter_shipping&#x3D;OP,ts&amp;... where OP in (GT, LT, GOE, LOE, EQ). Ex: filter_shipping&#x3D;GT,14.58,LT,15.54
-     * @param filterVendorName Filters invoices by vendor name starting with given string
-     * @param filterSku Filters invoices by item sku
-     * @param size The number of objects returned per page
-     * @param page The number of the page returned, starting with 1
-     * @param order A comma separated list of sorting requirements in priority order, each entry matching PROPERTY_NAME:[ASC|DESC]
-     */
-    public getInvoices(filterUser?: number, filterEmail?: string, filterFulfillmentStatus?: string, filterPaymentStatus?: string, filterItemName?: string, filterExternalRef?: string, filterCreatedDate?: string, filterVendorIds?: string, filterCurrency?: string, filterShippingStateName?: string, filterShippingCountryName?: string, filterShipping?: string, filterVendorName?: string, filterSku?: string, size?: number, page?: number, order?: string, extraHttpRequestParams?: any): Observable<PageResourceInvoiceResource> {
-        return this.getInvoicesWithHttpInfo(filterUser, filterEmail, filterFulfillmentStatus, filterPaymentStatus, filterItemName, filterExternalRef, filterCreatedDate, filterVendorIds, filterCurrency, filterShippingStateName, filterShippingCountryName, filterShipping, filterVendorName, filterSku, size, page, order, extraHttpRequestParams)
-            .map((response: Response) => {
-                if (response.status === 204) {
-                    return undefined;
-                } else {
-                    return response.json() || {};
-                }
-            });
-    }
-
-    /**
-     * <b>Permissions Needed:</b> ANY
-     * @summary Lists available payment statuses
-     */
-    public getPaymentStatuses(extraHttpRequestParams?: any): Observable<Array<string>> {
-        return this.getPaymentStatusesWithHttpInfo(extraHttpRequestParams)
-            .map((response: Response) => {
-                if (response.status === 204) {
-                    return undefined;
-                } else {
-                    return response.json() || {};
-                }
-            });
-    }
-
-    /**
-     * <b>Permissions Needed:</b> INVOICES_USER and owner, or INVOICES_ADMIN
-     * @summary Pay an invoice using a saved payment method
-     * @param id The id of the invoice
-     * @param request The payment method details. Will default to the appropriate user&#39;s wallet in the invoice currency if ommited.
-     */
-    public payInvoice(id: number, request?: PayBySavedMethodRequest, extraHttpRequestParams?: any): Observable<{}> {
-        return this.payInvoiceWithHttpInfo(id, request, extraHttpRequestParams)
-            .map((response: Response) => {
-                if (response.status === 204) {
-                    return undefined;
-                } else {
-                    return response.json() || {};
-                }
-            });
-    }
-
-    /**
-     * This allows external fulfillment systems to report success or failure. Fulfillment status changes are restricted by a specific flow determining which status can lead to which. <br><br><b>Permissions Needed:</b> INVOICES_ADMIN
-     * @summary Set the fulfillment status of a bundled invoice item
-     * @param id The id of the invoice
-     * @param bundleSku The sku of the bundle in the invoice that contains the given target
-     * @param sku The sku of an item in the bundle in the invoice
-     * @param status The new fulfillment status for the item. Additional options may be available based on configuration.  Allowable values:  &#39;unfulfilled&#39;, &#39;fulfilled&#39;, &#39;not fulfillable&#39;, &#39;failed&#39;, &#39;processing&#39;, &#39;failed_permanent&#39;, &#39;delayed&#39;
-     */
-    public setBundledInvoiceItemFulfillmentStatus(id: number, bundleSku: string, sku: string, status: StringWrapper, extraHttpRequestParams?: any): Observable<{}> {
-        return this.setBundledInvoiceItemFulfillmentStatusWithHttpInfo(id, bundleSku, sku, status, extraHttpRequestParams)
-            .map((response: Response) => {
-                if (response.status === 204) {
-                    return undefined;
-                } else {
-                    return response.json() || {};
-                }
-            });
-    }
-
-    /**
-     * <b>Permissions Needed:</b> INVOICES_ADMIN
-     * @summary Set the external reference of an invoice
-     * @param id The id of the invoice
-     * @param externalRef External reference info
-     */
-    public setExternalRef(id: number, externalRef?: StringWrapper, extraHttpRequestParams?: any): Observable<{}> {
-        return this.setExternalRefWithHttpInfo(id, externalRef, extraHttpRequestParams)
-            .map((response: Response) => {
-                if (response.status === 204) {
-                    return undefined;
-                } else {
-                    return response.json() || {};
-                }
-            });
-    }
-
-    /**
-     * This allows external fulfillment systems to report success or failure. Fulfillment status changes are restricted by a specific flow determining which status can lead to which. <br><br><b>Permissions Needed:</b> INVOICES_ADMIN
-     * @summary Set the fulfillment status of an invoice item
-     * @param id The id of the invoice
-     * @param sku The sku of an item in the invoice
-     * @param status The new fulfillment status for the item. Additional options may be available based on configuration.  Allowable values:  &#39;unfulfilled&#39;, &#39;fulfilled&#39;, &#39;not fulfillable&#39;, &#39;failed&#39;, &#39;processing&#39;, &#39;failed_permanent&#39;, &#39;delayed&#39;
-     */
-    public setInvoiceItemFulfillmentStatus(id: number, sku: string, status: StringWrapper, extraHttpRequestParams?: any): Observable<{}> {
-        return this.setInvoiceItemFulfillmentStatusWithHttpInfo(id, sku, status, extraHttpRequestParams)
-            .map((response: Response) => {
-                if (response.status === 204) {
-                    return undefined;
-                } else {
-                    return response.json() || {};
-                }
-            });
-    }
-
-    /**
-     * <b>Permissions Needed:</b> INVOICES_ADMIN
-     * @summary Set the order notes of an invoice
-     * @param id The id of the invoice
-     * @param orderNotes Payment status info
-     */
-    public setOrderNotes(id: number, orderNotes?: StringWrapper, extraHttpRequestParams?: any): Observable<{}> {
-        return this.setOrderNotesWithHttpInfo(id, orderNotes, extraHttpRequestParams)
-            .map((response: Response) => {
-                if (response.status === 204) {
-                    return undefined;
-                } else {
-                    return response.json() || {};
-                }
-            });
-    }
-
-    /**
-     * This may trigger fulfillment if setting the status to 'paid'. This is mainly intended to support external payment systems that cannot be incorporated into the payment method system. Payment status changes are restricted by a specific flow determining which status can lead to which. <br><br><b>Permissions Needed:</b> INVOICES_ADMIN
-     * @summary Set the payment status of an invoice
-     * @param id The id of the invoice
-     * @param request Payment status info
-     */
-    public setPaymentStatus(id: number, request?: InvoicePaymentStatusRequest, extraHttpRequestParams?: any): Observable<{}> {
-        return this.setPaymentStatusWithHttpInfo(id, request, extraHttpRequestParams)
-            .map((response: Response) => {
-                if (response.status === 204) {
-                    return undefined;
-                } else {
-                    return response.json() || {};
-                }
-            });
-    }
-
-    /**
-     * <b>Permissions Needed:</b> INVOICES_USER and owner, or INVOICES_ADMIN
-     * @summary Set or update billing info
-     * @param id The id of the invoice
-     * @param billingInfoRequest Address info
-     */
-    public updateBillingInfo(id: number, billingInfoRequest?: AddressResource, extraHttpRequestParams?: any): Observable<{}> {
-        return this.updateBillingInfoWithHttpInfo(id, billingInfoRequest, extraHttpRequestParams)
-            .map((response: Response) => {
-                if (response.status === 204) {
-                    return undefined;
-                } else {
-                    return response.json() || {};
-                }
-            });
-    }
-
 
     /**
      * Create an invoice
      * Create an invoice(s) by providing a cart GUID. Note that there may be multiple invoices created, one per vendor. &lt;br&gt;&lt;br&gt;&lt;b&gt;Permissions Needed:&lt;/b&gt; INVOICES_USER or INVOICES_ADMIN
      * @param req Invoice to be created
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
      */
-    public createInvoiceWithHttpInfo(req?: InvoiceCreateRequest, extraHttpRequestParams?: any): Observable<Response> {
-        const path = this.basePath + '/invoices';
+    public createInvoice(req?: InvoiceCreateRequest, observe?: 'body', reportProgress?: boolean): Observable<Array<InvoiceResource>>;
+    public createInvoice(req?: InvoiceCreateRequest, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Array<InvoiceResource>>>;
+    public createInvoice(req?: InvoiceCreateRequest, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Array<InvoiceResource>>>;
+    public createInvoice(req?: InvoiceCreateRequest, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
 
-        let queryParameters = new URLSearchParams();
-        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
-
-
-        // to determine the Accept header
-        let produces: string[] = [
-            'application/json'
-        ];
+        let headers = this.defaultHeaders;
 
         // authentication (oauth2_client_credentials_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
         // authentication (oauth2_password_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-            
-        headers.set('Content-Type', 'application/json');
-
-        let requestOptions: RequestOptionsArgs = new RequestOptions({
-            method: RequestMethod.Post,
-            headers: headers,
-            body: req == null ? '' : JSON.stringify(req), // https://github.com/angular/angular/issues/10612
-            search: queryParameters,
-            withCredentials:this.configuration.withCredentials
-        });
-        // https://github.com/swagger-api/swagger-codegen/issues/4037
-        if (extraHttpRequestParams) {
-            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
+        // to determine the Accept header
+        let httpHeaderAccepts: string[] = [
+            'application/json'
+        ];
+        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers = headers.set('Accept', httpHeaderAcceptSelected);
         }
 
-        return this.http.request(path, requestOptions);
+        // to determine the Content-Type header
+        const consumes: string[] = [
+            'application/json'
+        ];
+        const httpContentTypeSelected: string | undefined = this.configuration.selectHeaderContentType(consumes);
+        if (httpContentTypeSelected != undefined) {
+            headers = headers.set('Content-Type', httpContentTypeSelected);
+        }
+
+        return this.httpClient.post<Array<InvoiceResource>>(`${this.basePath}/invoices`,
+            req,
+            {
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
     }
 
     /**
      * Lists available fulfillment statuses
      * &lt;b&gt;Permissions Needed:&lt;/b&gt; ANY
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
      */
-    public getFulFillmentStatusesWithHttpInfo(extraHttpRequestParams?: any): Observable<Response> {
-        const path = this.basePath + '/invoices/fulfillment-statuses';
+    public getFulFillmentStatuses(observe?: 'body', reportProgress?: boolean): Observable<Array<string>>;
+    public getFulFillmentStatuses(observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Array<string>>>;
+    public getFulFillmentStatuses(observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Array<string>>>;
+    public getFulFillmentStatuses(observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
 
-        let queryParameters = new URLSearchParams();
-        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
-
-
-        // to determine the Accept header
-        let produces: string[] = [
-            'application/json'
-        ];
+        let headers = this.defaultHeaders;
 
         // authentication (oauth2_client_credentials_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
         // authentication (oauth2_password_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-            
-        let requestOptions: RequestOptionsArgs = new RequestOptions({
-            method: RequestMethod.Get,
-            headers: headers,
-            search: queryParameters,
-            withCredentials:this.configuration.withCredentials
-        });
-        // https://github.com/swagger-api/swagger-codegen/issues/4037
-        if (extraHttpRequestParams) {
-            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
+        // to determine the Accept header
+        let httpHeaderAccepts: string[] = [
+            'application/json'
+        ];
+        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers = headers.set('Accept', httpHeaderAcceptSelected);
         }
 
-        return this.http.request(path, requestOptions);
+        // to determine the Content-Type header
+        const consumes: string[] = [
+        ];
+
+        return this.httpClient.get<Array<string>>(`${this.basePath}/invoices/fulfillment-statuses`,
+            {
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
     }
 
     /**
      * Retrieve an invoice
      * &lt;b&gt;Permissions Needed:&lt;/b&gt; INVOICES_USER and owner, or INVOICES_ADMIN
      * @param id The id of the invoice
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
      */
-    public getInvoiceWithHttpInfo(id: number, extraHttpRequestParams?: any): Observable<Response> {
-        const path = this.basePath + '/invoices/${id}'
-                    .replace('${' + 'id' + '}', String(id));
-
-        let queryParameters = new URLSearchParams();
-        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
-
-        // verify required parameter 'id' is not null or undefined
+    public getInvoice(id: number, observe?: 'body', reportProgress?: boolean): Observable<InvoiceResource>;
+    public getInvoice(id: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<InvoiceResource>>;
+    public getInvoice(id: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<InvoiceResource>>;
+    public getInvoice(id: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
         if (id === null || id === undefined) {
             throw new Error('Required parameter id was null or undefined when calling getInvoice.');
         }
 
-        // to determine the Accept header
-        let produces: string[] = [
-            'application/json'
-        ];
+        let headers = this.defaultHeaders;
 
         // authentication (oauth2_client_credentials_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
         // authentication (oauth2_password_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-            
-        let requestOptions: RequestOptionsArgs = new RequestOptions({
-            method: RequestMethod.Get,
-            headers: headers,
-            search: queryParameters,
-            withCredentials:this.configuration.withCredentials
-        });
-        // https://github.com/swagger-api/swagger-codegen/issues/4037
-        if (extraHttpRequestParams) {
-            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
+        // to determine the Accept header
+        let httpHeaderAccepts: string[] = [
+            'application/json'
+        ];
+        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers = headers.set('Accept', httpHeaderAcceptSelected);
         }
 
-        return this.http.request(path, requestOptions);
+        // to determine the Content-Type header
+        const consumes: string[] = [
+        ];
+
+        return this.httpClient.get<InvoiceResource>(`${this.basePath}/invoices/${encodeURIComponent(String(id))}`,
+            {
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
     }
 
     /**
@@ -478,63 +237,65 @@ export class InvoicesService {
      * @param id The id of the invoice
      * @param size The number of objects returned per page
      * @param page The number of the page returned, starting with 1
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
      */
-    public getInvoiceLogsWithHttpInfo(id: number, size?: number, page?: number, extraHttpRequestParams?: any): Observable<Response> {
-        const path = this.basePath + '/invoices/${id}/logs'
-                    .replace('${' + 'id' + '}', String(id));
-
-        let queryParameters = new URLSearchParams();
-        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
-
-        // verify required parameter 'id' is not null or undefined
+    public getInvoiceLogs(id: number, size?: number, page?: number, observe?: 'body', reportProgress?: boolean): Observable<PageResourceInvoiceLogEntry>;
+    public getInvoiceLogs(id: number, size?: number, page?: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<PageResourceInvoiceLogEntry>>;
+    public getInvoiceLogs(id: number, size?: number, page?: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<PageResourceInvoiceLogEntry>>;
+    public getInvoiceLogs(id: number, size?: number, page?: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
         if (id === null || id === undefined) {
             throw new Error('Required parameter id was null or undefined when calling getInvoiceLogs.');
         }
-        if (size !== undefined) {
-            queryParameters.set('size', <any>size);
+
+        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
+        if (size !== undefined && size !== null) {
+            queryParameters = queryParameters.set('size', <any>size);
+        }
+        if (page !== undefined && page !== null) {
+            queryParameters = queryParameters.set('page', <any>page);
         }
 
-        if (page !== undefined) {
-            queryParameters.set('page', <any>page);
-        }
-
-
-        // to determine the Accept header
-        let produces: string[] = [
-            'application/json'
-        ];
+        let headers = this.defaultHeaders;
 
         // authentication (oauth2_client_credentials_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
         // authentication (oauth2_password_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-            
-        let requestOptions: RequestOptionsArgs = new RequestOptions({
-            method: RequestMethod.Get,
-            headers: headers,
-            search: queryParameters,
-            withCredentials:this.configuration.withCredentials
-        });
-        // https://github.com/swagger-api/swagger-codegen/issues/4037
-        if (extraHttpRequestParams) {
-            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
+        // to determine the Accept header
+        let httpHeaderAccepts: string[] = [
+            'application/json'
+        ];
+        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers = headers.set('Accept', httpHeaderAcceptSelected);
         }
 
-        return this.http.request(path, requestOptions);
+        // to determine the Content-Type header
+        const consumes: string[] = [
+        ];
+
+        return this.httpClient.get<PageResourceInvoiceLogEntry>(`${this.basePath}/invoices/${encodeURIComponent(String(id))}/logs`,
+            {
+                params: queryParameters,
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
     }
 
     /**
@@ -557,167 +318,159 @@ export class InvoicesService {
      * @param size The number of objects returned per page
      * @param page The number of the page returned, starting with 1
      * @param order A comma separated list of sorting requirements in priority order, each entry matching PROPERTY_NAME:[ASC|DESC]
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
      */
-    public getInvoicesWithHttpInfo(filterUser?: number, filterEmail?: string, filterFulfillmentStatus?: string, filterPaymentStatus?: string, filterItemName?: string, filterExternalRef?: string, filterCreatedDate?: string, filterVendorIds?: string, filterCurrency?: string, filterShippingStateName?: string, filterShippingCountryName?: string, filterShipping?: string, filterVendorName?: string, filterSku?: string, size?: number, page?: number, order?: string, extraHttpRequestParams?: any): Observable<Response> {
-        const path = this.basePath + '/invoices';
+    public getInvoices(filterUser?: number, filterEmail?: string, filterFulfillmentStatus?: string, filterPaymentStatus?: string, filterItemName?: string, filterExternalRef?: string, filterCreatedDate?: string, filterVendorIds?: string, filterCurrency?: string, filterShippingStateName?: string, filterShippingCountryName?: string, filterShipping?: string, filterVendorName?: string, filterSku?: string, size?: number, page?: number, order?: string, observe?: 'body', reportProgress?: boolean): Observable<PageResourceInvoiceResource>;
+    public getInvoices(filterUser?: number, filterEmail?: string, filterFulfillmentStatus?: string, filterPaymentStatus?: string, filterItemName?: string, filterExternalRef?: string, filterCreatedDate?: string, filterVendorIds?: string, filterCurrency?: string, filterShippingStateName?: string, filterShippingCountryName?: string, filterShipping?: string, filterVendorName?: string, filterSku?: string, size?: number, page?: number, order?: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<PageResourceInvoiceResource>>;
+    public getInvoices(filterUser?: number, filterEmail?: string, filterFulfillmentStatus?: string, filterPaymentStatus?: string, filterItemName?: string, filterExternalRef?: string, filterCreatedDate?: string, filterVendorIds?: string, filterCurrency?: string, filterShippingStateName?: string, filterShippingCountryName?: string, filterShipping?: string, filterVendorName?: string, filterSku?: string, size?: number, page?: number, order?: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<PageResourceInvoiceResource>>;
+    public getInvoices(filterUser?: number, filterEmail?: string, filterFulfillmentStatus?: string, filterPaymentStatus?: string, filterItemName?: string, filterExternalRef?: string, filterCreatedDate?: string, filterVendorIds?: string, filterCurrency?: string, filterShippingStateName?: string, filterShippingCountryName?: string, filterShipping?: string, filterVendorName?: string, filterSku?: string, size?: number, page?: number, order?: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
 
-        let queryParameters = new URLSearchParams();
-        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
-
-        if (filterUser !== undefined) {
-            queryParameters.set('filter_user', <any>filterUser);
+        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
+        if (filterUser !== undefined && filterUser !== null) {
+            queryParameters = queryParameters.set('filter_user', <any>filterUser);
+        }
+        if (filterEmail !== undefined && filterEmail !== null) {
+            queryParameters = queryParameters.set('filter_email', <any>filterEmail);
+        }
+        if (filterFulfillmentStatus !== undefined && filterFulfillmentStatus !== null) {
+            queryParameters = queryParameters.set('filter_fulfillment_status', <any>filterFulfillmentStatus);
+        }
+        if (filterPaymentStatus !== undefined && filterPaymentStatus !== null) {
+            queryParameters = queryParameters.set('filter_payment_status', <any>filterPaymentStatus);
+        }
+        if (filterItemName !== undefined && filterItemName !== null) {
+            queryParameters = queryParameters.set('filter_item_name', <any>filterItemName);
+        }
+        if (filterExternalRef !== undefined && filterExternalRef !== null) {
+            queryParameters = queryParameters.set('filter_external_ref', <any>filterExternalRef);
+        }
+        if (filterCreatedDate !== undefined && filterCreatedDate !== null) {
+            queryParameters = queryParameters.set('filter_created_date', <any>filterCreatedDate);
+        }
+        if (filterVendorIds !== undefined && filterVendorIds !== null) {
+            queryParameters = queryParameters.set('filter_vendor_ids', <any>filterVendorIds);
+        }
+        if (filterCurrency !== undefined && filterCurrency !== null) {
+            queryParameters = queryParameters.set('filter_currency', <any>filterCurrency);
+        }
+        if (filterShippingStateName !== undefined && filterShippingStateName !== null) {
+            queryParameters = queryParameters.set('filter_shipping_state_name', <any>filterShippingStateName);
+        }
+        if (filterShippingCountryName !== undefined && filterShippingCountryName !== null) {
+            queryParameters = queryParameters.set('filter_shipping_country_name', <any>filterShippingCountryName);
+        }
+        if (filterShipping !== undefined && filterShipping !== null) {
+            queryParameters = queryParameters.set('filter_shipping', <any>filterShipping);
+        }
+        if (filterVendorName !== undefined && filterVendorName !== null) {
+            queryParameters = queryParameters.set('filter_vendor_name', <any>filterVendorName);
+        }
+        if (filterSku !== undefined && filterSku !== null) {
+            queryParameters = queryParameters.set('filter_sku', <any>filterSku);
+        }
+        if (size !== undefined && size !== null) {
+            queryParameters = queryParameters.set('size', <any>size);
+        }
+        if (page !== undefined && page !== null) {
+            queryParameters = queryParameters.set('page', <any>page);
+        }
+        if (order !== undefined && order !== null) {
+            queryParameters = queryParameters.set('order', <any>order);
         }
 
-        if (filterEmail !== undefined) {
-            queryParameters.set('filter_email', <any>filterEmail);
-        }
-
-        if (filterFulfillmentStatus !== undefined) {
-            queryParameters.set('filter_fulfillment_status', <any>filterFulfillmentStatus);
-        }
-
-        if (filterPaymentStatus !== undefined) {
-            queryParameters.set('filter_payment_status', <any>filterPaymentStatus);
-        }
-
-        if (filterItemName !== undefined) {
-            queryParameters.set('filter_item_name', <any>filterItemName);
-        }
-
-        if (filterExternalRef !== undefined) {
-            queryParameters.set('filter_external_ref', <any>filterExternalRef);
-        }
-
-        if (filterCreatedDate !== undefined) {
-            queryParameters.set('filter_created_date', <any>filterCreatedDate);
-        }
-
-        if (filterVendorIds !== undefined) {
-            queryParameters.set('filter_vendor_ids', <any>filterVendorIds);
-        }
-
-        if (filterCurrency !== undefined) {
-            queryParameters.set('filter_currency', <any>filterCurrency);
-        }
-
-        if (filterShippingStateName !== undefined) {
-            queryParameters.set('filter_shipping_state_name', <any>filterShippingStateName);
-        }
-
-        if (filterShippingCountryName !== undefined) {
-            queryParameters.set('filter_shipping_country_name', <any>filterShippingCountryName);
-        }
-
-        if (filterShipping !== undefined) {
-            queryParameters.set('filter_shipping', <any>filterShipping);
-        }
-
-        if (filterVendorName !== undefined) {
-            queryParameters.set('filter_vendor_name', <any>filterVendorName);
-        }
-
-        if (filterSku !== undefined) {
-            queryParameters.set('filter_sku', <any>filterSku);
-        }
-
-        if (size !== undefined) {
-            queryParameters.set('size', <any>size);
-        }
-
-        if (page !== undefined) {
-            queryParameters.set('page', <any>page);
-        }
-
-        if (order !== undefined) {
-            queryParameters.set('order', <any>order);
-        }
-
-
-        // to determine the Accept header
-        let produces: string[] = [
-            'application/json'
-        ];
+        let headers = this.defaultHeaders;
 
         // authentication (oauth2_client_credentials_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
         // authentication (oauth2_password_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-            
-        let requestOptions: RequestOptionsArgs = new RequestOptions({
-            method: RequestMethod.Get,
-            headers: headers,
-            search: queryParameters,
-            withCredentials:this.configuration.withCredentials
-        });
-        // https://github.com/swagger-api/swagger-codegen/issues/4037
-        if (extraHttpRequestParams) {
-            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
+        // to determine the Accept header
+        let httpHeaderAccepts: string[] = [
+            'application/json'
+        ];
+        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers = headers.set('Accept', httpHeaderAcceptSelected);
         }
 
-        return this.http.request(path, requestOptions);
+        // to determine the Content-Type header
+        const consumes: string[] = [
+        ];
+
+        return this.httpClient.get<PageResourceInvoiceResource>(`${this.basePath}/invoices`,
+            {
+                params: queryParameters,
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
     }
 
     /**
      * Lists available payment statuses
      * &lt;b&gt;Permissions Needed:&lt;/b&gt; ANY
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
      */
-    public getPaymentStatusesWithHttpInfo(extraHttpRequestParams?: any): Observable<Response> {
-        const path = this.basePath + '/invoices/payment-statuses';
+    public getPaymentStatuses(observe?: 'body', reportProgress?: boolean): Observable<Array<string>>;
+    public getPaymentStatuses(observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Array<string>>>;
+    public getPaymentStatuses(observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Array<string>>>;
+    public getPaymentStatuses(observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
 
-        let queryParameters = new URLSearchParams();
-        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
-
-
-        // to determine the Accept header
-        let produces: string[] = [
-            'application/json'
-        ];
+        let headers = this.defaultHeaders;
 
         // authentication (oauth2_client_credentials_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
         // authentication (oauth2_password_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-            
-        let requestOptions: RequestOptionsArgs = new RequestOptions({
-            method: RequestMethod.Get,
-            headers: headers,
-            search: queryParameters,
-            withCredentials:this.configuration.withCredentials
-        });
-        // https://github.com/swagger-api/swagger-codegen/issues/4037
-        if (extraHttpRequestParams) {
-            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
+        // to determine the Accept header
+        let httpHeaderAccepts: string[] = [
+            'application/json'
+        ];
+        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers = headers.set('Accept', httpHeaderAcceptSelected);
         }
 
-        return this.http.request(path, requestOptions);
+        // to determine the Content-Type header
+        const consumes: string[] = [
+        ];
+
+        return this.httpClient.get<Array<string>>(`${this.basePath}/invoices/payment-statuses`,
+            {
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
     }
 
     /**
@@ -725,58 +478,62 @@ export class InvoicesService {
      * &lt;b&gt;Permissions Needed:&lt;/b&gt; INVOICES_USER and owner, or INVOICES_ADMIN
      * @param id The id of the invoice
      * @param request The payment method details. Will default to the appropriate user&#39;s wallet in the invoice currency if ommited.
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
      */
-    public payInvoiceWithHttpInfo(id: number, request?: PayBySavedMethodRequest, extraHttpRequestParams?: any): Observable<Response> {
-        const path = this.basePath + '/invoices/${id}/payments'
-                    .replace('${' + 'id' + '}', String(id));
-
-        let queryParameters = new URLSearchParams();
-        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
-
-        // verify required parameter 'id' is not null or undefined
+    public payInvoice(id: number, request?: PayBySavedMethodRequest, observe?: 'body', reportProgress?: boolean): Observable<any>;
+    public payInvoice(id: number, request?: PayBySavedMethodRequest, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
+    public payInvoice(id: number, request?: PayBySavedMethodRequest, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
+    public payInvoice(id: number, request?: PayBySavedMethodRequest, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
         if (id === null || id === undefined) {
             throw new Error('Required parameter id was null or undefined when calling payInvoice.');
         }
 
-        // to determine the Accept header
-        let produces: string[] = [
-            'application/json'
-        ];
+        let headers = this.defaultHeaders;
 
         // authentication (oauth2_client_credentials_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
         // authentication (oauth2_password_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-            
-        headers.set('Content-Type', 'application/json');
-
-        let requestOptions: RequestOptionsArgs = new RequestOptions({
-            method: RequestMethod.Post,
-            headers: headers,
-            body: request == null ? '' : JSON.stringify(request), // https://github.com/angular/angular/issues/10612
-            search: queryParameters,
-            withCredentials:this.configuration.withCredentials
-        });
-        // https://github.com/swagger-api/swagger-codegen/issues/4037
-        if (extraHttpRequestParams) {
-            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
+        // to determine the Accept header
+        let httpHeaderAccepts: string[] = [
+            'application/json'
+        ];
+        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers = headers.set('Accept', httpHeaderAcceptSelected);
         }
 
-        return this.http.request(path, requestOptions);
+        // to determine the Content-Type header
+        const consumes: string[] = [
+            'application/json'
+        ];
+        const httpContentTypeSelected: string | undefined = this.configuration.selectHeaderContentType(consumes);
+        if (httpContentTypeSelected != undefined) {
+            headers = headers.set('Content-Type', httpContentTypeSelected);
+        }
+
+        return this.httpClient.post<any>(`${this.basePath}/invoices/${encodeURIComponent(String(id))}/payments`,
+            request,
+            {
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
     }
 
     /**
@@ -786,72 +543,71 @@ export class InvoicesService {
      * @param bundleSku The sku of the bundle in the invoice that contains the given target
      * @param sku The sku of an item in the bundle in the invoice
      * @param status The new fulfillment status for the item. Additional options may be available based on configuration.  Allowable values:  &#39;unfulfilled&#39;, &#39;fulfilled&#39;, &#39;not fulfillable&#39;, &#39;failed&#39;, &#39;processing&#39;, &#39;failed_permanent&#39;, &#39;delayed&#39;
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
      */
-    public setBundledInvoiceItemFulfillmentStatusWithHttpInfo(id: number, bundleSku: string, sku: string, status: StringWrapper, extraHttpRequestParams?: any): Observable<Response> {
-        const path = this.basePath + '/invoices/${id}/items/${bundleSku}/bundled-skus/${sku}/fulfillment-status'
-                    .replace('${' + 'id' + '}', String(id))
-                    .replace('${' + 'bundleSku' + '}', String(bundleSku))
-                    .replace('${' + 'sku' + '}', String(sku));
-
-        let queryParameters = new URLSearchParams();
-        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
-
-        // verify required parameter 'id' is not null or undefined
+    public setBundledInvoiceItemFulfillmentStatus(id: number, bundleSku: string, sku: string, status: StringWrapper, observe?: 'body', reportProgress?: boolean): Observable<any>;
+    public setBundledInvoiceItemFulfillmentStatus(id: number, bundleSku: string, sku: string, status: StringWrapper, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
+    public setBundledInvoiceItemFulfillmentStatus(id: number, bundleSku: string, sku: string, status: StringWrapper, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
+    public setBundledInvoiceItemFulfillmentStatus(id: number, bundleSku: string, sku: string, status: StringWrapper, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
         if (id === null || id === undefined) {
             throw new Error('Required parameter id was null or undefined when calling setBundledInvoiceItemFulfillmentStatus.');
         }
-        // verify required parameter 'bundleSku' is not null or undefined
         if (bundleSku === null || bundleSku === undefined) {
             throw new Error('Required parameter bundleSku was null or undefined when calling setBundledInvoiceItemFulfillmentStatus.');
         }
-        // verify required parameter 'sku' is not null or undefined
         if (sku === null || sku === undefined) {
             throw new Error('Required parameter sku was null or undefined when calling setBundledInvoiceItemFulfillmentStatus.');
         }
-        // verify required parameter 'status' is not null or undefined
         if (status === null || status === undefined) {
             throw new Error('Required parameter status was null or undefined when calling setBundledInvoiceItemFulfillmentStatus.');
         }
 
-        // to determine the Accept header
-        let produces: string[] = [
-            'application/json'
-        ];
+        let headers = this.defaultHeaders;
 
         // authentication (oauth2_client_credentials_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
         // authentication (oauth2_password_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-            
-        headers.set('Content-Type', 'application/json');
-
-        let requestOptions: RequestOptionsArgs = new RequestOptions({
-            method: RequestMethod.Put,
-            headers: headers,
-            body: status == null ? '' : JSON.stringify(status), // https://github.com/angular/angular/issues/10612
-            search: queryParameters,
-            withCredentials:this.configuration.withCredentials
-        });
-        // https://github.com/swagger-api/swagger-codegen/issues/4037
-        if (extraHttpRequestParams) {
-            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
+        // to determine the Accept header
+        let httpHeaderAccepts: string[] = [
+            'application/json'
+        ];
+        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers = headers.set('Accept', httpHeaderAcceptSelected);
         }
 
-        return this.http.request(path, requestOptions);
+        // to determine the Content-Type header
+        const consumes: string[] = [
+            'application/json'
+        ];
+        const httpContentTypeSelected: string | undefined = this.configuration.selectHeaderContentType(consumes);
+        if (httpContentTypeSelected != undefined) {
+            headers = headers.set('Content-Type', httpContentTypeSelected);
+        }
+
+        return this.httpClient.put<any>(`${this.basePath}/invoices/${encodeURIComponent(String(id))}/items/${encodeURIComponent(String(bundleSku))}/bundled-skus/${encodeURIComponent(String(sku))}/fulfillment-status`,
+            status,
+            {
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
     }
 
     /**
@@ -859,58 +615,62 @@ export class InvoicesService {
      * &lt;b&gt;Permissions Needed:&lt;/b&gt; INVOICES_ADMIN
      * @param id The id of the invoice
      * @param externalRef External reference info
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
      */
-    public setExternalRefWithHttpInfo(id: number, externalRef?: StringWrapper, extraHttpRequestParams?: any): Observable<Response> {
-        const path = this.basePath + '/invoices/${id}/external-ref'
-                    .replace('${' + 'id' + '}', String(id));
-
-        let queryParameters = new URLSearchParams();
-        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
-
-        // verify required parameter 'id' is not null or undefined
+    public setExternalRef(id: number, externalRef?: StringWrapper, observe?: 'body', reportProgress?: boolean): Observable<any>;
+    public setExternalRef(id: number, externalRef?: StringWrapper, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
+    public setExternalRef(id: number, externalRef?: StringWrapper, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
+    public setExternalRef(id: number, externalRef?: StringWrapper, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
         if (id === null || id === undefined) {
             throw new Error('Required parameter id was null or undefined when calling setExternalRef.');
         }
 
-        // to determine the Accept header
-        let produces: string[] = [
-            'application/json'
-        ];
+        let headers = this.defaultHeaders;
 
         // authentication (oauth2_client_credentials_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
         // authentication (oauth2_password_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-            
-        headers.set('Content-Type', 'application/json');
-
-        let requestOptions: RequestOptionsArgs = new RequestOptions({
-            method: RequestMethod.Put,
-            headers: headers,
-            body: externalRef == null ? '' : JSON.stringify(externalRef), // https://github.com/angular/angular/issues/10612
-            search: queryParameters,
-            withCredentials:this.configuration.withCredentials
-        });
-        // https://github.com/swagger-api/swagger-codegen/issues/4037
-        if (extraHttpRequestParams) {
-            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
+        // to determine the Accept header
+        let httpHeaderAccepts: string[] = [
+            'application/json'
+        ];
+        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers = headers.set('Accept', httpHeaderAcceptSelected);
         }
 
-        return this.http.request(path, requestOptions);
+        // to determine the Content-Type header
+        const consumes: string[] = [
+            'application/json'
+        ];
+        const httpContentTypeSelected: string | undefined = this.configuration.selectHeaderContentType(consumes);
+        if (httpContentTypeSelected != undefined) {
+            headers = headers.set('Content-Type', httpContentTypeSelected);
+        }
+
+        return this.httpClient.put<any>(`${this.basePath}/invoices/${encodeURIComponent(String(id))}/external-ref`,
+            externalRef,
+            {
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
     }
 
     /**
@@ -919,67 +679,68 @@ export class InvoicesService {
      * @param id The id of the invoice
      * @param sku The sku of an item in the invoice
      * @param status The new fulfillment status for the item. Additional options may be available based on configuration.  Allowable values:  &#39;unfulfilled&#39;, &#39;fulfilled&#39;, &#39;not fulfillable&#39;, &#39;failed&#39;, &#39;processing&#39;, &#39;failed_permanent&#39;, &#39;delayed&#39;
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
      */
-    public setInvoiceItemFulfillmentStatusWithHttpInfo(id: number, sku: string, status: StringWrapper, extraHttpRequestParams?: any): Observable<Response> {
-        const path = this.basePath + '/invoices/${id}/items/${sku}/fulfillment-status'
-                    .replace('${' + 'id' + '}', String(id))
-                    .replace('${' + 'sku' + '}', String(sku));
-
-        let queryParameters = new URLSearchParams();
-        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
-
-        // verify required parameter 'id' is not null or undefined
+    public setInvoiceItemFulfillmentStatus(id: number, sku: string, status: StringWrapper, observe?: 'body', reportProgress?: boolean): Observable<any>;
+    public setInvoiceItemFulfillmentStatus(id: number, sku: string, status: StringWrapper, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
+    public setInvoiceItemFulfillmentStatus(id: number, sku: string, status: StringWrapper, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
+    public setInvoiceItemFulfillmentStatus(id: number, sku: string, status: StringWrapper, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
         if (id === null || id === undefined) {
             throw new Error('Required parameter id was null or undefined when calling setInvoiceItemFulfillmentStatus.');
         }
-        // verify required parameter 'sku' is not null or undefined
         if (sku === null || sku === undefined) {
             throw new Error('Required parameter sku was null or undefined when calling setInvoiceItemFulfillmentStatus.');
         }
-        // verify required parameter 'status' is not null or undefined
         if (status === null || status === undefined) {
             throw new Error('Required parameter status was null or undefined when calling setInvoiceItemFulfillmentStatus.');
         }
 
-        // to determine the Accept header
-        let produces: string[] = [
-            'application/json'
-        ];
+        let headers = this.defaultHeaders;
 
         // authentication (oauth2_client_credentials_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
         // authentication (oauth2_password_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-            
-        headers.set('Content-Type', 'application/json');
-
-        let requestOptions: RequestOptionsArgs = new RequestOptions({
-            method: RequestMethod.Put,
-            headers: headers,
-            body: status == null ? '' : JSON.stringify(status), // https://github.com/angular/angular/issues/10612
-            search: queryParameters,
-            withCredentials:this.configuration.withCredentials
-        });
-        // https://github.com/swagger-api/swagger-codegen/issues/4037
-        if (extraHttpRequestParams) {
-            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
+        // to determine the Accept header
+        let httpHeaderAccepts: string[] = [
+            'application/json'
+        ];
+        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers = headers.set('Accept', httpHeaderAcceptSelected);
         }
 
-        return this.http.request(path, requestOptions);
+        // to determine the Content-Type header
+        const consumes: string[] = [
+            'application/json'
+        ];
+        const httpContentTypeSelected: string | undefined = this.configuration.selectHeaderContentType(consumes);
+        if (httpContentTypeSelected != undefined) {
+            headers = headers.set('Content-Type', httpContentTypeSelected);
+        }
+
+        return this.httpClient.put<any>(`${this.basePath}/invoices/${encodeURIComponent(String(id))}/items/${encodeURIComponent(String(sku))}/fulfillment-status`,
+            status,
+            {
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
     }
 
     /**
@@ -987,58 +748,62 @@ export class InvoicesService {
      * &lt;b&gt;Permissions Needed:&lt;/b&gt; INVOICES_ADMIN
      * @param id The id of the invoice
      * @param orderNotes Payment status info
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
      */
-    public setOrderNotesWithHttpInfo(id: number, orderNotes?: StringWrapper, extraHttpRequestParams?: any): Observable<Response> {
-        const path = this.basePath + '/invoices/${id}/order-notes'
-                    .replace('${' + 'id' + '}', String(id));
-
-        let queryParameters = new URLSearchParams();
-        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
-
-        // verify required parameter 'id' is not null or undefined
+    public setOrderNotes(id: number, orderNotes?: StringWrapper, observe?: 'body', reportProgress?: boolean): Observable<any>;
+    public setOrderNotes(id: number, orderNotes?: StringWrapper, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
+    public setOrderNotes(id: number, orderNotes?: StringWrapper, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
+    public setOrderNotes(id: number, orderNotes?: StringWrapper, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
         if (id === null || id === undefined) {
             throw new Error('Required parameter id was null or undefined when calling setOrderNotes.');
         }
 
-        // to determine the Accept header
-        let produces: string[] = [
-            'application/json'
-        ];
+        let headers = this.defaultHeaders;
 
         // authentication (oauth2_client_credentials_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
         // authentication (oauth2_password_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-            
-        headers.set('Content-Type', 'application/json');
-
-        let requestOptions: RequestOptionsArgs = new RequestOptions({
-            method: RequestMethod.Put,
-            headers: headers,
-            body: orderNotes == null ? '' : JSON.stringify(orderNotes), // https://github.com/angular/angular/issues/10612
-            search: queryParameters,
-            withCredentials:this.configuration.withCredentials
-        });
-        // https://github.com/swagger-api/swagger-codegen/issues/4037
-        if (extraHttpRequestParams) {
-            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
+        // to determine the Accept header
+        let httpHeaderAccepts: string[] = [
+            'application/json'
+        ];
+        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers = headers.set('Accept', httpHeaderAcceptSelected);
         }
 
-        return this.http.request(path, requestOptions);
+        // to determine the Content-Type header
+        const consumes: string[] = [
+            'application/json'
+        ];
+        const httpContentTypeSelected: string | undefined = this.configuration.selectHeaderContentType(consumes);
+        if (httpContentTypeSelected != undefined) {
+            headers = headers.set('Content-Type', httpContentTypeSelected);
+        }
+
+        return this.httpClient.put<any>(`${this.basePath}/invoices/${encodeURIComponent(String(id))}/order-notes`,
+            orderNotes,
+            {
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
     }
 
     /**
@@ -1046,58 +811,62 @@ export class InvoicesService {
      * This may trigger fulfillment if setting the status to &#39;paid&#39;. This is mainly intended to support external payment systems that cannot be incorporated into the payment method system. Payment status changes are restricted by a specific flow determining which status can lead to which. &lt;br&gt;&lt;br&gt;&lt;b&gt;Permissions Needed:&lt;/b&gt; INVOICES_ADMIN
      * @param id The id of the invoice
      * @param request Payment status info
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
      */
-    public setPaymentStatusWithHttpInfo(id: number, request?: InvoicePaymentStatusRequest, extraHttpRequestParams?: any): Observable<Response> {
-        const path = this.basePath + '/invoices/${id}/payment-status'
-                    .replace('${' + 'id' + '}', String(id));
-
-        let queryParameters = new URLSearchParams();
-        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
-
-        // verify required parameter 'id' is not null or undefined
+    public setPaymentStatus(id: number, request?: InvoicePaymentStatusRequest, observe?: 'body', reportProgress?: boolean): Observable<any>;
+    public setPaymentStatus(id: number, request?: InvoicePaymentStatusRequest, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
+    public setPaymentStatus(id: number, request?: InvoicePaymentStatusRequest, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
+    public setPaymentStatus(id: number, request?: InvoicePaymentStatusRequest, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
         if (id === null || id === undefined) {
             throw new Error('Required parameter id was null or undefined when calling setPaymentStatus.');
         }
 
-        // to determine the Accept header
-        let produces: string[] = [
-            'application/json'
-        ];
+        let headers = this.defaultHeaders;
 
         // authentication (oauth2_client_credentials_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
         // authentication (oauth2_password_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-            
-        headers.set('Content-Type', 'application/json');
-
-        let requestOptions: RequestOptionsArgs = new RequestOptions({
-            method: RequestMethod.Put,
-            headers: headers,
-            body: request == null ? '' : JSON.stringify(request), // https://github.com/angular/angular/issues/10612
-            search: queryParameters,
-            withCredentials:this.configuration.withCredentials
-        });
-        // https://github.com/swagger-api/swagger-codegen/issues/4037
-        if (extraHttpRequestParams) {
-            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
+        // to determine the Accept header
+        let httpHeaderAccepts: string[] = [
+            'application/json'
+        ];
+        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers = headers.set('Accept', httpHeaderAcceptSelected);
         }
 
-        return this.http.request(path, requestOptions);
+        // to determine the Content-Type header
+        const consumes: string[] = [
+            'application/json'
+        ];
+        const httpContentTypeSelected: string | undefined = this.configuration.selectHeaderContentType(consumes);
+        if (httpContentTypeSelected != undefined) {
+            headers = headers.set('Content-Type', httpContentTypeSelected);
+        }
+
+        return this.httpClient.put<any>(`${this.basePath}/invoices/${encodeURIComponent(String(id))}/payment-status`,
+            request,
+            {
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
     }
 
     /**
@@ -1105,58 +874,62 @@ export class InvoicesService {
      * &lt;b&gt;Permissions Needed:&lt;/b&gt; INVOICES_USER and owner, or INVOICES_ADMIN
      * @param id The id of the invoice
      * @param billingInfoRequest Address info
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
      */
-    public updateBillingInfoWithHttpInfo(id: number, billingInfoRequest?: AddressResource, extraHttpRequestParams?: any): Observable<Response> {
-        const path = this.basePath + '/invoices/${id}/billing-address'
-                    .replace('${' + 'id' + '}', String(id));
-
-        let queryParameters = new URLSearchParams();
-        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
-
-        // verify required parameter 'id' is not null or undefined
+    public updateBillingInfo(id: number, billingInfoRequest?: AddressResource, observe?: 'body', reportProgress?: boolean): Observable<any>;
+    public updateBillingInfo(id: number, billingInfoRequest?: AddressResource, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
+    public updateBillingInfo(id: number, billingInfoRequest?: AddressResource, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
+    public updateBillingInfo(id: number, billingInfoRequest?: AddressResource, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
         if (id === null || id === undefined) {
             throw new Error('Required parameter id was null or undefined when calling updateBillingInfo.');
         }
 
-        // to determine the Accept header
-        let produces: string[] = [
-            'application/json'
-        ];
+        let headers = this.defaultHeaders;
 
         // authentication (oauth2_client_credentials_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
         // authentication (oauth2_password_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-            
-        headers.set('Content-Type', 'application/json');
-
-        let requestOptions: RequestOptionsArgs = new RequestOptions({
-            method: RequestMethod.Put,
-            headers: headers,
-            body: billingInfoRequest == null ? '' : JSON.stringify(billingInfoRequest), // https://github.com/angular/angular/issues/10612
-            search: queryParameters,
-            withCredentials:this.configuration.withCredentials
-        });
-        // https://github.com/swagger-api/swagger-codegen/issues/4037
-        if (extraHttpRequestParams) {
-            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
+        // to determine the Accept header
+        let httpHeaderAccepts: string[] = [
+            'application/json'
+        ];
+        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers = headers.set('Accept', httpHeaderAcceptSelected);
         }
 
-        return this.http.request(path, requestOptions);
+        // to determine the Content-Type header
+        const consumes: string[] = [
+            'application/json'
+        ];
+        const httpContentTypeSelected: string | undefined = this.configuration.selectHeaderContentType(consumes);
+        if (httpContentTypeSelected != undefined) {
+            headers = headers.set('Content-Type', httpContentTypeSelected);
+        }
+
+        return this.httpClient.put<any>(`${this.basePath}/invoices/${encodeURIComponent(String(id))}/billing-address`,
+            billingInfoRequest,
+            {
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
     }
 
 }

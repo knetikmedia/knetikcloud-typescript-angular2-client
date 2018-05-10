@@ -11,39 +11,34 @@
  */
 
 
-
-export interface ChallengeEventResource {
+export interface ChallengeEventResource { 
     /**
      * The id of the challenge
      */
     challengeId?: number;
-
     /**
      * The end date in seconds
      */
     endDate?: number;
-
     /**
      * The id of the challenge event
      */
     id?: number;
-
     /**
      * Indicate if the rewards have been given out already 
      */
-    rewardStatus?: ChallengeEventResource.RewardStatusEnum;
-
+    readonly rewardStatus?: ChallengeEventResource.RewardStatusEnum;
     /**
      * The start date in seconds
      */
     startDate?: number;
-
 }
 export namespace ChallengeEventResource {
-    export enum RewardStatusEnum {
-        Pending = <any> 'pending',
-        Failed = <any> 'failed',
-        Complete = <any> 'complete',
-        Partial = <any> 'partial'
-    }
+    export type RewardStatusEnum = 'pending' | 'failed' | 'complete' | 'partial';
+    export const RewardStatusEnum = {
+        Pending: 'pending' as RewardStatusEnum,
+        Failed: 'failed' as RewardStatusEnum,
+        Complete: 'complete' as RewardStatusEnum,
+        Partial: 'partial' as RewardStatusEnum
+    };
 }

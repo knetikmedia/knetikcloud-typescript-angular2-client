@@ -11,31 +11,25 @@
  */
 
 
-
-export interface RawEmailResource {
+export interface RawEmailResource { 
     /**
      * The body of the outgoing message.
      */
     body: string;
-
     /**
      * Address to attribute the outgoing message to. Optional if the config email.out_address is set.
      */
     from?: string;
-
     /**
      * Whether the body is to be treated as html. Default false.
      */
     html?: boolean;
-
     /**
      * A list of user ids to send the message to.
      */
     recipients: Array<number>;
-
     /**
      * The subject of the outgoing message.
      */
     subject: string;
-
 }

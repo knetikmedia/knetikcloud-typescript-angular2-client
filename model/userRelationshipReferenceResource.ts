@@ -11,36 +11,29 @@
  */
 
 
-
-export interface UserRelationshipReferenceResource {
+export interface UserRelationshipReferenceResource { 
     /**
      * The url of the user's avatar image
      */
-    avatarUrl?: string;
-
+    readonly avatarUrl?: string;
     /**
      * The context of the relationship
      */
     context?: string;
-
     /**
      * The public username of the user
      */
-    displayName?: string;
-
+    readonly displayName?: string;
     /**
      * The id of the user
      */
     id: number;
-
     /**
      * The id of the relationship
      */
     relationshipId?: number;
-
     /**
      * The username of the user
      */
-    username?: string;
-
+    readonly username?: string;
 }

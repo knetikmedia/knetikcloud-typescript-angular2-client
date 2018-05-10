@@ -10,65 +10,58 @@
  * Do not edit the class manually.
  */
 
-import { PropertyFieldResource } from './propertyFieldResource';
 
-
-export interface PropertyFieldResource {
+export interface PropertyFieldResource { 
     /**
      * A description of the field
      */
     description?: string;
-
     /**
      * The type of values within a 'list' type field
      */
     innerType?: PropertyFieldResource.InnerTypeEnum;
-
     /**
      * A description of fields within objects within a 'list' type field, when inner_type is 'object'
      */
     innerTypeFields?: Array<PropertyFieldResource>;
-
     /**
      * The name of the field
      */
     name?: string;
-
     /**
      * Whether the field is required
      */
     required?: boolean;
-
     /**
      * The type of the field
      */
     type?: PropertyFieldResource.TypeEnum;
-
     /**
      * A list of valid values for 'enum' type fields
      */
     validValues?: Array<string>;
-
 }
 export namespace PropertyFieldResource {
-    export enum InnerTypeEnum {
-        Integer = <any> 'integer',
-        Number = <any> 'number',
-        Bool = <any> 'bool',
-        String = <any> 'string',
-        Enumeration = <any> 'enumeration',
-        List = <any> 'list',
-        Object = <any> 'object',
-        Definition = <any> 'definition'
-    }
-    export enum TypeEnum {
-        Integer = <any> 'integer',
-        Number = <any> 'number',
-        Bool = <any> 'bool',
-        String = <any> 'string',
-        Enumeration = <any> 'enumeration',
-        List = <any> 'list',
-        Object = <any> 'object',
-        Definition = <any> 'definition'
-    }
+    export type InnerTypeEnum = 'integer' | 'number' | 'bool' | 'string' | 'enumeration' | 'list' | 'object' | 'definition';
+    export const InnerTypeEnum = {
+        Integer: 'integer' as InnerTypeEnum,
+        Number: 'number' as InnerTypeEnum,
+        Bool: 'bool' as InnerTypeEnum,
+        String: 'string' as InnerTypeEnum,
+        Enumeration: 'enumeration' as InnerTypeEnum,
+        List: 'list' as InnerTypeEnum,
+        Object: 'object' as InnerTypeEnum,
+        Definition: 'definition' as InnerTypeEnum
+    };
+    export type TypeEnum = 'integer' | 'number' | 'bool' | 'string' | 'enumeration' | 'list' | 'object' | 'definition';
+    export const TypeEnum = {
+        Integer: 'integer' as TypeEnum,
+        Number: 'number' as TypeEnum,
+        Bool: 'bool' as TypeEnum,
+        String: 'string' as TypeEnum,
+        Enumeration: 'enumeration' as TypeEnum,
+        List: 'list' as TypeEnum,
+        Object: 'object' as TypeEnum,
+        Definition: 'definition' as TypeEnum
+    };
 }

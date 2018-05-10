@@ -9,45 +9,37 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
-
 import { Property } from './property';
 import { TierResource } from './tierResource';
 
 
-export interface LevelingResource {
+export interface LevelingResource { 
     /**
      * A map of additional properties, keyed on the property name.  Must match the names and types defined in the template for this item type
      */
     additionalProperties?: { [key: string]: Property; };
-
     /**
      * The date the leveling schema was created
      */
-    createdDate?: number;
-
+    readonly createdDate?: number;
     /**
      * The description of the leveling schema
      */
     description?: string;
-
     /**
      * The name of the leveling schema.  IMMUTABLE
      */
     name: string;
-
     /**
      * A set of tiers that contain experience boundaries
      */
     tiers?: Array<TierResource>;
-
     /**
      * The name of an event that will add one progress to this level when fired
      */
     triggerEventName?: string;
-
     /**
      * The date the leveling schema was updated
      */
-    updatedDate?: number;
-
+    readonly updatedDate?: number;
 }

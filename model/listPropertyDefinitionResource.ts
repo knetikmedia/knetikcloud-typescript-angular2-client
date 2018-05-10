@@ -9,25 +9,21 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
-
 import { PropertyDefinitionResource } from './propertyDefinitionResource';
 import { PropertyFieldListResource } from './propertyFieldListResource';
 
 
-export interface ListPropertyDefinitionResource extends PropertyDefinitionResource {
+export interface ListPropertyDefinitionResource extends PropertyDefinitionResource { 
     /**
      * If provided, the maximum number of files in the group
      */
     maxCount?: number;
-
     /**
      * If provided, the minimum number of files in the group
      */
     minCount?: number;
-
     /**
      * If provided, a property definition for validating values within list
      */
     valueDefinition?: PropertyDefinitionResource;
-
 }

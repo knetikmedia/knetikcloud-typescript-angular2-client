@@ -9,14 +9,12 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
-
 import { Property } from './property';
 
 
-export interface ListProperty extends Property {
+export interface ListProperty extends Property { 
     /**
      * The list of properties
      */
     values: Array<Property>;
-
 }

@@ -9,28 +9,18 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
-
 import { ChallengeEventResource } from './challengeEventResource';
 import { Order } from './order';
 
 
-export interface PageResourceChallengeEventResource {
+export interface PageResourceChallengeEventResource { 
     content?: Array<ChallengeEventResource>;
-
     first?: boolean;
-
     last?: boolean;
-
     number?: number;
-
     numberOfElements?: number;
-
     size?: number;
-
     sort?: Array<Order>;
-
     totalElements?: number;
-
     totalPages?: number;
-
 }

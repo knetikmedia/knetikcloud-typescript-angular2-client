@@ -9,28 +9,18 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
-
 import { DispositionResource } from './dispositionResource';
 import { Order } from './order';
 
 
-export interface PageResourceDispositionResource {
+export interface PageResourceDispositionResource { 
     content?: Array<DispositionResource>;
-
     first?: boolean;
-
     last?: boolean;
-
     number?: number;
-
     numberOfElements?: number;
-
     size?: number;
-
     sort?: Array<Order>;
-
     totalElements?: number;
-
     totalPages?: number;
-
 }

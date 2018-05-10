@@ -9,44 +9,36 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
-
 import { BreActionLog } from './breActionLog';
 
 
-export interface BreRuleLog {
+export interface BreRuleLog { 
     /**
      * The actions of the BRE rule
      */
-    actions?: Array<BreActionLog>;
-
+    readonly actions?: Array<BreActionLog>;
     /**
      * Whether the rule ran
      */
-    ran?: boolean;
-
+    readonly ran?: boolean;
     /**
      * The reason for the rule
      */
-    reason?: string;
-
+    readonly reason?: string;
     /**
      * The end date of the rule in seconds
      */
-    ruleEndDate?: number;
-
+    readonly ruleEndDate?: number;
     /**
      * The id of the rule
      */
-    ruleId?: string;
-
+    readonly ruleId?: string;
     /**
      * The name of the rule
      */
-    ruleName?: string;
-
+    readonly ruleName?: string;
     /**
      * The start date of the rule in seconds
      */
-    ruleStartDate?: number;
-
+    readonly ruleStartDate?: number;
 }

@@ -11,26 +11,21 @@
  */
 
 
-
-export interface UserInventoryAddRequest {
+export interface UserInventoryAddRequest { 
     /**
      * A note to be passed to the invoice or transaction
      */
     note: string;
-
     /**
      * A list of behaviors to ignore explicitely.  Ex: 'limited_gettable'
      */
     overrides?: Array<string>;
-
     /**
      * If set to true will cause the endpoint to skip creation of cart and invoice to track the inventory change
      */
     skipInvoice: boolean;
-
     /**
      * The specific SKU of the item to be added to the inventory
      */
     sku: string;
-
 }

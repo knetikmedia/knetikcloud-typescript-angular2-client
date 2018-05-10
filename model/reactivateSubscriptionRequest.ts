@@ -11,16 +11,13 @@
  */
 
 
-
-export interface ReactivateSubscriptionRequest {
+export interface ReactivateSubscriptionRequest { 
     /**
      * The inventory to reactivate. Only required if using the deprecated subscriptions service
      */
     inventoryId?: number;
-
     /**
      * Whether to add the additional reactivation fee in addition to the recurring fee
      */
     reactivationFee?: boolean;
-
 }

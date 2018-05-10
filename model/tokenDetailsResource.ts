@@ -11,12 +11,8 @@
  */
 
 
-
-export interface TokenDetailsResource {
+export interface TokenDetailsResource { 
     clientId?: string;
-
     roles?: Array<string>;
-
     userId?: number;
-
 }

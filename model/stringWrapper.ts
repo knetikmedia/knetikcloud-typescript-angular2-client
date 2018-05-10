@@ -11,8 +11,6 @@
  */
 
 
-
-export interface StringWrapper {
+export interface StringWrapper { 
     value?: string;
-
 }

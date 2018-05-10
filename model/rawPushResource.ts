@@ -11,16 +11,13 @@
  */
 
 
-
-export interface RawPushResource {
+export interface RawPushResource { 
     /**
      * A list of user ids to send the message to.
      */
     recipients: Array<number>;
-
     /**
      * The body of the outgoing message.
      */
     text: string;
-
 }

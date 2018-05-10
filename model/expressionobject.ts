@@ -11,6 +11,5 @@
  */
 
 
-
-export interface Expressionobject {
+export interface Expressionobject { 
 }

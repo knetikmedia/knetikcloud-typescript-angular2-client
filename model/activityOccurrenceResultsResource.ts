@@ -9,14 +9,12 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
-
 import { UserActivityResultsResource } from './userActivityResultsResource';
 
 
-export interface ActivityOccurrenceResultsResource {
+export interface ActivityOccurrenceResultsResource { 
     /**
      * The game results for each user. Include all users that played (paid to get in) even if they were eliminated without a result. A null metric is allowed
      */
     users: Array<UserActivityResultsResource>;
-
 }

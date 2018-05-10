@@ -9,16 +9,14 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
-
 /* tslint:disable:no-unused-variable member-ordering */
 
 import { Inject, Injectable, Optional }                      from '@angular/core';
-import { Http, Headers, URLSearchParams }                    from '@angular/http';
-import { RequestMethod, RequestOptions, RequestOptionsArgs } from '@angular/http';
-import { Response, ResponseContentType }                     from '@angular/http';
+import { HttpClient, HttpHeaders, HttpParams,
+         HttpResponse, HttpEvent }                           from '@angular/common/http';
+import { CustomHttpUrlEncodingCodec }                        from '../encoder';
 
 import { Observable }                                        from 'rxjs/Observable';
-import '../rxjs-operators';
 
 import { PageResourceRevenueCountryReportResource } from '../model/pageResourceRevenueCountryReportResource';
 import { PageResourceRevenueProductReportResource } from '../model/pageResourceRevenueProductReportResource';
@@ -33,32 +31,17 @@ import { Configuration }                                     from '../configurat
 export class ReportingRevenueService {
 
     protected basePath = 'https://jsapi-integration.us-east-1.elasticbeanstalk.com';
-    public defaultHeaders: Headers = new Headers();
-    public configuration: Configuration = new Configuration();
+    public defaultHeaders = new HttpHeaders();
+    public configuration = new Configuration();
 
-    constructor(protected http: Http, @Optional()@Inject(BASE_PATH) basePath: string, @Optional() configuration: Configuration) {
+    constructor(protected httpClient: HttpClient, @Optional()@Inject(BASE_PATH) basePath: string, @Optional() configuration: Configuration) {
         if (basePath) {
             this.basePath = basePath;
         }
         if (configuration) {
             this.configuration = configuration;
-			this.basePath = basePath || configuration.basePath || this.basePath;
+            this.basePath = basePath || configuration.basePath || this.basePath;
         }
-    }
-
-    /**
-     * 
-     * Extends object by coping non-existing properties.
-     * @param objA object to be extended
-     * @param objB source object
-     */
-    private extendObj<T1,T2>(objA: T1, objB: T2) {
-        for(let key in objB){
-            if(objB.hasOwnProperty(key)){
-                (objA as any)[key] = (objB as any)[key];
-            }
-        }
-        return <T1&T2>objA;
     }
 
     /**
@@ -67,106 +50,12 @@ export class ReportingRevenueService {
      */
     private canConsumeForm(consumes: string[]): boolean {
         const form = 'multipart/form-data';
-        for (let consume of consumes) {
+        for (const consume of consumes) {
             if (form === consume) {
                 return true;
             }
         }
         return false;
-    }
-
-    /**
-     * Get basic info about revenue from sales of items and bundles (not subscriptions, shipping, etc), summed up within a time range. <br><br><b>Permissions Needed:</b> REPORTING_REVENUE_ADMIN
-     * @summary Get item revenue info
-     * @param currencyCode The code for a currency to get sales data for
-     * @param startDate The start of the time range to aggregate, unix timestamp in seconds. Default is beginning of time
-     * @param endDate The end of the time range to aggregate, unix timestamp in seconds. Default is end of time
-     */
-    public getItemRevenue(currencyCode: string, startDate?: number, endDate?: number, extraHttpRequestParams?: any): Observable<RevenueReportResource> {
-        return this.getItemRevenueWithHttpInfo(currencyCode, startDate, endDate, extraHttpRequestParams)
-            .map((response: Response) => {
-                if (response.status === 204) {
-                    return undefined;
-                } else {
-                    return response.json() || {};
-                }
-            });
-    }
-
-    /**
-     * Get basic info about revenue loss from refunds (for all item types), summed up within a time range. <br><br><b>Permissions Needed:</b> REPORTING_REVENUE_ADMIN
-     * @summary Get refund revenue info
-     * @param currencyCode The code for a currency to get refund data for
-     * @param startDate The start of the time range to aggregate, unix timestamp in seconds. Default is beginning of time
-     * @param endDate The end of the time range to aggregate, unix timestamp in seconds. Default is end of time
-     */
-    public getRefundRevenue(currencyCode: string, startDate?: number, endDate?: number, extraHttpRequestParams?: any): Observable<RevenueReportResource> {
-        return this.getRefundRevenueWithHttpInfo(currencyCode, startDate, endDate, extraHttpRequestParams)
-            .map((response: Response) => {
-                if (response.status === 204) {
-                    return undefined;
-                } else {
-                    return response.json() || {};
-                }
-            });
-    }
-
-    /**
-     * Get basic info about revenue from sales of all types, summed up within a time range and split out by country. Sorted for largest revenue at the top. <br><br><b>Permissions Needed:</b> REPORTING_REVENUE_ADMIN
-     * @summary Get revenue info by country
-     * @param currencyCode The code for a currency to get sales data for
-     * @param startDate The start of the time range to aggregate, unix timestamp in seconds. Default is beginning of time
-     * @param endDate The end of the time range to aggregate, unix timestamp in seconds. Default is end of time
-     * @param size The number of objects returned per page
-     * @param page The number of the page returned, starting with 1
-     */
-    public getRevenueByCountry(currencyCode: string, startDate?: number, endDate?: number, size?: number, page?: number, extraHttpRequestParams?: any): Observable<PageResourceRevenueCountryReportResource> {
-        return this.getRevenueByCountryWithHttpInfo(currencyCode, startDate, endDate, size, page, extraHttpRequestParams)
-            .map((response: Response) => {
-                if (response.status === 204) {
-                    return undefined;
-                } else {
-                    return response.json() || {};
-                }
-            });
-    }
-
-    /**
-     * Get basic info about revenue from sales of all types, summed up within a time range and split out by specific item. Sorted for largest revenue at the top. <br><br><b>Permissions Needed:</b> REPORTING_REVENUE_ADMIN
-     * @summary Get revenue info by item
-     * @param currencyCode The code for a currency to get sales data for
-     * @param startDate The start of the time range to aggregate, unix timestamp in seconds. Default is beginning of time
-     * @param endDate The end of the time range to aggregate, unix timestamp in seconds. Default is end of time
-     * @param size The number of objects returned per page
-     * @param page The number of the page returned, starting with 1
-     */
-    public getRevenueByItem(currencyCode: string, startDate?: number, endDate?: number, size?: number, page?: number, extraHttpRequestParams?: any): Observable<PageResourceRevenueProductReportResource> {
-        return this.getRevenueByItemWithHttpInfo(currencyCode, startDate, endDate, size, page, extraHttpRequestParams)
-            .map((response: Response) => {
-                if (response.status === 204) {
-                    return undefined;
-                } else {
-                    return response.json() || {};
-                }
-            });
-    }
-
-    /**
-     * Get basic info about revenue from sales of new subscriptions as well as recurring payemnts, summed up within a time range. <br><br><b>Permissions Needed:</b> REPORTING_REVENUE_ADMIN
-     * @summary Get subscription revenue info
-     * @param currencyCode The code for a currency to get sales data for
-     * @param startDate The start of the time range to aggregate, unix timestamp in seconds. Default is beginning of time
-     * @param endDate The end of the time range to aggregate, unix timestamp in seconds. Default is end of time
-     */
-    public getSubscriptionRevenue(currencyCode: string, startDate?: number, endDate?: number, extraHttpRequestParams?: any): Observable<RevenueReportResource> {
-        return this.getSubscriptionRevenueWithHttpInfo(currencyCode, startDate, endDate, extraHttpRequestParams)
-            .map((response: Response) => {
-                if (response.status === 204) {
-                    return undefined;
-                } else {
-                    return response.json() || {};
-                }
-            });
     }
 
 
@@ -176,63 +65,65 @@ export class ReportingRevenueService {
      * @param currencyCode The code for a currency to get sales data for
      * @param startDate The start of the time range to aggregate, unix timestamp in seconds. Default is beginning of time
      * @param endDate The end of the time range to aggregate, unix timestamp in seconds. Default is end of time
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
      */
-    public getItemRevenueWithHttpInfo(currencyCode: string, startDate?: number, endDate?: number, extraHttpRequestParams?: any): Observable<Response> {
-        const path = this.basePath + '/reporting/revenue/item-sales/${currency_code}'
-                    .replace('${' + 'currency_code' + '}', String(currencyCode));
-
-        let queryParameters = new URLSearchParams();
-        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
-
-        // verify required parameter 'currencyCode' is not null or undefined
+    public getItemRevenue(currencyCode: string, startDate?: number, endDate?: number, observe?: 'body', reportProgress?: boolean): Observable<RevenueReportResource>;
+    public getItemRevenue(currencyCode: string, startDate?: number, endDate?: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<RevenueReportResource>>;
+    public getItemRevenue(currencyCode: string, startDate?: number, endDate?: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<RevenueReportResource>>;
+    public getItemRevenue(currencyCode: string, startDate?: number, endDate?: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
         if (currencyCode === null || currencyCode === undefined) {
             throw new Error('Required parameter currencyCode was null or undefined when calling getItemRevenue.');
         }
-        if (startDate !== undefined) {
-            queryParameters.set('start_date', <any>startDate);
+
+        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
+        if (startDate !== undefined && startDate !== null) {
+            queryParameters = queryParameters.set('start_date', <any>startDate);
+        }
+        if (endDate !== undefined && endDate !== null) {
+            queryParameters = queryParameters.set('end_date', <any>endDate);
         }
 
-        if (endDate !== undefined) {
-            queryParameters.set('end_date', <any>endDate);
-        }
-
-
-        // to determine the Accept header
-        let produces: string[] = [
-            'application/json'
-        ];
+        let headers = this.defaultHeaders;
 
         // authentication (oauth2_client_credentials_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
         // authentication (oauth2_password_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-            
-        let requestOptions: RequestOptionsArgs = new RequestOptions({
-            method: RequestMethod.Get,
-            headers: headers,
-            search: queryParameters,
-            withCredentials:this.configuration.withCredentials
-        });
-        // https://github.com/swagger-api/swagger-codegen/issues/4037
-        if (extraHttpRequestParams) {
-            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
+        // to determine the Accept header
+        let httpHeaderAccepts: string[] = [
+            'application/json'
+        ];
+        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers = headers.set('Accept', httpHeaderAcceptSelected);
         }
 
-        return this.http.request(path, requestOptions);
+        // to determine the Content-Type header
+        const consumes: string[] = [
+        ];
+
+        return this.httpClient.get<RevenueReportResource>(`${this.basePath}/reporting/revenue/item-sales/${encodeURIComponent(String(currencyCode))}`,
+            {
+                params: queryParameters,
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
     }
 
     /**
@@ -241,63 +132,65 @@ export class ReportingRevenueService {
      * @param currencyCode The code for a currency to get refund data for
      * @param startDate The start of the time range to aggregate, unix timestamp in seconds. Default is beginning of time
      * @param endDate The end of the time range to aggregate, unix timestamp in seconds. Default is end of time
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
      */
-    public getRefundRevenueWithHttpInfo(currencyCode: string, startDate?: number, endDate?: number, extraHttpRequestParams?: any): Observable<Response> {
-        const path = this.basePath + '/reporting/revenue/refunds/${currency_code}'
-                    .replace('${' + 'currency_code' + '}', String(currencyCode));
-
-        let queryParameters = new URLSearchParams();
-        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
-
-        // verify required parameter 'currencyCode' is not null or undefined
+    public getRefundRevenue(currencyCode: string, startDate?: number, endDate?: number, observe?: 'body', reportProgress?: boolean): Observable<RevenueReportResource>;
+    public getRefundRevenue(currencyCode: string, startDate?: number, endDate?: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<RevenueReportResource>>;
+    public getRefundRevenue(currencyCode: string, startDate?: number, endDate?: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<RevenueReportResource>>;
+    public getRefundRevenue(currencyCode: string, startDate?: number, endDate?: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
         if (currencyCode === null || currencyCode === undefined) {
             throw new Error('Required parameter currencyCode was null or undefined when calling getRefundRevenue.');
         }
-        if (startDate !== undefined) {
-            queryParameters.set('start_date', <any>startDate);
+
+        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
+        if (startDate !== undefined && startDate !== null) {
+            queryParameters = queryParameters.set('start_date', <any>startDate);
+        }
+        if (endDate !== undefined && endDate !== null) {
+            queryParameters = queryParameters.set('end_date', <any>endDate);
         }
 
-        if (endDate !== undefined) {
-            queryParameters.set('end_date', <any>endDate);
-        }
-
-
-        // to determine the Accept header
-        let produces: string[] = [
-            'application/json'
-        ];
+        let headers = this.defaultHeaders;
 
         // authentication (oauth2_client_credentials_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
         // authentication (oauth2_password_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-            
-        let requestOptions: RequestOptionsArgs = new RequestOptions({
-            method: RequestMethod.Get,
-            headers: headers,
-            search: queryParameters,
-            withCredentials:this.configuration.withCredentials
-        });
-        // https://github.com/swagger-api/swagger-codegen/issues/4037
-        if (extraHttpRequestParams) {
-            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
+        // to determine the Accept header
+        let httpHeaderAccepts: string[] = [
+            'application/json'
+        ];
+        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers = headers.set('Accept', httpHeaderAcceptSelected);
         }
 
-        return this.http.request(path, requestOptions);
+        // to determine the Content-Type header
+        const consumes: string[] = [
+        ];
+
+        return this.httpClient.get<RevenueReportResource>(`${this.basePath}/reporting/revenue/refunds/${encodeURIComponent(String(currencyCode))}`,
+            {
+                params: queryParameters,
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
     }
 
     /**
@@ -308,71 +201,71 @@ export class ReportingRevenueService {
      * @param endDate The end of the time range to aggregate, unix timestamp in seconds. Default is end of time
      * @param size The number of objects returned per page
      * @param page The number of the page returned, starting with 1
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
      */
-    public getRevenueByCountryWithHttpInfo(currencyCode: string, startDate?: number, endDate?: number, size?: number, page?: number, extraHttpRequestParams?: any): Observable<Response> {
-        const path = this.basePath + '/reporting/revenue/countries/${currency_code}'
-                    .replace('${' + 'currency_code' + '}', String(currencyCode));
-
-        let queryParameters = new URLSearchParams();
-        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
-
-        // verify required parameter 'currencyCode' is not null or undefined
+    public getRevenueByCountry(currencyCode: string, startDate?: number, endDate?: number, size?: number, page?: number, observe?: 'body', reportProgress?: boolean): Observable<PageResourceRevenueCountryReportResource>;
+    public getRevenueByCountry(currencyCode: string, startDate?: number, endDate?: number, size?: number, page?: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<PageResourceRevenueCountryReportResource>>;
+    public getRevenueByCountry(currencyCode: string, startDate?: number, endDate?: number, size?: number, page?: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<PageResourceRevenueCountryReportResource>>;
+    public getRevenueByCountry(currencyCode: string, startDate?: number, endDate?: number, size?: number, page?: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
         if (currencyCode === null || currencyCode === undefined) {
             throw new Error('Required parameter currencyCode was null or undefined when calling getRevenueByCountry.');
         }
-        if (startDate !== undefined) {
-            queryParameters.set('start_date', <any>startDate);
+
+        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
+        if (startDate !== undefined && startDate !== null) {
+            queryParameters = queryParameters.set('start_date', <any>startDate);
+        }
+        if (endDate !== undefined && endDate !== null) {
+            queryParameters = queryParameters.set('end_date', <any>endDate);
+        }
+        if (size !== undefined && size !== null) {
+            queryParameters = queryParameters.set('size', <any>size);
+        }
+        if (page !== undefined && page !== null) {
+            queryParameters = queryParameters.set('page', <any>page);
         }
 
-        if (endDate !== undefined) {
-            queryParameters.set('end_date', <any>endDate);
-        }
-
-        if (size !== undefined) {
-            queryParameters.set('size', <any>size);
-        }
-
-        if (page !== undefined) {
-            queryParameters.set('page', <any>page);
-        }
-
-
-        // to determine the Accept header
-        let produces: string[] = [
-            'application/json'
-        ];
+        let headers = this.defaultHeaders;
 
         // authentication (oauth2_client_credentials_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
         // authentication (oauth2_password_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-            
-        let requestOptions: RequestOptionsArgs = new RequestOptions({
-            method: RequestMethod.Get,
-            headers: headers,
-            search: queryParameters,
-            withCredentials:this.configuration.withCredentials
-        });
-        // https://github.com/swagger-api/swagger-codegen/issues/4037
-        if (extraHttpRequestParams) {
-            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
+        // to determine the Accept header
+        let httpHeaderAccepts: string[] = [
+            'application/json'
+        ];
+        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers = headers.set('Accept', httpHeaderAcceptSelected);
         }
 
-        return this.http.request(path, requestOptions);
+        // to determine the Content-Type header
+        const consumes: string[] = [
+        ];
+
+        return this.httpClient.get<PageResourceRevenueCountryReportResource>(`${this.basePath}/reporting/revenue/countries/${encodeURIComponent(String(currencyCode))}`,
+            {
+                params: queryParameters,
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
     }
 
     /**
@@ -383,71 +276,71 @@ export class ReportingRevenueService {
      * @param endDate The end of the time range to aggregate, unix timestamp in seconds. Default is end of time
      * @param size The number of objects returned per page
      * @param page The number of the page returned, starting with 1
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
      */
-    public getRevenueByItemWithHttpInfo(currencyCode: string, startDate?: number, endDate?: number, size?: number, page?: number, extraHttpRequestParams?: any): Observable<Response> {
-        const path = this.basePath + '/reporting/revenue/products/${currency_code}'
-                    .replace('${' + 'currency_code' + '}', String(currencyCode));
-
-        let queryParameters = new URLSearchParams();
-        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
-
-        // verify required parameter 'currencyCode' is not null or undefined
+    public getRevenueByItem(currencyCode: string, startDate?: number, endDate?: number, size?: number, page?: number, observe?: 'body', reportProgress?: boolean): Observable<PageResourceRevenueProductReportResource>;
+    public getRevenueByItem(currencyCode: string, startDate?: number, endDate?: number, size?: number, page?: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<PageResourceRevenueProductReportResource>>;
+    public getRevenueByItem(currencyCode: string, startDate?: number, endDate?: number, size?: number, page?: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<PageResourceRevenueProductReportResource>>;
+    public getRevenueByItem(currencyCode: string, startDate?: number, endDate?: number, size?: number, page?: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
         if (currencyCode === null || currencyCode === undefined) {
             throw new Error('Required parameter currencyCode was null or undefined when calling getRevenueByItem.');
         }
-        if (startDate !== undefined) {
-            queryParameters.set('start_date', <any>startDate);
+
+        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
+        if (startDate !== undefined && startDate !== null) {
+            queryParameters = queryParameters.set('start_date', <any>startDate);
+        }
+        if (endDate !== undefined && endDate !== null) {
+            queryParameters = queryParameters.set('end_date', <any>endDate);
+        }
+        if (size !== undefined && size !== null) {
+            queryParameters = queryParameters.set('size', <any>size);
+        }
+        if (page !== undefined && page !== null) {
+            queryParameters = queryParameters.set('page', <any>page);
         }
 
-        if (endDate !== undefined) {
-            queryParameters.set('end_date', <any>endDate);
-        }
-
-        if (size !== undefined) {
-            queryParameters.set('size', <any>size);
-        }
-
-        if (page !== undefined) {
-            queryParameters.set('page', <any>page);
-        }
-
-
-        // to determine the Accept header
-        let produces: string[] = [
-            'application/json'
-        ];
+        let headers = this.defaultHeaders;
 
         // authentication (oauth2_client_credentials_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
         // authentication (oauth2_password_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-            
-        let requestOptions: RequestOptionsArgs = new RequestOptions({
-            method: RequestMethod.Get,
-            headers: headers,
-            search: queryParameters,
-            withCredentials:this.configuration.withCredentials
-        });
-        // https://github.com/swagger-api/swagger-codegen/issues/4037
-        if (extraHttpRequestParams) {
-            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
+        // to determine the Accept header
+        let httpHeaderAccepts: string[] = [
+            'application/json'
+        ];
+        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers = headers.set('Accept', httpHeaderAcceptSelected);
         }
 
-        return this.http.request(path, requestOptions);
+        // to determine the Content-Type header
+        const consumes: string[] = [
+        ];
+
+        return this.httpClient.get<PageResourceRevenueProductReportResource>(`${this.basePath}/reporting/revenue/products/${encodeURIComponent(String(currencyCode))}`,
+            {
+                params: queryParameters,
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
     }
 
     /**
@@ -456,63 +349,65 @@ export class ReportingRevenueService {
      * @param currencyCode The code for a currency to get sales data for
      * @param startDate The start of the time range to aggregate, unix timestamp in seconds. Default is beginning of time
      * @param endDate The end of the time range to aggregate, unix timestamp in seconds. Default is end of time
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
      */
-    public getSubscriptionRevenueWithHttpInfo(currencyCode: string, startDate?: number, endDate?: number, extraHttpRequestParams?: any): Observable<Response> {
-        const path = this.basePath + '/reporting/revenue/subscription-sales/${currency_code}'
-                    .replace('${' + 'currency_code' + '}', String(currencyCode));
-
-        let queryParameters = new URLSearchParams();
-        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
-
-        // verify required parameter 'currencyCode' is not null or undefined
+    public getSubscriptionRevenue(currencyCode: string, startDate?: number, endDate?: number, observe?: 'body', reportProgress?: boolean): Observable<RevenueReportResource>;
+    public getSubscriptionRevenue(currencyCode: string, startDate?: number, endDate?: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<RevenueReportResource>>;
+    public getSubscriptionRevenue(currencyCode: string, startDate?: number, endDate?: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<RevenueReportResource>>;
+    public getSubscriptionRevenue(currencyCode: string, startDate?: number, endDate?: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
         if (currencyCode === null || currencyCode === undefined) {
             throw new Error('Required parameter currencyCode was null or undefined when calling getSubscriptionRevenue.');
         }
-        if (startDate !== undefined) {
-            queryParameters.set('start_date', <any>startDate);
+
+        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
+        if (startDate !== undefined && startDate !== null) {
+            queryParameters = queryParameters.set('start_date', <any>startDate);
+        }
+        if (endDate !== undefined && endDate !== null) {
+            queryParameters = queryParameters.set('end_date', <any>endDate);
         }
 
-        if (endDate !== undefined) {
-            queryParameters.set('end_date', <any>endDate);
-        }
-
-
-        // to determine the Accept header
-        let produces: string[] = [
-            'application/json'
-        ];
+        let headers = this.defaultHeaders;
 
         // authentication (oauth2_client_credentials_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
         // authentication (oauth2_password_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-            
-        let requestOptions: RequestOptionsArgs = new RequestOptions({
-            method: RequestMethod.Get,
-            headers: headers,
-            search: queryParameters,
-            withCredentials:this.configuration.withCredentials
-        });
-        // https://github.com/swagger-api/swagger-codegen/issues/4037
-        if (extraHttpRequestParams) {
-            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
+        // to determine the Accept header
+        let httpHeaderAccepts: string[] = [
+            'application/json'
+        ];
+        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers = headers.set('Accept', httpHeaderAcceptSelected);
         }
 
-        return this.http.request(path, requestOptions);
+        // to determine the Content-Type header
+        const consumes: string[] = [
+        ];
+
+        return this.httpClient.get<RevenueReportResource>(`${this.basePath}/reporting/revenue/subscription-sales/${encodeURIComponent(String(currencyCode))}`,
+            {
+                params: queryParameters,
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
     }
 
 }

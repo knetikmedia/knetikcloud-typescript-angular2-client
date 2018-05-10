@@ -11,17 +11,12 @@
  */
 
 
-
 /**
  * Expressions are instructions for the rule engine to resolve certain values. For example instead of `user 1` it'd state `user provided by the event`. Full list and definitions available at GET /bre/expressions.
  */
-export interface ParameterResource {
+export interface ParameterResource { 
     definition?: string;
-
     of?: string;
-
     type?: string;
-
     value?: any;
-
 }

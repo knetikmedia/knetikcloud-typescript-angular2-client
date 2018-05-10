@@ -11,31 +11,25 @@
  */
 
 
-
-export interface RewardItemResource {
+export interface RewardItemResource { 
     /**
      * The id of the item to reward
      */
     itemId: number;
-
     /**
      * The name of the item to reward (read only, set by id)
      */
     itemName?: string;
-
     /**
      * The highest number (worst) rank to give the reward to. Must be greater than or equal to minRank
      */
     maxRank: number;
-
     /**
      * The lowest number (best) rank to give the reward to. Must be greater than zero
      */
     minRank: number;
-
     /**
      * How many copies to give
      */
     quantity: number;
-
 }

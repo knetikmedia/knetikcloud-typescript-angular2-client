@@ -11,38 +11,21 @@
  */
 
 
-
-export interface InvoiceItemResource {
+export interface InvoiceItemResource { 
     bundleSku?: string;
-
     currentFulfillmentStatus?: string;
-
     id?: number;
-
     invoiceId?: number;
-
     itemId?: number;
-
     itemName?: string;
-
     originalTotalPrice?: number;
-
     originalUnitPrice?: number;
-
     qty?: number;
-
     saleName?: string;
-
     sku?: string;
-
     skuDescription?: string;
-
     systemPrice?: number;
-
     totalPrice?: number;
-
     typeHint?: string;
-
     unitPrice?: number;
-
 }

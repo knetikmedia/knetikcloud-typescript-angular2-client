@@ -11,26 +11,21 @@
  */
 
 
-
-export interface UsageInfo {
+export interface UsageInfo { 
     /**
      * The number of requests within the range
      */
     count?: number;
-
     /**
      * The date at the start of the range (see granularity)
      */
     date?: number;
-
     /**
      * The http method
      */
     method?: string;
-
     /**
      * The url path
      */
     url?: string;
-
 }

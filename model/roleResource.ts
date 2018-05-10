@@ -9,44 +9,36 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
-
 import { PermissionResource } from './permissionResource';
 
 
-export interface RoleResource {
+export interface RoleResource { 
     /**
      * The number of clients this role is assigned to
      */
-    clientCount?: number;
-
+    readonly clientCount?: number;
     /**
      * The date the role was added. Unix timestamp in seconds
      */
-    createdDate?: number;
-
+    readonly createdDate?: number;
     /**
      * Whether a role is locked from being deleted
      */
     locked?: boolean;
-
     /**
      * The name of the role used for display purposes
      */
     name: string;
-
     /**
      * The keyword that defines the role
      */
     role: string;
-
     /**
      * The list of permissions this role has
      */
-    rolePermission?: Array<PermissionResource>;
-
+    readonly rolePermission?: Array<PermissionResource>;
     /**
      * The number of users this role is assigned to
      */
-    userCount?: number;
-
+    readonly userCount?: number;
 }

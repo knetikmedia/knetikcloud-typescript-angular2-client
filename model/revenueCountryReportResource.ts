@@ -11,12 +11,8 @@
  */
 
 
-
-export interface RevenueCountryReportResource {
+export interface RevenueCountryReportResource { 
     country?: string;
-
     revenue?: number;
-
     volume?: number;
-
 }

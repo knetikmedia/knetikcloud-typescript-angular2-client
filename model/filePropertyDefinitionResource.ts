@@ -9,20 +9,17 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
-
 import { PropertyDefinitionResource } from './propertyDefinitionResource';
 import { PropertyFieldListResource } from './propertyFieldListResource';
 
 
-export interface FilePropertyDefinitionResource extends PropertyDefinitionResource {
+export interface FilePropertyDefinitionResource extends PropertyDefinitionResource { 
     /**
      * If provided, a file type that the property must match
      */
     fileType?: string;
-
     /**
      * If provided, the maximum allowed file size in bytes
      */
     maxFileSize?: number;
-
 }

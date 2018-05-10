@@ -9,34 +9,28 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
-
 import { SearchReferenceMapping } from './searchReferenceMapping';
 
 
-export interface SearchObjectDefinition {
+export interface SearchObjectDefinition { 
     /**
      * The relative URL of the service that will provide the initial data to index. Assumed to be compliant with KnetikCloud pagination standards. Ex: /locations.
      */
     dataSupplierUrl?: string;
-
     /**
      * The name of the field representing the unique identifier of the document. Ex: UserResource -> id
      */
     idField?: string;
-
     /**
      * Describe how nested resources should be mapped to documents if needed. Search service will copy the already indexed dependant documents and use them to replace the listed fields at runtime. Ex: comment.user is a user document
      */
     mappings?: Array<SearchReferenceMapping>;
-
     /**
      * The name of the property that holds the template ID for custom objects. (ex: template or template_id)
      */
     templateField?: string;
-
     /**
      * The name of the index where the documents will be stored. Be convention, the name of the resource w/o suffix. Ex: UserResource -> users
      */
     type?: string;
-
 }

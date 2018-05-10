@@ -11,51 +11,41 @@
  */
 
 
-
-export interface UserBaseResource {
+export interface UserBaseResource { 
     /**
      * The url of the user's avatar image
      */
     avatarUrl?: string;
-
     /**
      * The chosen display name of the user, defaults to username if not present
      */
     displayName?: string;
-
     /**
      * The user's email address (private). May be required and/or unique depending on system configuration (both on by default). Must match standard email requirements if provided (RFC 2822)
      */
     email: string;
-
     /**
      * The user's full name (private)
      */
     fullname?: string;
-
     /**
      * The id of the user
      */
-    id?: number;
-
+    readonly id?: number;
     /**
      * The date the user last interacted with the API (private)
      */
-    lastActivity?: number;
-
+    readonly lastActivity?: number;
     /**
      * The date the user's info was last updated as a unix timestamp
      */
-    lastUpdated?: number;
-
+    readonly lastUpdated?: number;
     /**
      * The user's date of registration as a unix timestamp
      */
-    memberSince?: number;
-
+    readonly memberSince?: number;
     /**
      * The login username for the user (private). May be set to match email if system does not require usernames separately.
      */
     username: string;
-
 }

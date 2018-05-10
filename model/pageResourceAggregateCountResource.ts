@@ -9,28 +9,18 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
-
 import { AggregateCountResource } from './aggregateCountResource';
 import { Order } from './order';
 
 
-export interface PageResourceAggregateCountResource {
+export interface PageResourceAggregateCountResource { 
     content?: Array<AggregateCountResource>;
-
     first?: boolean;
-
     last?: boolean;
-
     number?: number;
-
     numberOfElements?: number;
-
     size?: number;
-
     sort?: Array<Order>;
-
     totalElements?: number;
-
     totalPages?: number;
-
 }

@@ -9,29 +9,24 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
-
 import { SimpleReferenceResourcelong } from './simpleReferenceResourcelong';
 
 
-export interface VideoRelationshipResource {
+export interface VideoRelationshipResource { 
     /**
      * The owner of the relationship
      */
-    from?: SimpleReferenceResourcelong;
-
+    readonly from?: SimpleReferenceResourcelong;
     /**
      * The id of the relationship
      */
-    id?: number;
-
+    readonly id?: number;
     /**
      * Details about the relationship such as type or other information. Max length 10 characters
      */
     relationshipDetails: string;
-
     /**
      * The target of the relationship.
      */
     to: SimpleReferenceResourcelong;
-
 }

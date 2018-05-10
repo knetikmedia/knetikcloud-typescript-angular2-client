@@ -9,16 +9,14 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
-
 /* tslint:disable:no-unused-variable member-ordering */
 
 import { Inject, Injectable, Optional }                      from '@angular/core';
-import { Http, Headers, URLSearchParams }                    from '@angular/http';
-import { RequestMethod, RequestOptions, RequestOptionsArgs } from '@angular/http';
-import { Response, ResponseContentType }                     from '@angular/http';
+import { HttpClient, HttpHeaders, HttpParams,
+         HttpResponse, HttpEvent }                           from '@angular/common/http';
+import { CustomHttpUrlEncodingCodec }                        from '../encoder';
 
 import { Observable }                                        from 'rxjs/Observable';
-import '../rxjs-operators';
 
 import { IntWrapper } from '../model/intWrapper';
 import { InventorySubscriptionResource } from '../model/inventorySubscriptionResource';
@@ -37,32 +35,17 @@ import { Configuration }                                     from '../configurat
 export class UsersSubscriptionsService {
 
     protected basePath = 'https://jsapi-integration.us-east-1.elasticbeanstalk.com';
-    public defaultHeaders: Headers = new Headers();
-    public configuration: Configuration = new Configuration();
+    public defaultHeaders = new HttpHeaders();
+    public configuration = new Configuration();
 
-    constructor(protected http: Http, @Optional()@Inject(BASE_PATH) basePath: string, @Optional() configuration: Configuration) {
+    constructor(protected httpClient: HttpClient, @Optional()@Inject(BASE_PATH) basePath: string, @Optional() configuration: Configuration) {
         if (basePath) {
             this.basePath = basePath;
         }
         if (configuration) {
             this.configuration = configuration;
-			this.basePath = basePath || configuration.basePath || this.basePath;
+            this.basePath = basePath || configuration.basePath || this.basePath;
         }
-    }
-
-    /**
-     * 
-     * Extends object by coping non-existing properties.
-     * @param objA object to be extended
-     * @param objB source object
-     */
-    private extendObj<T1,T2>(objA: T1, objB: T2) {
-        for(let key in objB){
-            if(objB.hasOwnProperty(key)){
-                (objA as any)[key] = (objB as any)[key];
-            }
-        }
-        return <T1&T2>objA;
     }
 
     /**
@@ -71,153 +54,12 @@ export class UsersSubscriptionsService {
      */
     private canConsumeForm(consumes: string[]): boolean {
         const form = 'multipart/form-data';
-        for (let consume of consumes) {
+        for (const consume of consumes) {
             if (form === consume) {
                 return true;
             }
         }
         return false;
-    }
-
-    /**
-     * <b>Permissions Needed:</b> USERS_SUBSCRIPTIONS_ADMIN or owner
-     * @summary Get details about a user's subscription
-     * @param userId The id of the user
-     * @param inventoryId The id of the user&#39;s inventory
-     */
-    public getUserSubscriptionDetails(userId: number, inventoryId: number, extraHttpRequestParams?: any): Observable<InventorySubscriptionResource> {
-        return this.getUserSubscriptionDetailsWithHttpInfo(userId, inventoryId, extraHttpRequestParams)
-            .map((response: Response) => {
-                if (response.status === 204) {
-                    return undefined;
-                } else {
-                    return response.json() || {};
-                }
-            });
-    }
-
-    /**
-     * <b>Permissions Needed:</b> USERS_SUBSCRIPTIONS_ADMIN or owner
-     * @summary Get details about a user's subscriptions
-     * @param userId The id of the user
-     */
-    public getUsersSubscriptionDetails(userId: number, extraHttpRequestParams?: any): Observable<Array<InventorySubscriptionResource>> {
-        return this.getUsersSubscriptionDetailsWithHttpInfo(userId, extraHttpRequestParams)
-            .map((response: Response) => {
-                if (response.status === 204) {
-                    return undefined;
-                } else {
-                    return response.json() || {};
-                }
-            });
-    }
-
-    /**
-     * <b>Permissions Needed:</b> USERS_SUBSCRIPTIONS_ADMIN
-     * @summary Reactivate a subscription and charge fee
-     * @param userId The id of the user
-     * @param inventoryId The id of the user&#39;s inventory
-     * @param reactivateSubscriptionRequest The reactivate subscription request object inventory
-     */
-    public reactivateUserSubscription(userId: number, inventoryId: number, reactivateSubscriptionRequest?: ReactivateSubscriptionRequest, extraHttpRequestParams?: any): Observable<InvoiceResource> {
-        return this.reactivateUserSubscriptionWithHttpInfo(userId, inventoryId, reactivateSubscriptionRequest, extraHttpRequestParams)
-            .map((response: Response) => {
-                if (response.status === 204) {
-                    return undefined;
-                } else {
-                    return response.json() || {};
-                }
-            });
-    }
-
-    /**
-     * <b>Permissions Needed:</b> USERS_SUBSCRIPTIONS_ADMIN
-     * @summary Set a new date to bill a subscription on
-     * @param userId The id of the user
-     * @param inventoryId The id of the user&#39;s inventory
-     * @param billDate The new bill date. Unix timestamp in seconds
-     */
-    public setSubscriptionBillDate(userId: number, inventoryId: number, billDate: number, extraHttpRequestParams?: any): Observable<{}> {
-        return this.setSubscriptionBillDateWithHttpInfo(userId, inventoryId, billDate, extraHttpRequestParams)
-            .map((response: Response) => {
-                if (response.status === 204) {
-                    return undefined;
-                } else {
-                    return response.json() || {};
-                }
-            });
-    }
-
-    /**
-     * May send null to use floating default. <br><br><b>Permissions Needed:</b> USERS_SUBSCRIPTIONS_ADMIN or owner
-     * @summary Set the payment method to use for a subscription
-     * @param userId The id of the user
-     * @param inventoryId The id of the user&#39;s inventory
-     * @param paymentMethodId The id of the payment method
-     */
-    public setSubscriptionPaymentMethod(userId: number, inventoryId: number, paymentMethodId?: IntWrapper, extraHttpRequestParams?: any): Observable<{}> {
-        return this.setSubscriptionPaymentMethodWithHttpInfo(userId, inventoryId, paymentMethodId, extraHttpRequestParams)
-            .map((response: Response) => {
-                if (response.status === 204) {
-                    return undefined;
-                } else {
-                    return response.json() || {};
-                }
-            });
-    }
-
-    /**
-     * Note that the new status may be blocked if the system is not configured to allow the current status to be changed to the new, to enforce proper flow. The default options for statuses are shown below but may be altered for special use cases. <br><br><b>Permissions Needed:</b> USERS_SUBSCRIPTIONS_ADMIN or owner
-     * @summary Set the status of a subscription
-     * @param userId The id of the user
-     * @param inventoryId The id of the user&#39;s inventory
-     * @param status The new status for the subscription
-     */
-    public setSubscriptionStatus(userId: number, inventoryId: number, status: SubscriptionStatusWrapper, extraHttpRequestParams?: any): Observable<{}> {
-        return this.setSubscriptionStatusWithHttpInfo(userId, inventoryId, status, extraHttpRequestParams)
-            .map((response: Response) => {
-                if (response.status === 204) {
-                    return undefined;
-                } else {
-                    return response.json() || {};
-                }
-            });
-    }
-
-    /**
-     * <b>Permissions Needed:</b> USERS_SUBSCRIPTIONS_ADMIN
-     * @summary Set a new subscription plan for a user
-     * @param userId The id of the user
-     * @param inventoryId The id of the user&#39;s inventory
-     * @param planId The id of the new plan. Must be from the same subscription
-     */
-    public setUserSubscriptionPlan(userId: number, inventoryId: number, planId?: StringWrapper, extraHttpRequestParams?: any): Observable<{}> {
-        return this.setUserSubscriptionPlanWithHttpInfo(userId, inventoryId, planId, extraHttpRequestParams)
-            .map((response: Response) => {
-                if (response.status === 204) {
-                    return undefined;
-                } else {
-                    return response.json() || {};
-                }
-            });
-    }
-
-    /**
-     * This new price will be what the user is charged at the begining of each new period. This override is specific to the current subscription and will not carry over if they end and later re-subscribe. It will persist if the plan is changed using the setUserSubscriptionPlan endpoint. <br><br><b>Permissions Needed:</b> USERS_SUBSCRIPTIONS_ADMIN
-     * @summary Set a new subscription price for a user
-     * @param userId The id of the user
-     * @param inventoryId The id of the user&#39;s inventory
-     * @param override The override details
-     */
-    public setUserSubscriptionPrice(userId: number, inventoryId: number, override?: SubscriptionPriceOverrideRequest, extraHttpRequestParams?: any): Observable<{}> {
-        return this.setUserSubscriptionPriceWithHttpInfo(userId, inventoryId, override, extraHttpRequestParams)
-            .map((response: Response) => {
-                if (response.status === 204) {
-                    return undefined;
-                } else {
-                    return response.json() || {};
-                }
-            });
     }
 
 
@@ -226,115 +68,115 @@ export class UsersSubscriptionsService {
      * &lt;b&gt;Permissions Needed:&lt;/b&gt; USERS_SUBSCRIPTIONS_ADMIN or owner
      * @param userId The id of the user
      * @param inventoryId The id of the user&#39;s inventory
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
      */
-    public getUserSubscriptionDetailsWithHttpInfo(userId: number, inventoryId: number, extraHttpRequestParams?: any): Observable<Response> {
-        const path = this.basePath + '/users/${user_id}/subscriptions/${inventory_id}'
-                    .replace('${' + 'user_id' + '}', String(userId))
-                    .replace('${' + 'inventory_id' + '}', String(inventoryId));
-
-        let queryParameters = new URLSearchParams();
-        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
-
-        // verify required parameter 'userId' is not null or undefined
+    public getUserSubscriptionDetails(userId: number, inventoryId: number, observe?: 'body', reportProgress?: boolean): Observable<InventorySubscriptionResource>;
+    public getUserSubscriptionDetails(userId: number, inventoryId: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<InventorySubscriptionResource>>;
+    public getUserSubscriptionDetails(userId: number, inventoryId: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<InventorySubscriptionResource>>;
+    public getUserSubscriptionDetails(userId: number, inventoryId: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
         if (userId === null || userId === undefined) {
             throw new Error('Required parameter userId was null or undefined when calling getUserSubscriptionDetails.');
         }
-        // verify required parameter 'inventoryId' is not null or undefined
         if (inventoryId === null || inventoryId === undefined) {
             throw new Error('Required parameter inventoryId was null or undefined when calling getUserSubscriptionDetails.');
         }
 
-        // to determine the Accept header
-        let produces: string[] = [
-            'application/json'
-        ];
+        let headers = this.defaultHeaders;
 
         // authentication (oauth2_client_credentials_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
         // authentication (oauth2_password_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-            
-        let requestOptions: RequestOptionsArgs = new RequestOptions({
-            method: RequestMethod.Get,
-            headers: headers,
-            search: queryParameters,
-            withCredentials:this.configuration.withCredentials
-        });
-        // https://github.com/swagger-api/swagger-codegen/issues/4037
-        if (extraHttpRequestParams) {
-            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
+        // to determine the Accept header
+        let httpHeaderAccepts: string[] = [
+            'application/json'
+        ];
+        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers = headers.set('Accept', httpHeaderAcceptSelected);
         }
 
-        return this.http.request(path, requestOptions);
+        // to determine the Content-Type header
+        const consumes: string[] = [
+        ];
+
+        return this.httpClient.get<InventorySubscriptionResource>(`${this.basePath}/users/${encodeURIComponent(String(userId))}/subscriptions/${encodeURIComponent(String(inventoryId))}`,
+            {
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
     }
 
     /**
      * Get details about a user&#39;s subscriptions
      * &lt;b&gt;Permissions Needed:&lt;/b&gt; USERS_SUBSCRIPTIONS_ADMIN or owner
      * @param userId The id of the user
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
      */
-    public getUsersSubscriptionDetailsWithHttpInfo(userId: number, extraHttpRequestParams?: any): Observable<Response> {
-        const path = this.basePath + '/users/${user_id}/subscriptions'
-                    .replace('${' + 'user_id' + '}', String(userId));
-
-        let queryParameters = new URLSearchParams();
-        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
-
-        // verify required parameter 'userId' is not null or undefined
+    public getUsersSubscriptionDetails(userId: number, observe?: 'body', reportProgress?: boolean): Observable<Array<InventorySubscriptionResource>>;
+    public getUsersSubscriptionDetails(userId: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Array<InventorySubscriptionResource>>>;
+    public getUsersSubscriptionDetails(userId: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Array<InventorySubscriptionResource>>>;
+    public getUsersSubscriptionDetails(userId: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
         if (userId === null || userId === undefined) {
             throw new Error('Required parameter userId was null or undefined when calling getUsersSubscriptionDetails.');
         }
 
-        // to determine the Accept header
-        let produces: string[] = [
-            'application/json'
-        ];
+        let headers = this.defaultHeaders;
 
         // authentication (oauth2_client_credentials_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
         // authentication (oauth2_password_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-            
-        let requestOptions: RequestOptionsArgs = new RequestOptions({
-            method: RequestMethod.Get,
-            headers: headers,
-            search: queryParameters,
-            withCredentials:this.configuration.withCredentials
-        });
-        // https://github.com/swagger-api/swagger-codegen/issues/4037
-        if (extraHttpRequestParams) {
-            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
+        // to determine the Accept header
+        let httpHeaderAccepts: string[] = [
+            'application/json'
+        ];
+        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers = headers.set('Accept', httpHeaderAcceptSelected);
         }
 
-        return this.http.request(path, requestOptions);
+        // to determine the Content-Type header
+        const consumes: string[] = [
+        ];
+
+        return this.httpClient.get<Array<InventorySubscriptionResource>>(`${this.basePath}/users/${encodeURIComponent(String(userId))}/subscriptions`,
+            {
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
     }
 
     /**
@@ -343,63 +185,65 @@ export class UsersSubscriptionsService {
      * @param userId The id of the user
      * @param inventoryId The id of the user&#39;s inventory
      * @param reactivateSubscriptionRequest The reactivate subscription request object inventory
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
      */
-    public reactivateUserSubscriptionWithHttpInfo(userId: number, inventoryId: number, reactivateSubscriptionRequest?: ReactivateSubscriptionRequest, extraHttpRequestParams?: any): Observable<Response> {
-        const path = this.basePath + '/users/${user_id}/subscriptions/${inventory_id}/reactivate'
-                    .replace('${' + 'user_id' + '}', String(userId))
-                    .replace('${' + 'inventory_id' + '}', String(inventoryId));
-
-        let queryParameters = new URLSearchParams();
-        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
-
-        // verify required parameter 'userId' is not null or undefined
+    public reactivateUserSubscription(userId: number, inventoryId: number, reactivateSubscriptionRequest?: ReactivateSubscriptionRequest, observe?: 'body', reportProgress?: boolean): Observable<InvoiceResource>;
+    public reactivateUserSubscription(userId: number, inventoryId: number, reactivateSubscriptionRequest?: ReactivateSubscriptionRequest, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<InvoiceResource>>;
+    public reactivateUserSubscription(userId: number, inventoryId: number, reactivateSubscriptionRequest?: ReactivateSubscriptionRequest, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<InvoiceResource>>;
+    public reactivateUserSubscription(userId: number, inventoryId: number, reactivateSubscriptionRequest?: ReactivateSubscriptionRequest, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
         if (userId === null || userId === undefined) {
             throw new Error('Required parameter userId was null or undefined when calling reactivateUserSubscription.');
         }
-        // verify required parameter 'inventoryId' is not null or undefined
         if (inventoryId === null || inventoryId === undefined) {
             throw new Error('Required parameter inventoryId was null or undefined when calling reactivateUserSubscription.');
         }
 
-        // to determine the Accept header
-        let produces: string[] = [
-            'application/json'
-        ];
+        let headers = this.defaultHeaders;
 
         // authentication (oauth2_client_credentials_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
         // authentication (oauth2_password_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-            
-        headers.set('Content-Type', 'application/json');
-
-        let requestOptions: RequestOptionsArgs = new RequestOptions({
-            method: RequestMethod.Post,
-            headers: headers,
-            body: reactivateSubscriptionRequest == null ? '' : JSON.stringify(reactivateSubscriptionRequest), // https://github.com/angular/angular/issues/10612
-            search: queryParameters,
-            withCredentials:this.configuration.withCredentials
-        });
-        // https://github.com/swagger-api/swagger-codegen/issues/4037
-        if (extraHttpRequestParams) {
-            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
+        // to determine the Accept header
+        let httpHeaderAccepts: string[] = [
+            'application/json'
+        ];
+        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers = headers.set('Accept', httpHeaderAcceptSelected);
         }
 
-        return this.http.request(path, requestOptions);
+        // to determine the Content-Type header
+        const consumes: string[] = [
+            'application/json'
+        ];
+        const httpContentTypeSelected: string | undefined = this.configuration.selectHeaderContentType(consumes);
+        if (httpContentTypeSelected != undefined) {
+            headers = headers.set('Content-Type', httpContentTypeSelected);
+        }
+
+        return this.httpClient.post<InvoiceResource>(`${this.basePath}/users/${encodeURIComponent(String(userId))}/subscriptions/${encodeURIComponent(String(inventoryId))}/reactivate`,
+            reactivateSubscriptionRequest,
+            {
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
     }
 
     /**
@@ -408,67 +252,68 @@ export class UsersSubscriptionsService {
      * @param userId The id of the user
      * @param inventoryId The id of the user&#39;s inventory
      * @param billDate The new bill date. Unix timestamp in seconds
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
      */
-    public setSubscriptionBillDateWithHttpInfo(userId: number, inventoryId: number, billDate: number, extraHttpRequestParams?: any): Observable<Response> {
-        const path = this.basePath + '/users/${user_id}/subscriptions/${inventory_id}/bill-date'
-                    .replace('${' + 'user_id' + '}', String(userId))
-                    .replace('${' + 'inventory_id' + '}', String(inventoryId));
-
-        let queryParameters = new URLSearchParams();
-        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
-
-        // verify required parameter 'userId' is not null or undefined
+    public setSubscriptionBillDate(userId: number, inventoryId: number, billDate: number, observe?: 'body', reportProgress?: boolean): Observable<any>;
+    public setSubscriptionBillDate(userId: number, inventoryId: number, billDate: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
+    public setSubscriptionBillDate(userId: number, inventoryId: number, billDate: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
+    public setSubscriptionBillDate(userId: number, inventoryId: number, billDate: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
         if (userId === null || userId === undefined) {
             throw new Error('Required parameter userId was null or undefined when calling setSubscriptionBillDate.');
         }
-        // verify required parameter 'inventoryId' is not null or undefined
         if (inventoryId === null || inventoryId === undefined) {
             throw new Error('Required parameter inventoryId was null or undefined when calling setSubscriptionBillDate.');
         }
-        // verify required parameter 'billDate' is not null or undefined
         if (billDate === null || billDate === undefined) {
             throw new Error('Required parameter billDate was null or undefined when calling setSubscriptionBillDate.');
         }
 
-        // to determine the Accept header
-        let produces: string[] = [
-            'application/json'
-        ];
+        let headers = this.defaultHeaders;
 
         // authentication (oauth2_client_credentials_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
         // authentication (oauth2_password_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-            
-        headers.set('Content-Type', 'application/json');
-
-        let requestOptions: RequestOptionsArgs = new RequestOptions({
-            method: RequestMethod.Put,
-            headers: headers,
-            body: billDate == null ? '' : JSON.stringify(billDate), // https://github.com/angular/angular/issues/10612
-            search: queryParameters,
-            withCredentials:this.configuration.withCredentials
-        });
-        // https://github.com/swagger-api/swagger-codegen/issues/4037
-        if (extraHttpRequestParams) {
-            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
+        // to determine the Accept header
+        let httpHeaderAccepts: string[] = [
+            'application/json'
+        ];
+        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers = headers.set('Accept', httpHeaderAcceptSelected);
         }
 
-        return this.http.request(path, requestOptions);
+        // to determine the Content-Type header
+        const consumes: string[] = [
+            'application/json'
+        ];
+        const httpContentTypeSelected: string | undefined = this.configuration.selectHeaderContentType(consumes);
+        if (httpContentTypeSelected != undefined) {
+            headers = headers.set('Content-Type', httpContentTypeSelected);
+        }
+
+        return this.httpClient.put<any>(`${this.basePath}/users/${encodeURIComponent(String(userId))}/subscriptions/${encodeURIComponent(String(inventoryId))}/bill-date`,
+            billDate,
+            {
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
     }
 
     /**
@@ -477,63 +322,65 @@ export class UsersSubscriptionsService {
      * @param userId The id of the user
      * @param inventoryId The id of the user&#39;s inventory
      * @param paymentMethodId The id of the payment method
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
      */
-    public setSubscriptionPaymentMethodWithHttpInfo(userId: number, inventoryId: number, paymentMethodId?: IntWrapper, extraHttpRequestParams?: any): Observable<Response> {
-        const path = this.basePath + '/users/${user_id}/subscriptions/${inventory_id}/payment-method'
-                    .replace('${' + 'user_id' + '}', String(userId))
-                    .replace('${' + 'inventory_id' + '}', String(inventoryId));
-
-        let queryParameters = new URLSearchParams();
-        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
-
-        // verify required parameter 'userId' is not null or undefined
+    public setSubscriptionPaymentMethod(userId: number, inventoryId: number, paymentMethodId?: IntWrapper, observe?: 'body', reportProgress?: boolean): Observable<any>;
+    public setSubscriptionPaymentMethod(userId: number, inventoryId: number, paymentMethodId?: IntWrapper, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
+    public setSubscriptionPaymentMethod(userId: number, inventoryId: number, paymentMethodId?: IntWrapper, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
+    public setSubscriptionPaymentMethod(userId: number, inventoryId: number, paymentMethodId?: IntWrapper, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
         if (userId === null || userId === undefined) {
             throw new Error('Required parameter userId was null or undefined when calling setSubscriptionPaymentMethod.');
         }
-        // verify required parameter 'inventoryId' is not null or undefined
         if (inventoryId === null || inventoryId === undefined) {
             throw new Error('Required parameter inventoryId was null or undefined when calling setSubscriptionPaymentMethod.');
         }
 
-        // to determine the Accept header
-        let produces: string[] = [
-            'application/json'
-        ];
+        let headers = this.defaultHeaders;
 
         // authentication (oauth2_client_credentials_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
         // authentication (oauth2_password_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-            
-        headers.set('Content-Type', 'application/json');
-
-        let requestOptions: RequestOptionsArgs = new RequestOptions({
-            method: RequestMethod.Put,
-            headers: headers,
-            body: paymentMethodId == null ? '' : JSON.stringify(paymentMethodId), // https://github.com/angular/angular/issues/10612
-            search: queryParameters,
-            withCredentials:this.configuration.withCredentials
-        });
-        // https://github.com/swagger-api/swagger-codegen/issues/4037
-        if (extraHttpRequestParams) {
-            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
+        // to determine the Accept header
+        let httpHeaderAccepts: string[] = [
+            'application/json'
+        ];
+        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers = headers.set('Accept', httpHeaderAcceptSelected);
         }
 
-        return this.http.request(path, requestOptions);
+        // to determine the Content-Type header
+        const consumes: string[] = [
+            'application/json'
+        ];
+        const httpContentTypeSelected: string | undefined = this.configuration.selectHeaderContentType(consumes);
+        if (httpContentTypeSelected != undefined) {
+            headers = headers.set('Content-Type', httpContentTypeSelected);
+        }
+
+        return this.httpClient.put<any>(`${this.basePath}/users/${encodeURIComponent(String(userId))}/subscriptions/${encodeURIComponent(String(inventoryId))}/payment-method`,
+            paymentMethodId,
+            {
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
     }
 
     /**
@@ -542,67 +389,68 @@ export class UsersSubscriptionsService {
      * @param userId The id of the user
      * @param inventoryId The id of the user&#39;s inventory
      * @param status The new status for the subscription
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
      */
-    public setSubscriptionStatusWithHttpInfo(userId: number, inventoryId: number, status: SubscriptionStatusWrapper, extraHttpRequestParams?: any): Observable<Response> {
-        const path = this.basePath + '/users/${user_id}/subscriptions/${inventory_id}/status'
-                    .replace('${' + 'user_id' + '}', String(userId))
-                    .replace('${' + 'inventory_id' + '}', String(inventoryId));
-
-        let queryParameters = new URLSearchParams();
-        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
-
-        // verify required parameter 'userId' is not null or undefined
+    public setSubscriptionStatus(userId: number, inventoryId: number, status: SubscriptionStatusWrapper, observe?: 'body', reportProgress?: boolean): Observable<any>;
+    public setSubscriptionStatus(userId: number, inventoryId: number, status: SubscriptionStatusWrapper, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
+    public setSubscriptionStatus(userId: number, inventoryId: number, status: SubscriptionStatusWrapper, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
+    public setSubscriptionStatus(userId: number, inventoryId: number, status: SubscriptionStatusWrapper, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
         if (userId === null || userId === undefined) {
             throw new Error('Required parameter userId was null or undefined when calling setSubscriptionStatus.');
         }
-        // verify required parameter 'inventoryId' is not null or undefined
         if (inventoryId === null || inventoryId === undefined) {
             throw new Error('Required parameter inventoryId was null or undefined when calling setSubscriptionStatus.');
         }
-        // verify required parameter 'status' is not null or undefined
         if (status === null || status === undefined) {
             throw new Error('Required parameter status was null or undefined when calling setSubscriptionStatus.');
         }
 
-        // to determine the Accept header
-        let produces: string[] = [
-            'application/json'
-        ];
+        let headers = this.defaultHeaders;
 
         // authentication (oauth2_client_credentials_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
         // authentication (oauth2_password_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-            
-        headers.set('Content-Type', 'application/json');
-
-        let requestOptions: RequestOptionsArgs = new RequestOptions({
-            method: RequestMethod.Put,
-            headers: headers,
-            body: status == null ? '' : JSON.stringify(status), // https://github.com/angular/angular/issues/10612
-            search: queryParameters,
-            withCredentials:this.configuration.withCredentials
-        });
-        // https://github.com/swagger-api/swagger-codegen/issues/4037
-        if (extraHttpRequestParams) {
-            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
+        // to determine the Accept header
+        let httpHeaderAccepts: string[] = [
+            'application/json'
+        ];
+        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers = headers.set('Accept', httpHeaderAcceptSelected);
         }
 
-        return this.http.request(path, requestOptions);
+        // to determine the Content-Type header
+        const consumes: string[] = [
+            'application/json'
+        ];
+        const httpContentTypeSelected: string | undefined = this.configuration.selectHeaderContentType(consumes);
+        if (httpContentTypeSelected != undefined) {
+            headers = headers.set('Content-Type', httpContentTypeSelected);
+        }
+
+        return this.httpClient.put<any>(`${this.basePath}/users/${encodeURIComponent(String(userId))}/subscriptions/${encodeURIComponent(String(inventoryId))}/status`,
+            status,
+            {
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
     }
 
     /**
@@ -611,63 +459,65 @@ export class UsersSubscriptionsService {
      * @param userId The id of the user
      * @param inventoryId The id of the user&#39;s inventory
      * @param planId The id of the new plan. Must be from the same subscription
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
      */
-    public setUserSubscriptionPlanWithHttpInfo(userId: number, inventoryId: number, planId?: StringWrapper, extraHttpRequestParams?: any): Observable<Response> {
-        const path = this.basePath + '/users/${user_id}/subscriptions/${inventory_id}/plan'
-                    .replace('${' + 'user_id' + '}', String(userId))
-                    .replace('${' + 'inventory_id' + '}', String(inventoryId));
-
-        let queryParameters = new URLSearchParams();
-        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
-
-        // verify required parameter 'userId' is not null or undefined
+    public setUserSubscriptionPlan(userId: number, inventoryId: number, planId?: StringWrapper, observe?: 'body', reportProgress?: boolean): Observable<any>;
+    public setUserSubscriptionPlan(userId: number, inventoryId: number, planId?: StringWrapper, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
+    public setUserSubscriptionPlan(userId: number, inventoryId: number, planId?: StringWrapper, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
+    public setUserSubscriptionPlan(userId: number, inventoryId: number, planId?: StringWrapper, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
         if (userId === null || userId === undefined) {
             throw new Error('Required parameter userId was null or undefined when calling setUserSubscriptionPlan.');
         }
-        // verify required parameter 'inventoryId' is not null or undefined
         if (inventoryId === null || inventoryId === undefined) {
             throw new Error('Required parameter inventoryId was null or undefined when calling setUserSubscriptionPlan.');
         }
 
-        // to determine the Accept header
-        let produces: string[] = [
-            'application/json'
-        ];
+        let headers = this.defaultHeaders;
 
         // authentication (oauth2_client_credentials_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
         // authentication (oauth2_password_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-            
-        headers.set('Content-Type', 'application/json');
-
-        let requestOptions: RequestOptionsArgs = new RequestOptions({
-            method: RequestMethod.Put,
-            headers: headers,
-            body: planId == null ? '' : JSON.stringify(planId), // https://github.com/angular/angular/issues/10612
-            search: queryParameters,
-            withCredentials:this.configuration.withCredentials
-        });
-        // https://github.com/swagger-api/swagger-codegen/issues/4037
-        if (extraHttpRequestParams) {
-            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
+        // to determine the Accept header
+        let httpHeaderAccepts: string[] = [
+            'application/json'
+        ];
+        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers = headers.set('Accept', httpHeaderAcceptSelected);
         }
 
-        return this.http.request(path, requestOptions);
+        // to determine the Content-Type header
+        const consumes: string[] = [
+            'application/json'
+        ];
+        const httpContentTypeSelected: string | undefined = this.configuration.selectHeaderContentType(consumes);
+        if (httpContentTypeSelected != undefined) {
+            headers = headers.set('Content-Type', httpContentTypeSelected);
+        }
+
+        return this.httpClient.put<any>(`${this.basePath}/users/${encodeURIComponent(String(userId))}/subscriptions/${encodeURIComponent(String(inventoryId))}/plan`,
+            planId,
+            {
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
     }
 
     /**
@@ -676,63 +526,65 @@ export class UsersSubscriptionsService {
      * @param userId The id of the user
      * @param inventoryId The id of the user&#39;s inventory
      * @param override The override details
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
      */
-    public setUserSubscriptionPriceWithHttpInfo(userId: number, inventoryId: number, override?: SubscriptionPriceOverrideRequest, extraHttpRequestParams?: any): Observable<Response> {
-        const path = this.basePath + '/users/${user_id}/subscriptions/${inventory_id}/price-override'
-                    .replace('${' + 'user_id' + '}', String(userId))
-                    .replace('${' + 'inventory_id' + '}', String(inventoryId));
-
-        let queryParameters = new URLSearchParams();
-        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
-
-        // verify required parameter 'userId' is not null or undefined
+    public setUserSubscriptionPrice(userId: number, inventoryId: number, override?: SubscriptionPriceOverrideRequest, observe?: 'body', reportProgress?: boolean): Observable<any>;
+    public setUserSubscriptionPrice(userId: number, inventoryId: number, override?: SubscriptionPriceOverrideRequest, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
+    public setUserSubscriptionPrice(userId: number, inventoryId: number, override?: SubscriptionPriceOverrideRequest, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
+    public setUserSubscriptionPrice(userId: number, inventoryId: number, override?: SubscriptionPriceOverrideRequest, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
         if (userId === null || userId === undefined) {
             throw new Error('Required parameter userId was null or undefined when calling setUserSubscriptionPrice.');
         }
-        // verify required parameter 'inventoryId' is not null or undefined
         if (inventoryId === null || inventoryId === undefined) {
             throw new Error('Required parameter inventoryId was null or undefined when calling setUserSubscriptionPrice.');
         }
 
-        // to determine the Accept header
-        let produces: string[] = [
-            'application/json'
-        ];
+        let headers = this.defaultHeaders;
 
         // authentication (oauth2_client_credentials_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
         // authentication (oauth2_password_grant) required
-        // oauth required
         if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
+            const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-            
-        headers.set('Content-Type', 'application/json');
-
-        let requestOptions: RequestOptionsArgs = new RequestOptions({
-            method: RequestMethod.Put,
-            headers: headers,
-            body: override == null ? '' : JSON.stringify(override), // https://github.com/angular/angular/issues/10612
-            search: queryParameters,
-            withCredentials:this.configuration.withCredentials
-        });
-        // https://github.com/swagger-api/swagger-codegen/issues/4037
-        if (extraHttpRequestParams) {
-            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
+        // to determine the Accept header
+        let httpHeaderAccepts: string[] = [
+            'application/json'
+        ];
+        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers = headers.set('Accept', httpHeaderAcceptSelected);
         }
 
-        return this.http.request(path, requestOptions);
+        // to determine the Content-Type header
+        const consumes: string[] = [
+            'application/json'
+        ];
+        const httpContentTypeSelected: string | undefined = this.configuration.selectHeaderContentType(consumes);
+        if (httpContentTypeSelected != undefined) {
+            headers = headers.set('Content-Type', httpContentTypeSelected);
+        }
+
+        return this.httpClient.put<any>(`${this.basePath}/users/${encodeURIComponent(String(userId))}/subscriptions/${encodeURIComponent(String(inventoryId))}/price-override`,
+            override,
+            {
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
     }
 
 }

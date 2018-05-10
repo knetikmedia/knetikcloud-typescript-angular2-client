@@ -9,28 +9,18 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
-
 import { Order } from './order';
 import { PermissionResource } from './permissionResource';
 
 
-export interface PageResourcePermissionResource {
+export interface PageResourcePermissionResource { 
     content?: Array<PermissionResource>;
-
     first?: boolean;
-
     last?: boolean;
-
     number?: number;
-
     numberOfElements?: number;
-
     size?: number;
-
     sort?: Array<Order>;
-
     totalElements?: number;
-
     totalPages?: number;
-
 }

@@ -11,16 +11,13 @@
  */
 
 
-
-export interface ChatMessageRequest {
+export interface ChatMessageRequest { 
     /**
      * The content of the message
      */
     content: any;
-
     /**
      * The type of the message set by the client
      */
     messageType: string;
-
 }

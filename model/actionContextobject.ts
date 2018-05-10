@@ -11,16 +11,13 @@
  */
 
 
-
-export interface ActionContextobject {
+export interface ActionContextobject { 
     /**
      * The mapping of the action context
      */
     mapping: any;
-
     /**
      * The name of the action
      */
     type: string;
-
 }

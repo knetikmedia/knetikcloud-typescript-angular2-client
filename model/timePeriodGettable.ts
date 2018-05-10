@@ -9,29 +9,24 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
-
 import { Behavior } from './behavior';
 
 
-export interface TimePeriodGettable extends Behavior {
+export interface TimePeriodGettable extends Behavior { 
     /**
      * The time period limit
      */
     getLimit: number;
-
     /**
      * The name of a group of items. Multiple items with the same group name will be limited together, leave null to be assigned a random unique name. It is typical that the other properties here will be the same for all, but this is not enforced and the item being recieved will use its settings.
      */
     groupName?: string;
-
     /**
      * The length of time
      */
     timeLength: number;
-
     /**
      * The unit of time
      */
     unitOfTime: string;
-
 }

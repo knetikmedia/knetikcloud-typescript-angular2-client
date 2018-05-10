@@ -11,11 +11,9 @@
  */
 
 
-
-export interface Property {
+export interface Property { 
     /**
      * The type of the property. Used for polymorphic type recognition and thus must match an expected type with additional properties.
      */
     type: string;
-
 }

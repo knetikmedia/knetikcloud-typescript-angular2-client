@@ -11,16 +11,13 @@
  */
 
 
-
-export interface SimpleGroupResource {
+export interface SimpleGroupResource { 
     /**
      * The name of the group. Max 50 characters
      */
     name: string;
-
     /**
      * Unique name used in url and references. Uppercase, lowercase, numbers and hyphens only. Max 50 characters. Cannot be altered once created. Default: random UUID
      */
     uniqueName?: string;
-
 }

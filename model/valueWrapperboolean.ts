@@ -11,8 +11,6 @@
  */
 
 
-
-export interface ValueWrapperboolean {
+export interface ValueWrapperboolean { 
     value?: boolean;
-
 }

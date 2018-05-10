@@ -11,26 +11,21 @@
  */
 
 
-
-export interface InvoiceLogEntry {
+export interface InvoiceLogEntry { 
     /**
      * The date this event occurred as a unix timestamp in seconds
      */
     date?: number;
-
     /**
      * The ID of the invoice
      */
     invoiceId?: number;
-
     /**
      * A message describing the event
      */
     message?: string;
-
     /**
      * The type of event
      */
     type?: string;
-
 }

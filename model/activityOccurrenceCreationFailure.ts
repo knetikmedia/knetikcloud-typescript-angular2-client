@@ -9,14 +9,12 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
-
 import { ActivityOccurrenceJoinResult } from './activityOccurrenceJoinResult';
 
 
-export interface ActivityOccurrenceCreationFailure {
+export interface ActivityOccurrenceCreationFailure { 
     /**
      * The details of each user's entry, or just the current user's if not run with ACTIVITIES_ADMIN permission
      */
     userResults?: Array<ActivityOccurrenceJoinResult>;
-
 }

@@ -11,14 +11,9 @@
  */
 
 
-
-export interface AggregateInvoiceReportResource {
+export interface AggregateInvoiceReportResource { 
     count?: number;
-
     date?: string;
-
     revenue?: number;
-
     userCount?: number;
-
 }

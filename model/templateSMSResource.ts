@@ -11,26 +11,21 @@
  */
 
 
-
-export interface TemplateSMSResource {
+export interface TemplateSMSResource { 
     /**
      * The phone number to attribute the outgoing message to. Optional if the config text.out_number is set.
      */
     from?: string;
-
     /**
      * A list of user ids to send the message to.
      */
     recipients: Array<number>;
-
     /**
      * A mustache template
      */
     template: string;
-
     /**
      * A map of values to fill in the template
      */
     templateVars?: any;
-
 }

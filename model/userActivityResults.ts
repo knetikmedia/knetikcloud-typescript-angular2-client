@@ -9,51 +9,42 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
-
 import { RewardCurrencyResource } from './rewardCurrencyResource';
 import { RewardItemResource } from './rewardItemResource';
 import { SimpleUserResource } from './simpleUserResource';
 
 
-export interface UserActivityResults {
+export interface UserActivityResults { 
     /**
      * Any currency rewarded to this user
      */
-    currencyRewards?: Array<RewardCurrencyResource>;
-
+    readonly currencyRewards?: Array<RewardCurrencyResource>;
     /**
      * Any items rewarded to this user
      */
-    itemRewards?: Array<RewardItemResource>;
-
+    readonly itemRewards?: Array<RewardItemResource>;
     /**
      * The position of the user in the leaderboard. Null means non-compete or disqualification
      */
     rank?: number;
-
     /**
      * The raw score in this leaderboard. Null means non-compete or disqualification
      */
     score?: number;
-
     /**
      * Any tags for the metric. Each unique tag will translate into a unique leaderboard. Maximum 10 tags and 50 characters each
      */
     tags?: Array<string>;
-
     /**
      * The number of users tied at this rank, including this user. 1 means no tie
      */
-    ties?: number;
-
+    readonly ties?: number;
     /**
      * The date this score was recorded or updated. Unix timestamp in seconds
      */
     updatedDate?: number;
-
     /**
      * The player for this entry
      */
     user: SimpleUserResource;
-
 }

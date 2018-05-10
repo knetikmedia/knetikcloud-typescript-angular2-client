@@ -11,62 +11,52 @@
  */
 
 
-
-export interface ChatMessageResource {
+export interface ChatMessageResource { 
     /**
      * The content of the message
      */
     content: any;
-
     /**
      * The date the chat message was created
      */
-    createdDate?: number;
-
+    readonly createdDate?: number;
     /**
      * Whether the message has been edited
      */
-    edited?: boolean;
-
+    readonly edited?: boolean;
     /**
      * The id for this message
      */
-    id?: string;
-
+    readonly id?: string;
     /**
      * The type of the message set by the client
      */
     messageType: string;
-
     /**
      * The id of the recipient: user id or topic id
      */
     recipientId: string;
-
     /**
      * The recipient type of the message
      */
     recipientType: ChatMessageResource.RecipientTypeEnum;
-
     /**
      * The id of the sender
      */
-    senderId?: number;
-
+    readonly senderId?: number;
     /**
      * The id of the thread
      */
-    threadId?: string;
-
+    readonly threadId?: string;
     /**
      * The date the chat message was updated
      */
-    updatedDate?: number;
-
+    readonly updatedDate?: number;
 }
 export namespace ChatMessageResource {
-    export enum RecipientTypeEnum {
-        User = <any> 'user',
-        Topic = <any> 'topic'
-    }
+    export type RecipientTypeEnum = 'user' | 'topic';
+    export const RecipientTypeEnum = {
+        User: 'user' as RecipientTypeEnum,
+        Topic: 'topic' as RecipientTypeEnum
+    };
 }

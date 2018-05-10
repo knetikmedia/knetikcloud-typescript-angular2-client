@@ -11,16 +11,13 @@
  */
 
 
-
-export interface MessageTemplateBulkRequest {
+export interface MessageTemplateBulkRequest { 
     /**
      * The data to fill the templates with
      */
     data: any;
-
     /**
      * A list of message template ids
      */
     ids: Array<string>;
-
 }

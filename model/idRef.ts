@@ -11,8 +11,6 @@
  */
 
 
-
-export interface IdRef {
+export interface IdRef { 
     id?: number;
-
 }

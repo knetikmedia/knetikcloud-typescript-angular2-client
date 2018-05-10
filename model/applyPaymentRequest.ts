@@ -11,21 +11,17 @@
  */
 
 
-
-export interface ApplyPaymentRequest {
+export interface ApplyPaymentRequest { 
     /**
      * The id of the local invoice being paid.
      */
     invoiceId: number;
-
     /**
      * The encoded receipt string from Apple's services.
      */
     receipt: string;
-
     /**
      * The id of the specific transaction from Apple's services.
      */
     transactionId: string;
-
 }

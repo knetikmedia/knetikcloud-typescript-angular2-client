@@ -9,10 +9,9 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
-
 import { FileGroupProperty } from './fileGroupProperty';
 import { FileProperty } from './fileProperty';
 
 
-export interface VideoGroupProperty extends FileGroupProperty {
+export interface VideoGroupProperty extends FileGroupProperty { 
 }

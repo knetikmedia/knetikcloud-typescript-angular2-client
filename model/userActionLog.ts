@@ -11,41 +11,33 @@
  */
 
 
-
-export interface UserActionLog {
+export interface UserActionLog { 
     /**
      * A description of the action taken
      */
     actionDescription: string;
-
     /**
      * The name of the action taken
      */
     actionName: string;
-
     /**
      * The date of the action, unix timestamp in seconds
      */
-    createdDate?: number;
-
+    readonly createdDate?: number;
     /**
      * A map of additional details such as the target of the action
      */
     details?: { [key: string]: string; };
-
     /**
      * The id of the log entry
      */
-    id?: string;
-
+    readonly id?: string;
     /**
      * The id of the api request that spawned the action, if generated internally
      */
-    requestId?: string;
-
+    readonly requestId?: string;
     /**
      * The id of the user that took the action, if any. Read-only if not posting with LOGS_ADMIN
      */
     userId?: number;
-
 }

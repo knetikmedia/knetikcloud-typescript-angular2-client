@@ -11,26 +11,21 @@
  */
 
 
-
-export interface TopicSubscriberResource {
+export interface TopicSubscriberResource { 
     /**
      * Whether the user has disabled messages from the topic
      */
     disabled?: boolean;
-
     /**
      * The ID for this topic
      */
     topicId: string;
-
     /**
      * The user ID subscribed to the topic
      */
     userId?: number;
-
     /**
      * The username subscribed to the topic
      */
     username?: string;
-
 }

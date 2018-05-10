@@ -9,28 +9,18 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
-
 import { Order } from './order';
 import { UserInventoryResource } from './userInventoryResource';
 
 
-export interface PageResourceUserInventoryResource {
+export interface PageResourceUserInventoryResource { 
     content?: Array<UserInventoryResource>;
-
     first?: boolean;
-
     last?: boolean;
-
     number?: number;
-
     numberOfElements?: number;
-
     size?: number;
-
     sort?: Array<Order>;
-
     totalElements?: number;
-
     totalPages?: number;
-
 }

@@ -11,68 +11,54 @@
  */
 
 
-
-export interface SavedAddressResource {
+export interface SavedAddressResource { 
     /**
      * The first line of the address
      */
     address1: string;
-
     /**
      * A second line of the address
      */
     address2?: string;
-
     /**
      * The city
      */
     city: string;
-
     /**
      * The iso3 code for the country
      */
     countryCode: string;
-
-    default?: boolean;
-
+    _default?: boolean;
     /**
      * The first name of the user
      */
     firstName: string;
-
     /**
      * The id of the address
      */
-    id?: number;
-
+    readonly id?: number;
     /**
      * The last name of the user
      */
     lastName: string;
-
     /**
      * The name of the address
      */
     name: string;
-
     /**
      * The first phone number of the user
      */
     phone1?: string;
-
     /**
      * The second phone number of the user
      */
     phone2?: string;
-
     /**
      * The postal code
      */
     postalCode?: string;
-
     /**
      * The code for the state. Required if the country has states/provinces/equivalent
      */
     stateCode?: string;
-
 }

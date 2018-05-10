@@ -11,14 +11,9 @@
  */
 
 
-
-export interface S3Config {
+export interface S3Config { 
     bucketName?: string;
-
     cdnUrl?: string;
-
     region?: string;
-
     uploadPrefix?: string;
-
 }

@@ -9,29 +9,24 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
-
 import { BatchReturn } from './batchReturn';
 
 
-export interface BatchResult {
+export interface BatchResult { 
     /**
      * List of batch responses.  Returns in the order requested
      */
-    batchReturn?: Array<BatchReturn>;
-
+    readonly batchReturn?: Array<BatchReturn>;
     /**
      * The date the batch call started processing
      */
-    createdDate?: number;
-
+    readonly createdDate?: number;
     /**
      * The token to use at the /batch/{token} endpoint if the request times out
      */
-    id?: string;
-
+    readonly id?: string;
     /**
      * The date the batch call finished processing
      */
-    updatedDate?: number;
-
+    readonly updatedDate?: number;
 }

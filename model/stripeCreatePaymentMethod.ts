@@ -9,24 +9,20 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
-
 import { PaymentMethodDetails } from './paymentMethodDetails';
 
 
-export interface StripeCreatePaymentMethod {
+export interface StripeCreatePaymentMethod { 
     /**
      * Additional optional details to store on the payment method. If included, all fields in the details will override any defaults
      */
     details?: PaymentMethodDetails;
-
     /**
      * A token from Stripe to identify payment info to be tied to the customer
      */
     token: string;
-
     /**
      * The id of the user, if null the logged in user is used. Admin privilege need to specify other users
      */
     userId?: number;
-
 }

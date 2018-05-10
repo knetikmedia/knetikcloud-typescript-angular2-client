@@ -9,19 +9,16 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
-
 import { BatchRequest } from './batchRequest';
 
 
-export interface Batch {
+export interface Batch { 
     /**
      * The list of batch requests
      */
     batch: Array<BatchRequest>;
-
     /**
      * The amount of time before a request token is returned instead of the batch result.  Default is 60.  Range is 0-300
      */
     timeout: number;
-
 }

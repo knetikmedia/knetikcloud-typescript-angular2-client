@@ -9,19 +9,16 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
-
 import { Behavior } from './behavior';
 
 
-export interface PriceOverridable extends Behavior {
+export interface PriceOverridable extends Behavior { 
     /**
      * The maximum price allowed
      */
     maxPrice?: number;
-
     /**
      * The minimum price allowed
      */
     minPrice?: number;
-
 }

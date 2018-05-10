@@ -9,18 +9,13 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
-
 import { DatabaseConfig } from './databaseConfig';
 import { S3Config } from './s3Config';
 
 
-export interface CustomerConfig {
+export interface CustomerConfig { 
     aliases?: string;
-
     database?: DatabaseConfig;
-
     name?: string;
-
     s3Config?: S3Config;
-
 }

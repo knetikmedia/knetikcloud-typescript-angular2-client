@@ -11,14 +11,9 @@
  */
 
 
-
-export interface RevenueReportResource {
+export interface RevenueReportResource { 
     customerCount?: number;
-
     saleCount?: number;
-
     salesAverage?: number;
-
     salesTotal?: number;
-
 }

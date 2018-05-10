@@ -11,57 +11,48 @@
  */
 
 
-
-export interface CurrencyResource {
+export interface CurrencyResource { 
     /**
      * Whether the currency is active. Default true
      */
     active?: boolean;
-
     /**
      * The unique id code for the currency. Maximum 5 characters
      */
     code: string;
-
     /**
      * The unix timestamp in seconds the currency was added to the system
      */
-    createdDate?: number;
-
+    readonly createdDate?: number;
     /**
      * Whether this is the default currency. All real money wallets will be in this currency, and the 'factor' on each currency is in relation to the default. There must be one default currency and the current will be changed if you set another as the default. Cannot be combined with virtual currency. Take extreme caution when changing
      */
     defaultCurrency?: boolean;
-
     /**
      * The decimal to multiply the default currency to localize to this one. Should be 1 for the default currency itself.
      */
     factor: number;
-
     /**
      * The url for an icon of the currency
      */
     icon?: string;
-
     /**
      * The name of the currency
      */
     name: string;
-
     /**
      * The type of currency. Default 'real'
      */
     type?: CurrencyResource.TypeEnum;
-
     /**
      * The unix timestamp in seconds the currency was last updated in the system.
      */
-    updatedDate?: number;
-
+    readonly updatedDate?: number;
 }
 export namespace CurrencyResource {
-    export enum TypeEnum {
-        Real = <any> 'real',
-        Virtual = <any> 'virtual'
-    }
+    export type TypeEnum = 'real' | 'virtual';
+    export const TypeEnum = {
+        Real: 'real' as TypeEnum,
+        Virtual: 'virtual' as TypeEnum
+    };
 }

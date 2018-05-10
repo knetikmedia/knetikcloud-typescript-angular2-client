@@ -11,11 +11,9 @@
  */
 
 
-
-export interface EntitlementGrantRequest {
+export interface EntitlementGrantRequest { 
     /**
      * The ID of the entitlement item to grant
      */
     entitlementId: number;
-
 }

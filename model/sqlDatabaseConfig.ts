@@ -11,18 +11,11 @@
  */
 
 
-
-export interface SqlDatabaseConfig {
+export interface SqlDatabaseConfig { 
     connectionPoolSize?: number;
-
     dbName?: string;
-
     hostname?: string;
-
     password?: string;
-
     port?: number;
-
     username?: string;
-
 }

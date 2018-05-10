@@ -11,16 +11,10 @@
  */
 
 
-
-export interface Discount {
+export interface Discount { 
     description?: string;
-
     name?: string;
-
     sku?: string;
-
     uniqueKey?: string;
-
     value?: number;
-
 }

@@ -11,26 +11,21 @@
  */
 
 
-
-export interface MetricResource {
+export interface MetricResource { 
     /**
      * The id of the activity occurence where this score/metric occurred
      */
     activityOccurenceId: number;
-
     /**
      * Any tags for the metric. Each unique tag will translate into a unique leaderboard. Maximum 10 tags and 50 characters each
      */
     tags?: Array<string>;
-
     /**
      * The id of the user this metric is for. Default to caller and requires METRICS_ADMIN permission to specify another
      */
     userId?: number;
-
     /**
      * The value/score of the metric
      */
     value: number;
-
 }

@@ -9,28 +9,18 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
-
 import { Order } from './order';
 import { SavedAddressResource } from './savedAddressResource';
 
 
-export interface PageResourceSavedAddressResource {
+export interface PageResourceSavedAddressResource { 
     content?: Array<SavedAddressResource>;
-
     first?: boolean;
-
     last?: boolean;
-
     number?: number;
-
     numberOfElements?: number;
-
     size?: number;
-
     sort?: Array<Order>;
-
     totalElements?: number;
-
     totalPages?: number;
-
 }

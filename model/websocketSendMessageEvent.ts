@@ -9,13 +9,10 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
-
 import { BroadcastableEvent } from './broadcastableEvent';
 
 
-export interface WebsocketSendMessageEvent extends BroadcastableEvent {
+export interface WebsocketSendMessageEvent extends BroadcastableEvent { 
     content?: any;
-
     usernames?: Array<string>;
-
 }

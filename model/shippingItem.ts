@@ -9,29 +9,25 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
-
 import { Behavior } from './behavior';
 import { Property } from './property';
 import { Sku } from './sku';
 import { StoreItem } from './storeItem';
 
 
-export interface ShippingItem extends StoreItem {
+export interface ShippingItem extends StoreItem { 
     /**
      * A unique list of country iso3 codes that allow the shipping option
      */
     countries?: Array<string>;
-
     /**
      * An abstract max value that the values of item's shipping_tier work against to decide whether an order can be fulfilled
      */
     maxTierTotal: number;
-
     /**
      * Whether tax should be applied to the shipping price.  Default = false
      */
     taxable?: boolean;
-
 }
 export namespace ShippingItem {
 }

@@ -11,21 +11,17 @@
  */
 
 
-
-export interface RefundResource {
+export interface RefundResource { 
     /**
      * The amount refunded
      */
     amount?: number;
-
     /**
      * The id of the refund transaction
      */
     refundTransactionId?: number;
-
     /**
      * The id of the original transaction
      */
     transactionId?: number;
-
 }

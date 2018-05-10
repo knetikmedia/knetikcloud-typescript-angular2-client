@@ -9,12 +9,10 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
-
 import { Behavior } from './behavior';
 import { LimitedGettableGroup } from './limitedGettableGroup';
 
 
-export interface LimitedGettable extends Behavior {
+export interface LimitedGettable extends Behavior { 
     group?: LimitedGettableGroup;
-
 }

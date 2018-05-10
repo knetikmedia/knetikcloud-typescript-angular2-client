@@ -9,9 +9,8 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
-
 import { FileProperty } from './fileProperty';
 
 
-export interface ImageProperty extends FileProperty {
+export interface ImageProperty extends FileProperty { 
 }

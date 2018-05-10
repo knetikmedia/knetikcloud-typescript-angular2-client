@@ -11,22 +11,13 @@
  */
 
 
-
-export interface TopicSubscriber {
+export interface TopicSubscriber { 
     disabled?: boolean;
-
     email?: string;
-
     joinDate?: number;
-
     mobileNumber?: string;
-
     topicId?: string;
-
     topicSubscriberMap?: any;
-
     userId?: number;
-
     username?: string;
-
 }

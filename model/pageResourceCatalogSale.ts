@@ -9,28 +9,18 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
-
 import { CatalogSale } from './catalogSale';
 import { Order } from './order';
 
 
-export interface PageResourceCatalogSale {
+export interface PageResourceCatalogSale { 
     content?: Array<CatalogSale>;
-
     first?: boolean;
-
     last?: boolean;
-
     number?: number;
-
     numberOfElements?: number;
-
     size?: number;
-
     sort?: Array<Order>;
-
     totalElements?: number;
-
     totalPages?: number;
-
 }

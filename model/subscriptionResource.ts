@@ -9,131 +9,110 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
-
 import { Behavior } from './behavior';
 import { Property } from './property';
 import { SubscriptionPlanResource } from './subscriptionPlanResource';
 
 
-export interface SubscriptionResource {
+export interface SubscriptionResource { 
     /**
      * The additional properties for the subscription
      */
     additionalProperties?: { [key: string]: Property; };
-
     /**
      * Who can purchase this subscription
      */
     availability?: SubscriptionResource.AvailabilityEnum;
-
     /**
      * The behaviors linked to the item, describing various options and interactions. May not be included in item lists
      */
     behaviors?: Array<Behavior>;
-
     /**
      * The category of the subscription
      */
     category?: string;
-
     /**
      * The day of the month 1..31 this subscription will renew
      */
     consolidationDayOfMonth?: number;
-
     /**
      * The date the item was created, unix timestamp in seconds
      */
-    createdDate?: number;
-
+    readonly createdDate?: number;
     /**
      * Whether or not the item is currently visible to users. Does not block purchase; Use store_start or store_end to block purchase.  Default = true
      */
     displayable?: boolean;
-
     /**
      * The geo country list for the subscription
      */
     geoCountryList?: Array<string>;
-
     /**
      * The geo policy type for the subscription
      */
     geoPolicyType?: SubscriptionResource.GeoPolicyTypeEnum;
-
     /**
      * The id of the item
      */
-    id?: number;
-
+    readonly id?: number;
     /**
      * A long description of the subscription
      */
     longDescription?: string;
-
     /**
      * The name of the item
      */
     name: string;
-
     /**
      * The billing options for this subscription
      */
     plans?: Array<SubscriptionPlanResource>;
-
     /**
      * A short description of the subscription.  Max 255 characters
      */
     shortDescription?: string;
-
     /**
      * A number to use in sorting items.  Default 500
      */
     sort?: number;
-
     /**
      * Used to schedule removal from store.  Null means the subscription will never be removed
      */
     storeEnd?: number;
-
     /**
      * Used to schedule appearance in store.  Null means the subscription will appear now
      */
     storeStart?: number;
-
     /**
      * The tags for the subscription
      */
     tags?: Array<string>;
-
     /**
      * The template being used
      */
     template?: string;
-
     /**
      * The unique key of the subscription
      */
     uniqueKey?: string;
-
     /**
      * The date the item was last updated
      */
-    updatedDate?: number;
-
+    readonly updatedDate?: number;
     /**
      * The id of the vendor
      */
     vendorId: number;
-
 }
 export namespace SubscriptionResource {
-    export enum AvailabilityEnum {
-        All = <any> 'all',
-        NewSubscribers = <any> 'new_subscribers'
-    }
-    export enum GeoPolicyTypeEnum {
-        Whitelist = <any> 'whitelist',
-        Blacklist = <any> 'blacklist'
-    }
+    export type AvailabilityEnum = 'all' | 'new_subscribers';
+    export const AvailabilityEnum = {
+        All: 'all' as AvailabilityEnum,
+        NewSubscribers: 'new_subscribers' as AvailabilityEnum
+    };
+    export type GeoPolicyTypeEnum = 'whitelist' | 'blacklist';
+    export const GeoPolicyTypeEnum = {
+        Whitelist: 'whitelist' as GeoPolicyTypeEnum,
+        Blacklist: 'blacklist' as GeoPolicyTypeEnum
+    };
 }

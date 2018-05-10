@@ -11,68 +11,59 @@
  */
 
 
-
-export interface CoreChallengeActivitySettings {
+export interface CoreChallengeActivitySettings { 
     /**
      * Whether the host can boot a user while the status is PLAYING. Null to inherit from activity
      */
     bootInPlay?: boolean;
-
     /**
      * A custom address (url, ip or whatever is needed in your game) that users should connect to to play in this challenge rather than the usual game server. Max length: 255
      */
     customLaunchAddress?: string;
-
     /**
      * Restriction for whether the host creating an occurrence can specify a custom launch address (such as their own ip address). Will override the challenge's custom_launch_address if they do. Null to inherit from activity
      */
     customLaunchAddressAllowed?: boolean;
-
     /**
      * Restriction for who can host an occurrence. admin disallows regular users, player means the user must also be a player in the occurrence if not admin, non-player means the user has the option to host without being a player. Null to inherit
      */
     hostOption?: CoreChallengeActivitySettings.HostOptionEnum;
-
     /**
      * Restriction for whether the host has control of the status once the game launches. If false they can only manage the game before (when setup and open). Max length: 255. Null to inherit from activity
      */
     hostStatusControl?: boolean;
-
     /**
      * Whether users can join while the status is PLAYING. Null to inherit from activity
      */
     joinInPlay?: boolean;
-
     /**
      * Whether users can leave while the status is PLAYING. Null to inherit from activity
      */
     leaveInPlay?: boolean;
-
     /**
      * The maximum number of players the game can hold. Null to inherit from activity
      */
     maxPlayers?: number;
-
     /**
      * The minimum number of players the game can hold. Null to inherit from activity
      */
     minPlayers?: number;
-
     /**
      * Restriction for who is able to report game end and results. Admin is always able to send results as well. Null to inherit from activity
      */
     resultsTrust?: CoreChallengeActivitySettings.ResultsTrustEnum;
-
 }
 export namespace CoreChallengeActivitySettings {
-    export enum HostOptionEnum {
-        AdminOnly = <any> 'admin_only',
-        Player = <any> 'player',
-        NonPlayer = <any> 'non_player'
-    }
-    export enum ResultsTrustEnum {
-        None = <any> 'none',
-        Host = <any> 'host',
-        All = <any> 'all'
-    }
+    export type HostOptionEnum = 'admin_only' | 'player' | 'non_player';
+    export const HostOptionEnum = {
+        AdminOnly: 'admin_only' as HostOptionEnum,
+        Player: 'player' as HostOptionEnum,
+        NonPlayer: 'non_player' as HostOptionEnum
+    };
+    export type ResultsTrustEnum = 'none' | 'host' | 'all';
+    export const ResultsTrustEnum = {
+        None: 'none' as ResultsTrustEnum,
+        Host: 'host' as ResultsTrustEnum,
+        All: 'all' as ResultsTrustEnum
+    };
 }

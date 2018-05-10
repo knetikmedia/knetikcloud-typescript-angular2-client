@@ -9,28 +9,18 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
-
 import { ObjectResource } from './objectResource';
 import { Order } from './order';
 
 
-export interface PageResourceObjectResource {
+export interface PageResourceObjectResource { 
     content?: Array<ObjectResource>;
-
     first?: boolean;
-
     last?: boolean;
-
     number?: number;
-
     numberOfElements?: number;
-
     size?: number;
-
     sort?: Array<Order>;
-
     totalElements?: number;
-
     totalPages?: number;
-
 }

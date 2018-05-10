@@ -11,16 +11,13 @@
  */
 
 
-
-export interface SelectedSettingRequest {
+export interface SelectedSettingRequest { 
     /**
      * The unique ID for the setting
      */
     key: string;
-
     /**
      * The unique ID for the option. Must match one of the options from this setting in the activity, if not part of a challenge
      */
     value: string;
-
 }

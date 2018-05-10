@@ -11,10 +11,7 @@
  */
 
 
-
-export interface ReindexRequest {
+export interface ReindexRequest { 
     customer?: string;
-
     type?: string;
-
 }

@@ -9,29 +9,24 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
-
 import { Property } from './property';
 
 
-export interface FileProperty extends Property {
+export interface FileProperty extends Property { 
     /**
      * A crc value for file integrity verification
      */
     crc?: string;
-
     /**
      * A description of the file
      */
     description?: string;
-
     /**
      * The type of file such as txt, mp3, mov or csv
      */
     fileType?: string;
-
     /**
      * The url of the file
      */
     url?: string;
-
 }

@@ -9,40 +9,33 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
-
 import { FileGroupPropertyDefinitionResource } from './fileGroupPropertyDefinitionResource';
 import { PropertyFieldListResource } from './propertyFieldListResource';
 
 
-export interface VideoGroupPropertyDefinitionResource extends FileGroupPropertyDefinitionResource {
+export interface VideoGroupPropertyDefinitionResource extends FileGroupPropertyDefinitionResource { 
     /**
      * If provided, the maximum height of each video
      */
     maxHeight?: number;
-
     /**
      * If provided, the maximum length of each video
      */
     maxLength?: number;
-
     /**
      * If provided, the maximum width of each video
      */
     maxWidth?: number;
-
     /**
      * If provided, the minimum height of each video
      */
     minHeight?: number;
-
     /**
      * If provided, the minimum length of each video
      */
     minLength?: number;
-
     /**
      * If provided, the minimum width of each video
      */
     minWidth?: number;
-
 }

@@ -11,16 +11,13 @@
  */
 
 
-
-export interface GrantTypeResource {
+export interface GrantTypeResource { 
     /**
      * The description of the grant type
      */
     description?: string;
-
     /**
      * The name of the grant type
      */
     name?: string;
-
 }

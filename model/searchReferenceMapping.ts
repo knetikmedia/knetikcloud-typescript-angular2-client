@@ -11,31 +11,25 @@
  */
 
 
-
-export interface SearchReferenceMapping {
+export interface SearchReferenceMapping { 
     /**
      * Unique identifier for the mapping to protect against duplicates
      */
     id: string;
-
     /**
      * The field that will be replaced with the refType
      */
     newFieldName: string;
-
     /**
      * The path to the id of the referenced resource (can be a field name, or dot notation for sub-fields)
      */
     refIdField: string;
-
     /**
      * The index type that the mapping pulls data from
      */
     refType: string;
-
     /**
      * The index type that the mapping is for
      */
     type: string;
-
 }

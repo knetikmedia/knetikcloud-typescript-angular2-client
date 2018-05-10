@@ -9,24 +9,20 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
-
 import { Property } from './property';
 
 
-export interface AnswerResource {
+export interface AnswerResource { 
     /**
      * The answer to the question. Different 'type' values indicate different structures as the answer may be test, image, etc. See information on additional properties for the list and their structures
      */
     answer: Property;
-
     /**
      * Whether the answer is correct or not
      */
     correct: boolean;
-
     /**
      * The unique ID for that resource
      */
-    id?: string;
-
+    readonly id?: string;
 }

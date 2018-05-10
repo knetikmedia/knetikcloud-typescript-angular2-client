@@ -9,71 +9,61 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
-
 import { ImportJobOutputResource } from './importJobOutputResource';
 
 
-export interface ImportJobResource {
+export interface ImportJobResource { 
     /**
      * The id of the category to assign all questions in the import to
      */
     categoryId: string;
-
     /**
      * The date the job was created in seconds since unix epoc
      */
-    createdDate?: number;
-
+    readonly createdDate?: number;
     /**
      * The id of the job
      */
-    id?: number;
-
+    readonly id?: number;
     /**
      * A name for this import for later reference
      */
     name: string;
-
     /**
      * Error information from validation
      */
-    output?: Array<ImportJobOutputResource>;
-
+    readonly output?: Array<ImportJobOutputResource>;
     /**
      * The number of questions form the CSV file. Filled in after validation
      */
-    recordCount?: number;
-
+    readonly recordCount?: number;
     /**
      * The status of the job
      */
     status?: ImportJobResource.StatusEnum;
-
     /**
      * The date the job was last updated in seconds since unix epoc
      */
-    updatedDate?: number;
-
+    readonly updatedDate?: number;
     /**
      * The url of a CSV file to pull trivia questions from. Cannot be changed after initial POST
      */
     url: string;
-
     /**
      * The vendor who supplied this set of questions
      */
     vendor: string;
-
 }
 export namespace ImportJobResource {
-    export enum StatusEnum {
-        PENDINGVALIDATION = <any> 'PENDING_VALIDATION',
-        VALIDATING = <any> 'VALIDATING',
-        VALID = <any> 'VALID',
-        INVALID = <any> 'INVALID',
-        PENDINGPROCESS = <any> 'PENDING_PROCESS',
-        PROCESSING = <any> 'PROCESSING',
-        PROCESSED = <any> 'PROCESSED',
-        FAILED = <any> 'FAILED'
-    }
+    export type StatusEnum = 'PENDING_VALIDATION' | 'VALIDATING' | 'VALID' | 'INVALID' | 'PENDING_PROCESS' | 'PROCESSING' | 'PROCESSED' | 'FAILED';
+    export const StatusEnum = {
+        PENDINGVALIDATION: 'PENDING_VALIDATION' as StatusEnum,
+        VALIDATING: 'VALIDATING' as StatusEnum,
+        VALID: 'VALID' as StatusEnum,
+        INVALID: 'INVALID' as StatusEnum,
+        PENDINGPROCESS: 'PENDING_PROCESS' as StatusEnum,
+        PROCESSING: 'PROCESSING' as StatusEnum,
+        PROCESSED: 'PROCESSED' as StatusEnum,
+        FAILED: 'FAILED' as StatusEnum
+    };
 }

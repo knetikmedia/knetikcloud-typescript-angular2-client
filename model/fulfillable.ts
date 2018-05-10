@@ -9,14 +9,12 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
-
 import { Behavior } from './behavior';
 
 
-export interface Fulfillable extends Behavior {
+export interface Fulfillable extends Behavior { 
     /**
      * The name of the fulfillment type that describes how the item should be fulfilled.  Examples: inventory, wallet, amazon
      */
     typeName: string;
-
 }

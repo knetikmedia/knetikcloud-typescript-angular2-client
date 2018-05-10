@@ -11,14 +11,13 @@
  */
 
 
-
-export interface GroupMemberStatusWrapper {
+export interface GroupMemberStatusWrapper { 
     value?: GroupMemberStatusWrapper.ValueEnum;
-
 }
 export namespace GroupMemberStatusWrapper {
-    export enum ValueEnum {
-        Moderator = <any> 'moderator',
-        Member = <any> 'member'
-    }
+    export type ValueEnum = 'moderator' | 'member';
+    export const ValueEnum = {
+        Moderator: 'moderator' as ValueEnum,
+        Member: 'member' as ValueEnum
+    };
 }

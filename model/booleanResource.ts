@@ -11,8 +11,6 @@
  */
 
 
-
-export interface BooleanResource {
+export interface BooleanResource { 
     value?: boolean;
-
 }

@@ -11,31 +11,25 @@
  */
 
 
-
-export interface OAuth2Resource {
+export interface OAuth2Resource { 
     /**
      * The access token issued by the authorization server
      */
-    accessToken?: string;
-
+    readonly accessToken?: string;
     /**
      * The lifetime in seconds of the access token
      */
-    expiresIn?: string;
-
+    readonly expiresIn?: string;
     /**
      * The refresh token issued by the authorization server
      */
-    refreshToken?: string;
-
+    readonly refreshToken?: string;
     /**
      * The scope of the access token. Currently these values can be ignored, as security defaults to roles and permissions
      */
-    scope?: string;
-
+    readonly scope?: string;
     /**
      * The type of the token issued
      */
-    tokenType?: string;
-
+    readonly tokenType?: string;
 }

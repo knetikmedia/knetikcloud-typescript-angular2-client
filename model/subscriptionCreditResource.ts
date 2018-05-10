@@ -11,31 +11,25 @@
  */
 
 
-
-export interface SubscriptionCreditResource {
+export interface SubscriptionCreditResource { 
     /**
      * The amount of the credit, negative for debt
      */
     amount: number;
-
     /**
      * The date this credit was added, unix timestamp in seconds
      */
-    createdDate?: number;
-
+    readonly createdDate?: number;
     /**
      * The id of the credit record
      */
-    id?: number;
-
+    readonly id?: number;
     /**
      * The id of the subscription inventory entry
      */
     inventoryId?: number;
-
     /**
      * The reason for the subscription credit
      */
     reason: string;
-
 }

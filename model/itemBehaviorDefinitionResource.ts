@@ -9,24 +9,20 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
-
 import { Behavior } from './behavior';
 
 
-export interface ItemBehaviorDefinitionResource {
+export interface ItemBehaviorDefinitionResource { 
     /**
      * The default version of the behavior
      */
     behavior: Behavior;
-
     /**
      * Whether the behavior's values can be modified
      */
     modifiable: boolean;
-
     /**
      * Whether the behavior can be removed
      */
     required: boolean;
-
 }

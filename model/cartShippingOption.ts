@@ -11,26 +11,15 @@
  */
 
 
-
-export interface CartShippingOption {
+export interface CartShippingOption { 
     currencyCode?: string;
-
     description?: string;
-
     name?: string;
-
     originalPrice?: number;
-
     price?: number;
-
     shippingItemId?: number;
-
     sku?: string;
-
     taxable?: boolean;
-
     vendorId?: number;
-
     vendorName?: string;
-
 }

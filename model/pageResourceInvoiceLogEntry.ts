@@ -9,28 +9,18 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
-
 import { InvoiceLogEntry } from './invoiceLogEntry';
 import { Order } from './order';
 
 
-export interface PageResourceInvoiceLogEntry {
+export interface PageResourceInvoiceLogEntry { 
     content?: Array<InvoiceLogEntry>;
-
     first?: boolean;
-
     last?: boolean;
-
     number?: number;
-
     numberOfElements?: number;
-
     size?: number;
-
     sort?: Array<Order>;
-
     totalElements?: number;
-
     totalPages?: number;
-
 }

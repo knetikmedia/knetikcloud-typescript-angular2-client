@@ -9,12 +9,10 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
-
 import { BroadcastableEvent } from './broadcastableEvent';
 import { SearchObjectDefinition } from './searchObjectDefinition';
 
 
-export interface SearchDefinitionCreated extends BroadcastableEvent {
+export interface SearchDefinitionCreated extends BroadcastableEvent { 
     definition?: SearchObjectDefinition;
-
 }

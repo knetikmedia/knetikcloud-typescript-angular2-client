@@ -9,75 +9,57 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
-
 import { Property } from './property';
 
 
-export interface SubscriptionPlan {
+export interface SubscriptionPlan { 
     additionalProperties?: { [key: string]: Property; };
-
     availability?: SubscriptionPlan.AvailabilityEnum;
-
     billGraceDays?: number;
-
     consolidated?: boolean;
-
     firstBill?: number;
-
     firstBillUnitOfTime?: SubscriptionPlan.FirstBillUnitOfTimeEnum;
-
     id?: string;
-
     latePaymentSku?: string;
-
     locked?: boolean;
-
     maxAutoRenew?: number;
-
     maxBillAttempts?: number;
-
     migrationPlan?: string;
-
     minimumTerm?: number;
-
     name?: string;
-
     primarySku?: string;
-
     reactivationSku?: string;
-
     recurringSku?: string;
-
     renewPeriod?: number;
-
     renewPeriodUnitOfTime?: SubscriptionPlan.RenewPeriodUnitOfTimeEnum;
-
     subscriptionId?: number;
-
 }
 export namespace SubscriptionPlan {
-    export enum AvailabilityEnum {
-        All = <any> 'all',
-        NewSubscribers = <any> 'new_subscribers'
-    }
-    export enum FirstBillUnitOfTimeEnum {
-        Millisecond = <any> 'millisecond',
-        Second = <any> 'second',
-        Minute = <any> 'minute',
-        Hour = <any> 'hour',
-        Day = <any> 'day',
-        Week = <any> 'week',
-        Month = <any> 'month',
-        Year = <any> 'year'
-    }
-    export enum RenewPeriodUnitOfTimeEnum {
-        Millisecond = <any> 'millisecond',
-        Second = <any> 'second',
-        Minute = <any> 'minute',
-        Hour = <any> 'hour',
-        Day = <any> 'day',
-        Week = <any> 'week',
-        Month = <any> 'month',
-        Year = <any> 'year'
-    }
+    export type AvailabilityEnum = 'all' | 'new_subscribers';
+    export const AvailabilityEnum = {
+        All: 'all' as AvailabilityEnum,
+        NewSubscribers: 'new_subscribers' as AvailabilityEnum
+    };
+    export type FirstBillUnitOfTimeEnum = 'millisecond' | 'second' | 'minute' | 'hour' | 'day' | 'week' | 'month' | 'year';
+    export const FirstBillUnitOfTimeEnum = {
+        Millisecond: 'millisecond' as FirstBillUnitOfTimeEnum,
+        Second: 'second' as FirstBillUnitOfTimeEnum,
+        Minute: 'minute' as FirstBillUnitOfTimeEnum,
+        Hour: 'hour' as FirstBillUnitOfTimeEnum,
+        Day: 'day' as FirstBillUnitOfTimeEnum,
+        Week: 'week' as FirstBillUnitOfTimeEnum,
+        Month: 'month' as FirstBillUnitOfTimeEnum,
+        Year: 'year' as FirstBillUnitOfTimeEnum
+    };
+    export type RenewPeriodUnitOfTimeEnum = 'millisecond' | 'second' | 'minute' | 'hour' | 'day' | 'week' | 'month' | 'year';
+    export const RenewPeriodUnitOfTimeEnum = {
+        Millisecond: 'millisecond' as RenewPeriodUnitOfTimeEnum,
+        Second: 'second' as RenewPeriodUnitOfTimeEnum,
+        Minute: 'minute' as RenewPeriodUnitOfTimeEnum,
+        Hour: 'hour' as RenewPeriodUnitOfTimeEnum,
+        Day: 'day' as RenewPeriodUnitOfTimeEnum,
+        Week: 'week' as RenewPeriodUnitOfTimeEnum,
+        Month: 'month' as RenewPeriodUnitOfTimeEnum,
+        Year: 'year' as RenewPeriodUnitOfTimeEnum
+    };
 }

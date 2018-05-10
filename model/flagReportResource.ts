@@ -11,52 +11,44 @@
  */
 
 
-
-export interface FlagReportResource {
+export interface FlagReportResource { 
     /**
      * The context of that resource 
      */
-    context?: string;
-
+    readonly context?: string;
     /**
      * The context ID of that resource
      */
-    contextId?: string;
-
+    readonly contextId?: string;
     /**
      * The date/time this resource was created in seconds since epoch
      */
-    createdDate?: number;
-
+    readonly createdDate?: number;
     /**
      * The unique ID for that resource
      */
-    id?: number;
-
+    readonly id?: number;
     /**
      * The reason of that resource required only in case of active resolution
      */
     reason?: string;
-
     /**
      * The resolution of that resource
      */
     resolution: FlagReportResource.ResolutionEnum;
-
     /**
      * The date/time this report was resolved in seconds since epoch. Null if not resolved yet
      */
-    resolved?: number;
-
+    readonly resolved?: number;
     /**
      * The date/time this resource was last updated in seconds since epoch
      */
-    updatedDate?: number;
-
+    readonly updatedDate?: number;
 }
 export namespace FlagReportResource {
-    export enum ResolutionEnum {
-        Banned = <any> 'banned',
-        Ignored = <any> 'ignored'
-    }
+    export type ResolutionEnum = 'banned' | 'ignored';
+    export const ResolutionEnum = {
+        Banned: 'banned' as ResolutionEnum,
+        Ignored: 'ignored' as ResolutionEnum
+    };
 }

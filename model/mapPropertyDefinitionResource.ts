@@ -9,20 +9,17 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
-
 import { PropertyDefinitionResource } from './propertyDefinitionResource';
 import { PropertyFieldListResource } from './propertyFieldListResource';
 
 
-export interface MapPropertyDefinitionResource extends PropertyDefinitionResource {
+export interface MapPropertyDefinitionResource extends PropertyDefinitionResource { 
     /**
      * Whether to allow additional properties beyond those specified or not
      */
     allowAdditional?: boolean;
-
     /**
      * If provided, a list of property definitions for each map entry
      */
     properties?: Array<PropertyDefinitionResource>;
-
 }

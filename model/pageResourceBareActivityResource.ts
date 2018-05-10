@@ -9,28 +9,18 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
-
 import { BareActivityResource } from './bareActivityResource';
 import { Order } from './order';
 
 
-export interface PageResourceBareActivityResource {
+export interface PageResourceBareActivityResource { 
     content?: Array<BareActivityResource>;
-
     first?: boolean;
-
     last?: boolean;
-
     number?: number;
-
     numberOfElements?: number;
-
     size?: number;
-
     sort?: Array<Order>;
-
     totalElements?: number;
-
     totalPages?: number;
-
 }

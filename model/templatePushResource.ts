@@ -11,21 +11,17 @@
  */
 
 
-
-export interface TemplatePushResource {
+export interface TemplatePushResource { 
     /**
      * A list of user ids to send the message to.
      */
     recipients: Array<number>;
-
     /**
      * A mustache template
      */
     template: string;
-
     /**
      * A map of values to fill in the template
      */
     templateVars?: any;
-
 }
