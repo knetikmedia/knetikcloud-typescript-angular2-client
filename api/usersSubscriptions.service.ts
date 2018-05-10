@@ -207,10 +207,10 @@ export class UsersSubscriptionsService {
      * @summary Set a new subscription price for a user
      * @param userId The id of the user
      * @param inventoryId The id of the user&#39;s inventory
-     * @param the override details override
+     * @param override The override details
      */
-    public setUserSubscriptionPrice(userId: number, inventoryId: number, theoverridedetails?: SubscriptionPriceOverrideRequest, extraHttpRequestParams?: any): Observable<{}> {
-        return this.setUserSubscriptionPriceWithHttpInfo(userId, inventoryId, theoverridedetails, extraHttpRequestParams)
+    public setUserSubscriptionPrice(userId: number, inventoryId: number, override?: SubscriptionPriceOverrideRequest, extraHttpRequestParams?: any): Observable<{}> {
+        return this.setUserSubscriptionPriceWithHttpInfo(userId, inventoryId, override, extraHttpRequestParams)
             .map((response: Response) => {
                 if (response.status === 204) {
                     return undefined;
@@ -675,9 +675,9 @@ export class UsersSubscriptionsService {
      * This new price will be what the user is charged at the begining of each new period. This override is specific to the current subscription and will not carry over if they end and later re-subscribe. It will persist if the plan is changed using the setUserSubscriptionPlan endpoint. &lt;br&gt;&lt;br&gt;&lt;b&gt;Permissions Needed:&lt;/b&gt; USERS_SUBSCRIPTIONS_ADMIN
      * @param userId The id of the user
      * @param inventoryId The id of the user&#39;s inventory
-     * @param the override details override
+     * @param override The override details
      */
-    public setUserSubscriptionPriceWithHttpInfo(userId: number, inventoryId: number, theoverridedetails?: SubscriptionPriceOverrideRequest, extraHttpRequestParams?: any): Observable<Response> {
+    public setUserSubscriptionPriceWithHttpInfo(userId: number, inventoryId: number, override?: SubscriptionPriceOverrideRequest, extraHttpRequestParams?: any): Observable<Response> {
         const path = this.basePath + '/users/${user_id}/subscriptions/${inventory_id}/price-override'
                     .replace('${' + 'user_id' + '}', String(userId))
                     .replace('${' + 'inventory_id' + '}', String(inventoryId));
@@ -723,7 +723,7 @@ export class UsersSubscriptionsService {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Put,
             headers: headers,
-            body: theoverridedetails == null ? '' : JSON.stringify(theoverridedetails), // https://github.com/angular/angular/issues/10612
+            body: override == null ? '' : JSON.stringify(override), // https://github.com/angular/angular/issues/10612
             search: queryParameters,
             withCredentials:this.configuration.withCredentials
         });
