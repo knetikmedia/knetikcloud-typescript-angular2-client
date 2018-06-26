@@ -31,11 +31,13 @@ export class AccessTokenService {
     public defaultHeaders = new HttpHeaders();
     public configuration = new Configuration();
 
-    constructor(protected httpClient: HttpClient, @Optional() configuration: Configuration) {
-
+    constructor(protected httpClient: HttpClient, @Optional() basePath: string, @Optional() configuration: Configuration) {
+        if (basePath) {
+            this.basePath = basePath;
+        }
         if (configuration) {
             this.configuration = configuration;
-            this.basePath = configuration.basePath || this.basePath;
+            this.basePath = basePath || configuration.basePath || this.basePath;
         }
     }
 
