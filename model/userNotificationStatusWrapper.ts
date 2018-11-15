@@ -11,14 +11,15 @@
  */
 
 
-export interface UserNotificationStatusWrapper { 
+
+export interface UserNotificationStatusWrapper {
     value?: UserNotificationStatusWrapper.ValueEnum;
+
 }
 export namespace UserNotificationStatusWrapper {
-    export type ValueEnum = 'pending' | 'read' | 'hidden';
-    export const ValueEnum = {
-        Pending: 'pending' as ValueEnum,
-        Read: 'read' as ValueEnum,
-        Hidden: 'hidden' as ValueEnum
-    };
+    export enum ValueEnum {
+        Pending = <any> 'pending',
+        Read = <any> 'read',
+        Hidden = <any> 'hidden'
+    }
 }

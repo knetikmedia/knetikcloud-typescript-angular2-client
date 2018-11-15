@@ -11,46 +11,54 @@
  */
 
 
-export interface CartSummary { 
+
+export interface CartSummary {
     /**
      * The date/time this resource was created in seconds since unix epoch
      */
-    readonly createdDate?: number;
+    createdDate?: number;
+
     /**
      * The unique id code for the currency used in the cart
      */
-    readonly currencyCode?: string;
+    currencyCode?: string;
+
     /**
      * The grand total for the cart
      */
-    readonly grandTotal?: number;
+    grandTotal?: number;
+
     /**
      * The unique ID for the cart
      */
-    readonly id?: string;
+    id?: string;
+
     /**
      * The ID of the invoice associated with this cart
      */
-    readonly invoiceId?: number;
+    invoiceId?: number;
+
     /**
      * The number of items in the cart
      */
-    readonly itemsInCart?: number;
+    itemsInCart?: number;
+
     /**
      * The status of the cart
      */
-    readonly status?: CartSummary.StatusEnum;
+    status?: CartSummary.StatusEnum;
+
     /**
      * The subtotal of all items in the cart
      */
-    readonly subtotal?: number;
+    subtotal?: number;
+
 }
 export namespace CartSummary {
-    export type StatusEnum = 'active' | 'processing' | 'closed' | 'onhold';
-    export const StatusEnum = {
-        Active: 'active' as StatusEnum,
-        Processing: 'processing' as StatusEnum,
-        Closed: 'closed' as StatusEnum,
-        Onhold: 'onhold' as StatusEnum
-    };
+    export enum StatusEnum {
+        Active = <any> 'active',
+        Processing = <any> 'processing',
+        Closed = <any> 'closed',
+        Onhold = <any> 'onhold'
+    }
 }

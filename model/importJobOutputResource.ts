@@ -11,13 +11,16 @@
  */
 
 
-export interface ImportJobOutputResource { 
+
+export interface ImportJobOutputResource {
     /**
      * The description of the import job
      */
     description?: string;
+
     /**
      * The line number of the import job
      */
     lineNumber?: number;
+
 }

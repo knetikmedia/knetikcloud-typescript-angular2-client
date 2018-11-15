@@ -11,21 +11,26 @@
  */
 
 
-export interface CartItemRequest { 
+
+export interface CartItemRequest {
     /**
      * The affiliate key of the item
      */
     affiliateKey?: string;
+
     /**
      * The catalog SKU of the item
      */
     catalogSku: string;
+
     /**
-     * Allows to override the price of an item, if the behavior configuration permits it
+     * Override the price of an item, if the behavior configuration permits it. Do not send if taking standard pricing. Minimum 0
      */
-    priceOverride: number;
+    priceOverride?: number;
+
     /**
      * The quantity of the item
      */
     quantity: number;
+
 }

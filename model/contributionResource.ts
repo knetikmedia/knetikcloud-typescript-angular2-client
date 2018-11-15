@@ -9,20 +9,24 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
+
 import { SimpleReferenceResourcelong } from './simpleReferenceResourcelong';
 
 
-export interface ContributionResource { 
+export interface ContributionResource {
     /**
      * A reference to the contributing artist
      */
     artist: SimpleReferenceResourcelong;
+
     /**
      * A reference to the media being contributed to
      */
     media: SimpleReferenceResourcelong;
+
     /**
      * The nature of the contribution (role of the artist as in 'producer', 'performer', etc)
      */
     role: string;
+
 }

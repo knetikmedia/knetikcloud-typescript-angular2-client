@@ -11,17 +11,21 @@
  */
 
 
-export interface CreatePayPalPaymentRequest { 
+
+export interface CreatePayPalPaymentRequest {
     /**
      * The endpoint URL to which PayPal should forward the user to if they cancel the checkout process
      */
     cancelUrl: string;
+
     /**
      * The ID of an invoice to pay
      */
     invoiceId: number;
+
     /**
      * The endpoint URL to which PayPal should forward the user after they accept. This endpoint will receive information needed for the next step
      */
     returnUrl: string;
+
 }

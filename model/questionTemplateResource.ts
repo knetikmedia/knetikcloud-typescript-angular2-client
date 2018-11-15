@@ -9,40 +9,44 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
+
 import { PropertyDefinitionResource } from './propertyDefinitionResource';
 
 
-export interface QuestionTemplateResource { 
-    /**
-     * Whether to allow additional properties beyond those specified or not
-     */
-    allowAdditional?: boolean;
+export interface QuestionTemplateResource {
     /**
      * A property definition for all answers. If included each answer must match this definition's type and be valid
      */
     answerProperty?: PropertyDefinitionResource;
+
     /**
      * The date/time this resource was created in seconds since unix epoch
      */
-    readonly createdDate?: number;
+    createdDate?: number;
+
     /**
      * The id of the template
      */
-    readonly id?: string;
+    id?: string;
+
     /**
      * The name of the template
      */
     name: string;
+
     /**
      * The customized properties that are present
      */
     properties?: Array<PropertyDefinitionResource>;
+
     /**
      * A property definition for the question itself. If included the answer must match this definition's type and be valid
      */
     questionProperty?: PropertyDefinitionResource;
+
     /**
      * The date/time this resource was last updated in seconds since unix epoch
      */
-    readonly updatedDate?: number;
+    updatedDate?: number;
+
 }

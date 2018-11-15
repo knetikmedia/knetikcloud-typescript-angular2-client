@@ -9,18 +9,25 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
-import { Order } from './order';
+
 import { RevenueProductReportResource } from './revenueProductReportResource';
 
 
-export interface PageResourceRevenueProductReportResource { 
+export interface PageResourceRevenueProductReportResource {
     content?: Array<RevenueProductReportResource>;
+
     first?: boolean;
+
     last?: boolean;
+
     number?: number;
+
     numberOfElements?: number;
+
     size?: number;
-    sort?: Array<Order>;
+
     totalElements?: number;
+
     totalPages?: number;
+
 }

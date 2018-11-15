@@ -11,21 +11,26 @@
  */
 
 
-export interface BreTriggerParameterDefinition { 
+
+export interface BreTriggerParameterDefinition {
     /**
      * Whether this parameter is implicitely derived from another. Internal use only.
      */
-    readonly implicit?: boolean;
+    implicit?: boolean;
+
     /**
      * The name of the parameter. This is used as the unique identifier of this parameter
      */
     name: string;
+
     /**
      * Whether this parameter can be left off when firing the event. Default false
      */
     optional?: boolean;
+
     /**
      * The variable type of this parameter. See Bre Variables endpoint for list
      */
     type: string;
+
 }

@@ -11,9 +11,11 @@
  */
 
 
-export interface GoogleToken { 
+
+export interface GoogleToken {
     /**
      * A valid authorization code from google. See google documention for how to obtain one.
      */
     authorizationCode: string;
+
 }

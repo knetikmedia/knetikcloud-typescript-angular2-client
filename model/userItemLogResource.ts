@@ -9,37 +9,45 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
+
 import { SimpleReferenceResourceint } from './simpleReferenceResourceint';
 import { SimpleUserResource } from './simpleUserResource';
 
 
-export interface UserItemLogResource { 
+export interface UserItemLogResource {
     /**
      * The log entry id
      */
-    readonly id?: number;
+    id?: number;
+
     /**
      * Additional information defined by the type
      */
     info?: string;
+
     /**
      * The item interacted with
      */
     item?: SimpleReferenceResourceint;
+
     /**
      * The date/time this event occurred in seconds since epoch
      */
-    readonly logDate?: number;
+    logDate?: number;
+
     /**
      * The type of event
      */
     type?: string;
+
     /**
      * The user making the interaction
      */
     user?: SimpleUserResource;
+
     /**
      * The id of the inventory entry this event is related to, if any
      */
     userInventory?: number;
+
 }

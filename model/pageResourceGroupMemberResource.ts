@@ -9,18 +9,25 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
+
 import { GroupMemberResource } from './groupMemberResource';
-import { Order } from './order';
 
 
-export interface PageResourceGroupMemberResource { 
+export interface PageResourceGroupMemberResource {
     content?: Array<GroupMemberResource>;
+
     first?: boolean;
+
     last?: boolean;
+
     number?: number;
+
     numberOfElements?: number;
+
     size?: number;
-    sort?: Array<Order>;
+
     totalElements?: number;
+
     totalPages?: number;
+
 }

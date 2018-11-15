@@ -9,20 +9,24 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
+
 import { PropertyFieldResource } from './propertyFieldResource';
 
 
-export interface PropertyFieldListResource { 
+export interface PropertyFieldListResource {
     /**
      * A list of fields for the property definition.
      */
     propertyDefinitionFields?: Array<PropertyFieldResource>;
+
     /**
      * A list of fields for the property.
      */
     propertyFields?: Array<PropertyFieldResource>;
+
     /**
      * The type for the property this describes.
      */
     propertyType?: string;
+
 }

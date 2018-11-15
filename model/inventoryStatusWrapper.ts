@@ -11,14 +11,15 @@
  */
 
 
-export interface InventoryStatusWrapper { 
+
+export interface InventoryStatusWrapper {
     value?: InventoryStatusWrapper.ValueEnum;
+
 }
 export namespace InventoryStatusWrapper {
-    export type ValueEnum = 'pending' | 'active' | 'inactive';
-    export const ValueEnum = {
-        Pending: 'pending' as ValueEnum,
-        Active: 'active' as ValueEnum,
-        Inactive: 'inactive' as ValueEnum
-    };
+    export enum ValueEnum {
+        Pending = <any> 'pending',
+        Active = <any> 'active',
+        Inactive = <any> 'inactive'
+    }
 }

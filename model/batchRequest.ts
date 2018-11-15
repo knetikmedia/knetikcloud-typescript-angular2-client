@@ -11,29 +11,36 @@
  */
 
 
-export interface BatchRequest { 
+
+export interface BatchRequest {
     /**
      * The request body as would be passed to the URI
      */
     body: any;
+
     /**
      * Content type used, Ex:(application/json)
      */
     contentType: string;
+
     /**
      * The HTTP method used, Ex: (GET)
      */
     method: string;
+
     /**
      * Time in seconds before process will timeout.  Default is 60.  Range is 1-300
      */
     timeout: number;
+
     /**
      * The oauth token only
      */
     token?: string;
+
     /**
      * Full URI of REST call
      */
     uri: string;
+
 }

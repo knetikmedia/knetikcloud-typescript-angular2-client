@@ -11,17 +11,21 @@
  */
 
 
-export interface WebsocketMessageResource { 
+
+export interface WebsocketMessageResource {
     /**
      * The body of the outgoing message.
      */
     content: any;
+
     /**
      * A message type to inform websocket recipient how to parse content
      */
     messageType?: string;
+
     /**
      * A list of user ids to send the message to.
      */
     recipients: Array<number>;
+
 }

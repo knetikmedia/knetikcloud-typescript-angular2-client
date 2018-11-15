@@ -9,24 +9,29 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
+
 import { ActivityEntitlementResource } from './activityEntitlementResource';
 
 
-export interface ActivityOccurrenceJoinResult { 
+export interface ActivityOccurrenceJoinResult {
     /**
      * The details on the entitlement object needed to enter the occurrence (if any)
      */
     entitlement?: ActivityEntitlementResource;
+
     /**
      * Zero if the user was/could be added to the occurrence. Jsapi error code indicating the reason of the failure otherwise
      */
     errorCode: number;
+
     /**
      * An error message if failure
      */
     message?: string;
+
     /**
      * The user's id
      */
     userId: number;
+
 }

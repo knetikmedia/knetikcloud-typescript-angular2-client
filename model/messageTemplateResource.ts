@@ -11,21 +11,26 @@
  */
 
 
-export interface MessageTemplateResource { 
+
+export interface MessageTemplateResource {
     /**
      * The content of the template. See Apache Velocity documentation for formatting
      */
     content: string;
+
     /**
      * The id of the template. Cannot be changed after creation. default: auto generated
      */
     id?: string;
+
     /**
      * The name of the template
      */
     name: string;
+
     /**
      * A list of tags for search purposes. Will be converted to lower case
      */
     tags?: Array<string>;
+
 }

@@ -9,32 +9,39 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
+
 import { ChatThreadResource } from './chatThreadResource';
 
 
-export interface ChatUserThreadResource { 
+export interface ChatUserThreadResource {
     /**
      * The date the user thread was created
      */
-    readonly createdDate?: number;
+    createdDate?: number;
+
     /**
      * The number of messages read in the thread
      */
-    readonly readCount?: number;
+    readCount?: number;
+
     /**
      * The details about the thread
      */
-    readonly thread?: ChatThreadResource;
+    thread?: ChatThreadResource;
+
     /**
      * The id of the thread
      */
-    readonly threadId?: string;
+    threadId?: string;
+
     /**
      * The date the user thread was updated
      */
-    readonly updatedDate?: number;
+    updatedDate?: number;
+
     /**
      * The id of the user
      */
     userId?: number;
+
 }

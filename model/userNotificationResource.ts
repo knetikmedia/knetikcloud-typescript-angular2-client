@@ -11,54 +11,62 @@
  */
 
 
-export interface UserNotificationResource { 
+
+export interface UserNotificationResource {
     /**
      * The data to send and fill templates
      */
     data?: any;
+
     /**
      * The id of the notification
      */
     notificationId: string;
+
     /**
      * The id of the notification type
      */
     notificationTypeId: string;
+
     /**
      * The id of the recipient, dependent on the recipient_type. The user's id or the topic's id
      */
     recipient: string;
+
     /**
      * The type of recipient for the notification. Either a user, or all users in a topic
      */
     recipientType: UserNotificationResource.RecipientTypeEnum;
+
     /**
      * The date this notification was first retrieved
      */
-    readonly retrieveDate?: number;
+    retrieveDate?: number;
+
     /**
      * The date this notification was sent
      */
-    readonly sendDate?: number;
+    sendDate?: number;
+
     /**
      * The user's status for this notification
      */
     status?: UserNotificationResource.StatusEnum;
+
     /**
      * The id of the user
      */
     userId: number;
+
 }
 export namespace UserNotificationResource {
-    export type RecipientTypeEnum = 'user' | 'topic';
-    export const RecipientTypeEnum = {
-        User: 'user' as RecipientTypeEnum,
-        Topic: 'topic' as RecipientTypeEnum
-    };
-    export type StatusEnum = 'pending' | 'read' | 'hidden';
-    export const StatusEnum = {
-        Pending: 'pending' as StatusEnum,
-        Read: 'read' as StatusEnum,
-        Hidden: 'hidden' as StatusEnum
-    };
+    export enum RecipientTypeEnum {
+        User = <any> 'user',
+        Topic = <any> 'topic'
+    }
+    export enum StatusEnum {
+        Pending = <any> 'pending',
+        Read = <any> 'read',
+        Hidden = <any> 'hidden'
+    }
 }

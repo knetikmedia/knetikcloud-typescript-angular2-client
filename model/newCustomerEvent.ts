@@ -9,10 +9,12 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
+
 import { BroadcastableEvent } from './broadcastableEvent';
 import { CustomerConfig } from './customerConfig';
 
 
-export interface NewCustomerEvent extends BroadcastableEvent { 
+export interface NewCustomerEvent extends BroadcastableEvent {
     customerConfig?: CustomerConfig;
+
 }

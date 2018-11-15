@@ -11,31 +11,40 @@
  */
 
 
-export interface PaymentMethodDetails { 
-    _default?: boolean;
+
+export interface PaymentMethodDetails {
+    default?: boolean;
+
     /**
      * The expiration date for the payment method, expressed as seconds since epoch. Typically used for credit card payment methods
      */
     expirationDate?: number;
+
     /**
      * The expiration month (1 - 12) for the payment method. Typically used for credit card payment methods
      */
     expirationMonth?: number;
+
     /**
      * The expiration year for the payment method. Typically used for credit card payment methods
      */
     expirationYear?: number;
+
     /**
      * The last 4 digits of the account number for the payment method. Typically used for credit card payment methods
      */
     last4?: string;
+
     /**
      * The sort value for the payment method
      */
     sort?: number;
+
     /**
      * An optional unique identifier
      */
     uniqueKey?: string;
+
     verified?: boolean;
+
 }

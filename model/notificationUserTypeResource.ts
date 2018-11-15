@@ -11,17 +11,21 @@
  */
 
 
-export interface NotificationUserTypeResource { 
+
+export interface NotificationUserTypeResource {
     /**
      * Whether the user has muted direct notification of this type. Notifications can still be retrieved via the api
      */
     silenced?: boolean;
+
     /**
      * The notification type id
      */
     type?: string;
+
     /**
      * The user's id
      */
     userId?: number;
+
 }

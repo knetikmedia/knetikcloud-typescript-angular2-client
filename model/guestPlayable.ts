@@ -9,16 +9,19 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
+
 import { Behavior } from './behavior';
 
 
-export interface GuestPlayable extends Behavior { 
+export interface GuestPlayable extends Behavior {
     /**
      * Whether guests are allowed to use items
      */
     allowed?: boolean;
+
     /**
      * Whether guests are allowed on the leaderboard
      */
     leaderboard?: boolean;
+
 }

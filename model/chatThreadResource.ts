@@ -11,44 +11,52 @@
  */
 
 
-export interface ChatThreadResource { 
+
+export interface ChatThreadResource {
     /**
      * The number of active users in the thread
      */
-    readonly activeUsers?: number;
+    activeUsers?: number;
+
     /**
      * The number of messages in the thread
      */
-    readonly count?: number;
+    count?: number;
+
     /**
      * The date the thread was created
      */
-    readonly createdDate?: number;
+    createdDate?: number;
+
     /**
      * The id for this thread
      */
-    readonly id?: string;
+    id?: string;
+
     /**
      * The id of the recipient
      */
     recipientId: string;
+
     /**
      * The recipient type of the thread
      */
     recipientType: ChatThreadResource.RecipientTypeEnum;
+
     /**
      * The subject of the thread
      */
     subject?: string;
+
     /**
      * The date the thread was updated
      */
-    readonly updatedDate?: number;
+    updatedDate?: number;
+
 }
 export namespace ChatThreadResource {
-    export type RecipientTypeEnum = 'user' | 'topic';
-    export const RecipientTypeEnum = {
-        User: 'user' as RecipientTypeEnum,
-        Topic: 'topic' as RecipientTypeEnum
-    };
+    export enum RecipientTypeEnum {
+        User = <any> 'user',
+        Topic = <any> 'topic'
+    }
 }

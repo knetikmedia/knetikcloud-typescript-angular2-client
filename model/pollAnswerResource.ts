@@ -11,17 +11,21 @@
  */
 
 
-export interface PollAnswerResource { 
+
+export interface PollAnswerResource {
     /**
      * The number of users that selected this answer
      */
-    readonly count?: number;
+    count?: number;
+
     /**
      * The key to the answer (for code reference)
      */
     key: string;
+
     /**
      * The text of the answer (for user display)
      */
     text: string;
+
 }

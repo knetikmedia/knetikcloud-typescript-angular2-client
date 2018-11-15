@@ -9,21 +9,24 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
+
 import { PropertyDefinitionResource } from './propertyDefinitionResource';
-import { PropertyFieldListResource } from './propertyFieldListResource';
 
 
-export interface AudioPropertyDefinitionResource extends PropertyDefinitionResource { 
+export interface AudioPropertyDefinitionResource extends PropertyDefinitionResource {
     /**
      * If provided, a file type the property must match
      */
     fileType?: string;
+
     /**
      * If provided, the maximum length of the audio
      */
     maxLength?: number;
+
     /**
      * If provided, the minimum length of the audio
      */
     minLength?: number;
+
 }

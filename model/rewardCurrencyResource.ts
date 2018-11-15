@@ -11,29 +11,36 @@
  */
 
 
-export interface RewardCurrencyResource { 
+
+export interface RewardCurrencyResource {
     /**
      * The code of the currency type to give
      */
     currencyCode: string;
+
     /**
      * The name of the currency reward to give.  Set by currency_code)
      */
-    readonly currencyName?: string;
+    currencyName?: string;
+
     /**
      * The highest number (worst) rank to give the reward to. Must be greater than or equal to minRank
      */
     maxRank: number;
+
     /**
      * The lowest number (best) rank to give the reward to. Must be greater than zero
      */
     minRank: number;
+
     /**
      * True if the value is actually a percentage of the intake
      */
     percent: boolean;
+
     /**
      * The amount of currency to give. For percentage values, 0.5 is 50%
      */
     value: number;
+
 }

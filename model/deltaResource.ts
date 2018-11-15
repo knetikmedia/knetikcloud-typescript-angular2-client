@@ -11,36 +11,42 @@
  */
 
 
-export interface DeltaResource { 
+
+export interface DeltaResource {
     /**
      * The id of the category for question
      */
     categoryId?: string;
+
     /**
      * The media type of the question
      */
     mediaType?: string;
+
     /**
      * The id of the question
      */
     questionId?: string;
+
     /**
      * Whether the question was updated or removed
      */
     state?: DeltaResource.StateEnum;
+
     /**
      * The tags for the question
      */
     tags?: Array<string>;
+
     /**
      * The date this question was last updated in seconds since unix epoch
      */
     updatedDate?: number;
+
 }
 export namespace DeltaResource {
-    export type StateEnum = 'UPDATED' | 'REMOVED';
-    export const StateEnum = {
-        UPDATED: 'UPDATED' as StateEnum,
-        REMOVED: 'REMOVED' as StateEnum
-    };
+    export enum StateEnum {
+        UPDATED = <any> 'UPDATED',
+        REMOVED = <any> 'REMOVED'
+    }
 }

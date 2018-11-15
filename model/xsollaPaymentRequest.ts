@@ -11,13 +11,16 @@
  */
 
 
-export interface XsollaPaymentRequest { 
+
+export interface XsollaPaymentRequest {
     /**
      * The id of an invoice to pay
      */
     invoiceId: number;
+
     /**
      * The endpoint URL xsolla should forward the user to after they pay
      */
     returnUrl: string;
+
 }

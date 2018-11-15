@@ -9,18 +9,25 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
+
 import { ArticleResource } from './articleResource';
-import { Order } from './order';
 
 
-export interface PageResourceArticleResource { 
+export interface PageResourceArticleResource {
     content?: Array<ArticleResource>;
+
     first?: boolean;
+
     last?: boolean;
+
     number?: number;
+
     numberOfElements?: number;
+
     size?: number;
-    sort?: Array<Order>;
+
     totalElements?: number;
+
     totalPages?: number;
+
 }

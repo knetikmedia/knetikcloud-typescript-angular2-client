@@ -9,14 +9,20 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
+
 import { ArgumentResource } from './argumentResource';
 import { Operator } from './operator';
 
 
-export interface OperationDefinitionResource { 
+export interface OperationDefinitionResource {
     arguments?: Array<ArgumentResource>;
+
     description?: string;
+
     operator?: Operator;
+
     returnType?: string;
+
     template?: string;
+
 }

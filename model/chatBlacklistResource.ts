@@ -9,24 +9,29 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
+
 import { SimpleUserResource } from './simpleUserResource';
 
 
-export interface ChatBlacklistResource { 
+export interface ChatBlacklistResource {
     /**
      * The user that is blacklisted
      */
-    readonly blacklistedUser?: SimpleUserResource;
+    blacklistedUser?: SimpleUserResource;
+
     /**
      * The date the user was blacklisted
      */
-    readonly createdDate?: number;
+    createdDate?: number;
+
     /**
      * The unique ID for this chat message blacklist
      */
-    readonly id?: string;
+    id?: string;
+
     /**
      * The user that has blacklisted someone
      */
-    readonly userId?: number;
+    userId?: number;
+
 }

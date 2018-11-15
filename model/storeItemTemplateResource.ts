@@ -9,42 +9,46 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
+
 import { ItemBehaviorDefinitionResource } from './itemBehaviorDefinitionResource';
 import { PropertyDefinitionResource } from './propertyDefinitionResource';
 import { TemplateResource } from './templateResource';
 
 
-export interface StoreItemTemplateResource { 
-    /**
-     * Whether to allow additional properties beyond those specified or not
-     */
-    allowAdditional?: boolean;
+export interface StoreItemTemplateResource {
     /**
      * The customized behaviors that are required or default for this type of item
      */
     behaviors?: Array<ItemBehaviorDefinitionResource>;
+
     /**
      * The date/time this resource was created in seconds since unix epoch
      */
-    readonly createdDate?: number;
+    createdDate?: number;
+
     /**
      * The id of the template
      */
-    readonly id?: string;
+    id?: string;
+
     /**
      * The name of the template
      */
     name: string;
+
     /**
      * The customized properties that are present
      */
     properties?: Array<PropertyDefinitionResource>;
+
     /**
      * A template to apply to all skus on an item using this template
      */
     skuTemplate?: TemplateResource;
+
     /**
      * The date/time this resource was last updated in seconds since unix epoch
      */
-    readonly updatedDate?: number;
+    updatedDate?: number;
+
 }

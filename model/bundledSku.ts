@@ -11,17 +11,21 @@
  */
 
 
-export interface BundledSku { 
+
+export interface BundledSku {
     /**
      * The amount this item will cost inside the bundle instead of its regular price
      */
     priceOverride?: number;
+
     /**
      * The quantity of this item within the bundle
      */
     quantity: number;
+
     /**
      * The stock keeping unit (SKU) for an item included in the bundle
      */
     sku: string;
+
 }

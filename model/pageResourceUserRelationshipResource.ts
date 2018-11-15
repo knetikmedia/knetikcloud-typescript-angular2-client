@@ -9,18 +9,25 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
-import { Order } from './order';
+
 import { UserRelationshipResource } from './userRelationshipResource';
 
 
-export interface PageResourceUserRelationshipResource { 
+export interface PageResourceUserRelationshipResource {
     content?: Array<UserRelationshipResource>;
+
     first?: boolean;
+
     last?: boolean;
+
     number?: number;
+
     numberOfElements?: number;
+
     size?: number;
-    sort?: Array<Order>;
+
     totalElements?: number;
+
     totalPages?: number;
+
 }

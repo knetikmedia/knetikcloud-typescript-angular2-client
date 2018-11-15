@@ -9,10 +9,13 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
+
 import { BroadcastableEvent } from './broadcastableEvent';
 
 
-export interface LogLevelEvent extends BroadcastableEvent { 
+export interface LogLevelEvent extends BroadcastableEvent {
     level?: string;
+
     name?: string;
+
 }

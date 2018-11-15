@@ -11,6 +11,8 @@
  */
 
 
-export interface ItemIdRequest { 
+
+export interface ItemIdRequest {
     itemId?: number;
+
 }

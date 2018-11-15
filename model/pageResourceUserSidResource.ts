@@ -10,14 +10,24 @@
  * Do not edit the class manually.
  */
 
+import { UserSidResource } from './userSidResource';
 
-export interface GroupMemberStatusWrapper { 
-    value?: GroupMemberStatusWrapper.ValueEnum;
-}
-export namespace GroupMemberStatusWrapper {
-    export type ValueEnum = 'moderator' | 'member';
-    export const ValueEnum = {
-        Moderator: 'moderator' as ValueEnum,
-        Member: 'member' as ValueEnum
-    };
+
+export interface PageResourceUserSidResource {
+    content?: Array<UserSidResource>;
+
+    first?: boolean;
+
+    last?: boolean;
+
+    number?: number;
+
+    numberOfElements?: number;
+
+    size?: number;
+
+    totalElements?: number;
+
+    totalPages?: number;
+
 }

@@ -9,18 +9,25 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
+
 import { FlagReportResource } from './flagReportResource';
-import { Order } from './order';
 
 
-export interface PageResourceFlagReportResource { 
+export interface PageResourceFlagReportResource {
     content?: Array<FlagReportResource>;
+
     first?: boolean;
+
     last?: boolean;
+
     number?: number;
+
     numberOfElements?: number;
+
     size?: number;
-    sort?: Array<Order>;
+
     totalElements?: number;
+
     totalPages?: number;
+
 }

@@ -11,60 +11,72 @@
  */
 
 
-export interface CatalogSale { 
+
+export interface CatalogSale {
     /**
      * The iso3 code for the currency for this discountValue.  The sku purchased will have to match for it this sale to apply
      */
     currencyCode: string;
+
     /**
      * The way in which the price is reduced. 'value' means subtracting directly, 'percentage' means subtracting by the price times the discountValue (1.0 == 100%)
      */
     discountType: CatalogSale.DiscountTypeEnum;
+
     /**
      * The amount deducted from the price, in the same currencyCode as the item
      */
     discountValue?: number;
+
     /**
      * The id of the sale
      */
-    readonly id?: number;
+    id?: number;
+
     /**
      * The id of the item this sale applies to.  Leave null to use other filters
      */
     item?: number;
+
     /**
      * The long description of the sale
      */
     longDescription?: string;
+
     /**
      * The name of the sale.  Max 40 characters
      */
     name: string;
+
     /**
      * The date the sale ends, null for never.  Unix timestamp in seconds
      */
     saleEndDate?: number;
+
     /**
      * The date the sale begins.  Unix timestamp in seconds
      */
     saleStartDate: number;
+
     /**
      * The short description of the sale.  Max 140 characters
      */
     shortDescription?: string;
+
     /**
      * The tag this sale applies to.  Leave null to skip this filter (applies to all tags)
      */
     tag?: string;
+
     /**
      * The id of the vendor this sale applies to.  Leave null to skip this filter (applies to all vendors)
      */
     vendor?: number;
+
 }
 export namespace CatalogSale {
-    export type DiscountTypeEnum = 'value' | 'percentage';
-    export const DiscountTypeEnum = {
-        Value: 'value' as DiscountTypeEnum,
-        Percentage: 'percentage' as DiscountTypeEnum
-    };
+    export enum DiscountTypeEnum {
+        Value = <any> 'value',
+        Percentage = <any> 'percentage'
+    }
 }

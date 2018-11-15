@@ -11,7 +11,10 @@
  */
 
 
-export interface AggregateCountResource { 
+
+export interface AggregateCountResource {
     count?: number;
+
     date?: string;
+
 }

@@ -9,17 +9,19 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
+
 import { PropertyDefinitionResource } from './propertyDefinitionResource';
-import { PropertyFieldListResource } from './propertyFieldListResource';
 
 
-export interface LongPropertyDefinitionResource extends PropertyDefinitionResource { 
+export interface LongPropertyDefinitionResource extends PropertyDefinitionResource {
     /**
      * If provided, the maximum value
      */
     max?: number;
+
     /**
      * If provided, the minimum value
      */
     min?: number;
+
 }

@@ -11,27 +11,30 @@
  */
 
 
-export interface VariableTypeResource { 
+
+export interface VariableTypeResource {
     /**
      * The base class of the type
      */
     base: VariableTypeResource.BaseEnum;
+
     /**
      * Whether the type comes from a set of valid values that the system can provided (such as users)
      */
-    readonly enumerable?: boolean;
+    enumerable?: boolean;
+
     /**
      * The name of the variable type. Used as the unique id
      */
     name: string;
+
 }
 export namespace VariableTypeResource {
-    export type BaseEnum = 'NUMBER' | 'INTEGER' | 'STRING' | 'DATE' | 'BOOLEAN';
-    export const BaseEnum = {
-        NUMBER: 'NUMBER' as BaseEnum,
-        INTEGER: 'INTEGER' as BaseEnum,
-        STRING: 'STRING' as BaseEnum,
-        DATE: 'DATE' as BaseEnum,
-        BOOLEAN: 'BOOLEAN' as BaseEnum
-    };
+    export enum BaseEnum {
+        NUMBER = <any> 'NUMBER',
+        INTEGER = <any> 'INTEGER',
+        STRING = <any> 'STRING',
+        DATE = <any> 'DATE',
+        BOOLEAN = <any> 'BOOLEAN'
+    }
 }

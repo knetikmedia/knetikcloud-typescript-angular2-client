@@ -11,6 +11,8 @@
  */
 
 
-export interface IntWrapper { 
+
+export interface IntWrapper {
     value?: number;
+
 }

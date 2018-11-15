@@ -11,13 +11,16 @@
  */
 
 
-export interface QuickBuyRequest { 
+
+export interface QuickBuyRequest {
     /**
      * SKU of item being purchased
      */
     sku: string;
+
     /**
      * ID of the user making the purchase. If null, currently logged in user will be used.
      */
     userId?: number;
+
 }

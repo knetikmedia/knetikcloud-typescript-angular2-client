@@ -9,6 +9,7 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
+
 import { Behavior } from './behavior';
 import { BundledSku } from './bundledSku';
 import { Property } from './property';
@@ -16,11 +17,12 @@ import { Sku } from './sku';
 import { StoreItem } from './storeItem';
 
 
-export interface BundleItem extends StoreItem { 
+export interface BundleItem extends StoreItem {
     /**
      * The skus of items to be included in this bundle, and how they influence the bundle total price.  Must have at least one SKU
      */
     bundledSkus: Array<BundledSku>;
+
 }
 export namespace BundleItem {
 }

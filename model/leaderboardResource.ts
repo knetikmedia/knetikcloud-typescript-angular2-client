@@ -9,20 +9,24 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
+
 import { LeaderboardEntryResource } from './leaderboardEntryResource';
 
 
-export interface LeaderboardResource { 
+export interface LeaderboardResource {
     /**
      * The paginated list of user results, in order from best to worst
      */
     entries?: Array<LeaderboardEntryResource>;
+
     /**
      * The id of the leaderboard
      */
-    readonly id?: number;
+    id?: number;
+
     /**
      * The name of the strategy that defines how entries are stored and compared
      */
     strategy?: string;
+
 }

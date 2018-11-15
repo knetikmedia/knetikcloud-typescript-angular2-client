@@ -9,18 +9,25 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
+
 import { ChallengeResource } from './challengeResource';
-import { Order } from './order';
 
 
-export interface PageResourceChallengeResource { 
+export interface PageResourceChallengeResource {
     content?: Array<ChallengeResource>;
+
     first?: boolean;
+
     last?: boolean;
+
     number?: number;
+
     numberOfElements?: number;
+
     size?: number;
-    sort?: Array<Order>;
+
     totalElements?: number;
+
     totalPages?: number;
+
 }

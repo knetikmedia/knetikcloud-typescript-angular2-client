@@ -9,18 +9,25 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
+
 import { EntitlementItem } from './entitlementItem';
-import { Order } from './order';
 
 
-export interface PageResourceEntitlementItem { 
+export interface PageResourceEntitlementItem {
     content?: Array<EntitlementItem>;
+
     first?: boolean;
+
     last?: boolean;
+
     number?: number;
+
     numberOfElements?: number;
+
     size?: number;
-    sort?: Array<Order>;
+
     totalElements?: number;
+
     totalPages?: number;
+
 }

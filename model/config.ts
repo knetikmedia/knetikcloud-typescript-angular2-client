@@ -11,21 +11,26 @@
  */
 
 
-export interface Config { 
+
+export interface Config {
     /**
      * The description of the config.  Max 255 characters
      */
     description?: string;
+
     /**
      * The name of the config
      */
     name: string;
+
     /**
      * Whether the config is public for viewing. True means that it can be publicly viewed by all. Default: false
      */
     publicRead?: boolean;
+
     /**
      * The value of the config
      */
     value?: string;
+
 }

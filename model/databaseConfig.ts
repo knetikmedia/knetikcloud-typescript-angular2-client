@@ -9,11 +9,14 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
+
 import { MongoDatabaseConfig } from './mongoDatabaseConfig';
 import { SqlDatabaseConfig } from './sqlDatabaseConfig';
 
 
-export interface DatabaseConfig { 
+export interface DatabaseConfig {
     mongo?: MongoDatabaseConfig;
+
     sql?: SqlDatabaseConfig;
+
 }

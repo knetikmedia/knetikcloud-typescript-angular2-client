@@ -11,25 +11,31 @@
  */
 
 
-export interface ActivityEntitlementResource { 
+
+export interface ActivityEntitlementResource {
     /**
      * The ISO3 currency code the price is in, if available
      */
-    readonly currencyCode?: string;
+    currencyCode?: string;
+
     /**
      * The id of the entitlement item
      */
     itemId: number;
+
     /**
      * The name of the entitlement item
      */
-    readonly name?: string;
+    name?: string;
+
     /**
      * The price of the sku, if available
      */
-    readonly price?: number;
+    price?: number;
+
     /**
      * The sku id, if available. If multiple are available, then first one is returned
      */
-    readonly sku?: string;
+    sku?: string;
+
 }

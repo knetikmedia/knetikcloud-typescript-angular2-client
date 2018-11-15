@@ -9,60 +9,71 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
+
 import { SimpleUserResource } from './simpleUserResource';
 
 
-export interface UserInventoryResource { 
+export interface UserInventoryResource {
     /**
      * A map of data for behaviors
      */
     behaviorData?: any;
+
     /**
      * The date/time this resource was created in seconds since epoch
      */
-    readonly createdDate?: number;
+    createdDate?: number;
+
     /**
      * The date/time this resource exires in seconds since epoch. Null for no expiration. For subscriptions, this is the end of the 'grace period' if left unpaid
      */
     expires?: number;
+
     /**
      * The id of the inventory
      */
-    readonly id?: number;
+    id?: number;
+
     /**
      * The id of the invoice that resulted in this inventory, if any
      */
     invoiceId?: number;
+
     /**
      * The id of the item
      */
     itemId?: number;
+
     /**
      * The name of the item
      */
     itemName?: string;
+
     /**
      * The type hint of the item
      */
     itemTypeHint?: string;
+
     /**
      * The status of the inventory. Pending inventory is not yet ready for use. Inactive inventory has expired or been used up
      */
     status?: UserInventoryResource.StatusEnum;
+
     /**
      * The date/time this resource was last updated in seconds since epoch
      */
-    readonly updatedDate?: number;
+    updatedDate?: number;
+
     /**
      * The id of the user this inventory belongs to
      */
     user?: SimpleUserResource;
+
 }
 export namespace UserInventoryResource {
-    export type StatusEnum = 'pending' | 'active' | 'inactive';
-    export const StatusEnum = {
-        Pending: 'pending' as StatusEnum,
-        Active: 'active' as StatusEnum,
-        Inactive: 'inactive' as StatusEnum
-    };
+    export enum StatusEnum {
+        Pending = <any> 'pending',
+        Active = <any> 'active',
+        Inactive = <any> 'inactive'
+    }
 }

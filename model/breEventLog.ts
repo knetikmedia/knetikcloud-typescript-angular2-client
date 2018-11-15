@@ -9,36 +9,69 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
+
 import { BreRuleLog } from './breRuleLog';
 
 
-export interface BreEventLog { 
+export interface BreEventLog {
     /**
-     * The customer of the BRE event log
+     * The difference between received and handlded in ms
      */
-    readonly customer?: string;
+    age?: number;
+
     /**
-     * The event id of the BRE event log
+     * The customer
      */
-    readonly eventId?: string;
+    customer?: string;
+
     /**
-     * The event name of the BRE event log
+     * The time it took to expand the event parameters
      */
-    readonly eventName?: string;
+    eventExpansionDuration?: number;
+
     /**
-     * The event start date of the BRE event log
+     * The event id
      */
-    readonly eventStartDate?: number;
+    eventId?: string;
+
     /**
-     * The id of the BRE event log
+     * The time it took to log the event in IO
      */
-    readonly id?: string;
+    eventLoggingDuration?: number;
+
     /**
-     * The event paramters of the BRE event log
+     * The event name
      */
-    readonly parameters?: any;
+    eventName?: string;
+
     /**
-     * The rules of the BRE event log
+     * The date the event was fired
      */
-    readonly rules?: Array<BreRuleLog>;
+    eventReceivedDate?: number;
+
+    /**
+     * The date the event was handled
+     */
+    eventStartDate?: number;
+
+    /**
+     * The id
+     */
+    id?: string;
+
+    /**
+     * The event paramters
+     */
+    parameters?: any;
+
+    /**
+     * The rules
+     */
+    rules?: Array<BreRuleLog>;
+
+    /**
+     * The time it took to run all the rules for that event
+     */
+    runtime?: number;
+
 }

@@ -11,29 +11,36 @@
  */
 
 
-export interface AddressResource { 
+
+export interface AddressResource {
     /**
      * The first line of the address
      */
     address1: string;
+
     /**
      * A second line of the address
      */
     address2?: string;
+
     /**
      * The city
      */
     city: string;
+
     /**
      * The iso3 code for the country
      */
     countryCode: string;
+
     /**
      * The postal code
      */
     postalCode?: string;
+
     /**
      * The code for the state. Required if the country has states/provinces/equivalent
      */
     stateCode?: string;
+
 }

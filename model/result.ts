@@ -9,20 +9,24 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
+
 import { ErrorResource } from './errorResource';
 
 
-export interface Result { 
+export interface Result {
     /**
      * The JSAPI error code
      */
-    readonly code?: number;
+    code?: number;
+
     /**
      * The id used for debugging lookup
      */
-    readonly requestId?: string;
+    requestId?: string;
+
     /**
      * The error object
      */
-    readonly result?: Array<ErrorResource>;
+    result?: Array<ErrorResource>;
+
 }

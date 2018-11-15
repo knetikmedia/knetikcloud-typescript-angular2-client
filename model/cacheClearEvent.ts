@@ -9,9 +9,11 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
+
 import { BroadcastableEvent } from './broadcastableEvent';
 
 
-export interface CacheClearEvent extends BroadcastableEvent { 
+export interface CacheClearEvent extends BroadcastableEvent {
     teardown?: boolean;
+
 }

@@ -9,16 +9,19 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
+
 /* tslint:disable:no-unused-variable member-ordering */
 
 import { Inject, Injectable, Optional }                      from '@angular/core';
-import { HttpClient, HttpHeaders, HttpParams,
-         HttpResponse, HttpEvent }                           from '@angular/common/http';
-import { CustomHttpUrlEncodingCodec }                        from '../encoder';
+import { Http, Headers, URLSearchParams }                    from '@angular/http';
+import { RequestMethod, RequestOptions, RequestOptionsArgs } from '@angular/http';
+import { Response, ResponseContentType }                     from '@angular/http';
 
 import { Observable }                                        from 'rxjs/Observable';
+import '../rxjs-operators';
 
 import { PageResourceUsageInfo } from '../model/pageResourceUsageInfo';
+import { PageResourcestring } from '../model/pageResourcestring';
 import { Result } from '../model/result';
 
 import { BASE_PATH, COLLECTION_FORMATS }                     from '../variables';
@@ -28,18 +31,33 @@ import { Configuration }                                     from '../configurat
 @Injectable()
 export class ReportingUsageService {
 
-    protected basePath = 'https://jsapi-integration.us-east-1.elasticbeanstalk.com';
-    public defaultHeaders = new HttpHeaders();
-    public configuration = new Configuration();
+    protected basePath = 'https://devsandbox.knetikcloud.com';
+    public defaultHeaders: Headers = new Headers();
+    public configuration: Configuration = new Configuration();
 
-    constructor(protected httpClient: HttpClient, @Optional()@Inject(BASE_PATH) basePath: string, @Optional() configuration: Configuration) {
+    constructor(protected http: Http, @Optional()@Inject(BASE_PATH) basePath: string, @Optional() configuration: Configuration) {
         if (basePath) {
             this.basePath = basePath;
         }
         if (configuration) {
             this.configuration = configuration;
-            this.basePath = basePath || configuration.basePath || this.basePath;
+			this.basePath = basePath || configuration.basePath || this.basePath;
         }
+    }
+
+    /**
+     * 
+     * Extends object by coping non-existing properties.
+     * @param objA object to be extended
+     * @param objB source object
+     */
+    private extendObj<T1,T2>(objA: T1, objB: T2) {
+        for(let key in objB){
+            if(objB.hasOwnProperty(key)){
+                (objA as any)[key] = (objB as any)[key];
+            }
+        }
+        return <T1&T2>objA;
     }
 
     /**
@@ -48,12 +66,139 @@ export class ReportingUsageService {
      */
     private canConsumeForm(consumes: string[]): boolean {
         const form = 'multipart/form-data';
-        for (const consume of consumes) {
+        for (let consume of consumes) {
             if (form === consume) {
                 return true;
             }
         }
         return false;
+    }
+
+    /**
+     * <b>Permissions Needed:</b> USAGE_ADMIN
+     * @summary Returns aggregated endpoint usage information by day
+     * @param startDate The beginning of the range being requested, unix timestamp in seconds
+     * @param endDate The ending of the range being requested, unix timestamp in seconds
+     * @param combineEndpoints Whether to combine counts from different endpoint. Removes the url and method from the result object
+     * @param method Filter for a certain endpoint method.  Must include url as well to work
+     * @param url Filter for a certain endpoint.  Must include method as well to work
+     * @param size The number of objects returned per page
+     * @param page The number of the page returned, starting with 1
+     */
+    public getUsageByDay(startDate: number, endDate: number, combineEndpoints?: boolean, method?: string, url?: string, size?: number, page?: number, extraHttpRequestParams?: any): Observable<PageResourceUsageInfo> {
+        return this.getUsageByDayWithHttpInfo(startDate, endDate, combineEndpoints, method, url, size, page, extraHttpRequestParams)
+            .map((response: Response) => {
+                if (response.status === 204) {
+                    return undefined;
+                } else {
+                    return response.json() || {};
+                }
+            });
+    }
+
+    /**
+     * <b>Permissions Needed:</b> USAGE_ADMIN
+     * @summary Returns aggregated endpoint usage information by hour
+     * @param startDate The beginning of the range being requested, unix timestamp in seconds
+     * @param endDate The ending of the range being requested, unix timestamp in seconds
+     * @param combineEndpoints Whether to combine counts from different endpoint. Removes the url and method from the result object
+     * @param method Filter for a certain endpoint method.  Must include url as well to work
+     * @param url Filter for a certain endpoint.  Must include method as well to work
+     * @param size The number of objects returned per page
+     * @param page The number of the page returned, starting with 1
+     */
+    public getUsageByHour(startDate: number, endDate: number, combineEndpoints?: boolean, method?: string, url?: string, size?: number, page?: number, extraHttpRequestParams?: any): Observable<PageResourceUsageInfo> {
+        return this.getUsageByHourWithHttpInfo(startDate, endDate, combineEndpoints, method, url, size, page, extraHttpRequestParams)
+            .map((response: Response) => {
+                if (response.status === 204) {
+                    return undefined;
+                } else {
+                    return response.json() || {};
+                }
+            });
+    }
+
+    /**
+     * <b>Permissions Needed:</b> USAGE_ADMIN
+     * @summary Returns aggregated endpoint usage information by minute
+     * @param startDate The beginning of the range being requested, unix timestamp in seconds
+     * @param endDate The ending of the range being requested, unix timestamp in seconds
+     * @param combineEndpoints Whether to combine counts from different endpoint. Removes the url and method from the result object
+     * @param method Filter for a certain endpoint method.  Must include url as well to work
+     * @param url Filter for a certain endpoint.  Must include method as well to work
+     * @param size The number of objects returned per page
+     * @param page The number of the page returned, starting with 1
+     */
+    public getUsageByMinute(startDate: number, endDate: number, combineEndpoints?: boolean, method?: string, url?: string, size?: number, page?: number, extraHttpRequestParams?: any): Observable<PageResourceUsageInfo> {
+        return this.getUsageByMinuteWithHttpInfo(startDate, endDate, combineEndpoints, method, url, size, page, extraHttpRequestParams)
+            .map((response: Response) => {
+                if (response.status === 204) {
+                    return undefined;
+                } else {
+                    return response.json() || {};
+                }
+            });
+    }
+
+    /**
+     * <b>Permissions Needed:</b> USAGE_ADMIN
+     * @summary Returns aggregated endpoint usage information by month
+     * @param startDate The beginning of the range being requested, unix timestamp in seconds
+     * @param endDate The ending of the range being requested, unix timestamp in seconds
+     * @param combineEndpoints Whether to combine counts from different endpoint. Removes the url and method from the result object
+     * @param method Filter for a certain endpoint method.  Must include url as well to work
+     * @param url Filter for a certain endpoint.  Must include method as well to work
+     * @param size The number of objects returned per page
+     * @param page The number of the page returned, starting with 1
+     */
+    public getUsageByMonth(startDate: number, endDate: number, combineEndpoints?: boolean, method?: string, url?: string, size?: number, page?: number, extraHttpRequestParams?: any): Observable<PageResourceUsageInfo> {
+        return this.getUsageByMonthWithHttpInfo(startDate, endDate, combineEndpoints, method, url, size, page, extraHttpRequestParams)
+            .map((response: Response) => {
+                if (response.status === 204) {
+                    return undefined;
+                } else {
+                    return response.json() || {};
+                }
+            });
+    }
+
+    /**
+     * <b>Permissions Needed:</b> USAGE_ADMIN
+     * @summary Returns aggregated endpoint usage information by year
+     * @param startDate The beginning of the range being requested, unix timestamp in seconds
+     * @param endDate The ending of the range being requested, unix timestamp in seconds
+     * @param combineEndpoints Whether to combine counts from different endpoints. Removes the url and method from the result object
+     * @param method Filter for a certain endpoint method.  Must include url as well to work
+     * @param url Filter for a certain endpoint.  Must include method as well to work
+     * @param size The number of objects returned per page
+     * @param page The number of the page returned, starting with 1
+     */
+    public getUsageByYear(startDate: number, endDate: number, combineEndpoints?: boolean, method?: string, url?: string, size?: number, page?: number, extraHttpRequestParams?: any): Observable<PageResourceUsageInfo> {
+        return this.getUsageByYearWithHttpInfo(startDate, endDate, combineEndpoints, method, url, size, page, extraHttpRequestParams)
+            .map((response: Response) => {
+                if (response.status === 204) {
+                    return undefined;
+                } else {
+                    return response.json() || {};
+                }
+            });
+    }
+
+    /**
+     * <b>Permissions Needed:</b> USAGE_ADMIN
+     * @summary Returns list of endpoints called (method and url)
+     * @param startDate The beginning of the range being requested, unix timestamp in seconds
+     * @param endDate The ending of the range being requested, unix timestamp in seconds
+     */
+    public getUsageEndpoints(startDate: number, endDate: number, extraHttpRequestParams?: any): Observable<PageResourcestring> {
+        return this.getUsageEndpointsWithHttpInfo(startDate, endDate, extraHttpRequestParams)
+            .map((response: Response) => {
+                if (response.status === 204) {
+                    return undefined;
+                } else {
+                    return response.json() || {};
+                }
+            });
     }
 
 
@@ -67,83 +212,86 @@ export class ReportingUsageService {
      * @param url Filter for a certain endpoint.  Must include method as well to work
      * @param size The number of objects returned per page
      * @param page The number of the page returned, starting with 1
-     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-     * @param reportProgress flag to report request and response progress.
      */
-    public getUsageByDay(startDate: number, endDate: number, combineEndpoints?: boolean, method?: 'GET' | 'HEAD' | 'POST' | 'PUT' | 'PATCH' | 'DELETE' | 'OPTIONS' | 'TRACE', url?: string, size?: number, page?: number, observe?: 'body', reportProgress?: boolean): Observable<PageResourceUsageInfo>;
-    public getUsageByDay(startDate: number, endDate: number, combineEndpoints?: boolean, method?: 'GET' | 'HEAD' | 'POST' | 'PUT' | 'PATCH' | 'DELETE' | 'OPTIONS' | 'TRACE', url?: string, size?: number, page?: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<PageResourceUsageInfo>>;
-    public getUsageByDay(startDate: number, endDate: number, combineEndpoints?: boolean, method?: 'GET' | 'HEAD' | 'POST' | 'PUT' | 'PATCH' | 'DELETE' | 'OPTIONS' | 'TRACE', url?: string, size?: number, page?: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<PageResourceUsageInfo>>;
-    public getUsageByDay(startDate: number, endDate: number, combineEndpoints?: boolean, method?: 'GET' | 'HEAD' | 'POST' | 'PUT' | 'PATCH' | 'DELETE' | 'OPTIONS' | 'TRACE', url?: string, size?: number, page?: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public getUsageByDayWithHttpInfo(startDate: number, endDate: number, combineEndpoints?: boolean, method?: string, url?: string, size?: number, page?: number, extraHttpRequestParams?: any): Observable<Response> {
+        const path = this.basePath + '/reporting/usage/day';
+
+        let queryParameters = new URLSearchParams();
+        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
+        // verify required parameter 'startDate' is not null or undefined
         if (startDate === null || startDate === undefined) {
             throw new Error('Required parameter startDate was null or undefined when calling getUsageByDay.');
         }
+        // verify required parameter 'endDate' is not null or undefined
         if (endDate === null || endDate === undefined) {
             throw new Error('Required parameter endDate was null or undefined when calling getUsageByDay.');
         }
-
-        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
-        if (startDate !== undefined && startDate !== null) {
-            queryParameters = queryParameters.set('start_date', <any>startDate);
-        }
-        if (endDate !== undefined && endDate !== null) {
-            queryParameters = queryParameters.set('end_date', <any>endDate);
-        }
-        if (combineEndpoints !== undefined && combineEndpoints !== null) {
-            queryParameters = queryParameters.set('combine_endpoints', <any>combineEndpoints);
-        }
-        if (method !== undefined && method !== null) {
-            queryParameters = queryParameters.set('method', <any>method);
-        }
-        if (url !== undefined && url !== null) {
-            queryParameters = queryParameters.set('url', <any>url);
-        }
-        if (size !== undefined && size !== null) {
-            queryParameters = queryParameters.set('size', <any>size);
-        }
-        if (page !== undefined && page !== null) {
-            queryParameters = queryParameters.set('page', <any>page);
+        if (startDate !== undefined) {
+            queryParameters.set('start_date', <any>startDate);
         }
 
-        let headers = this.defaultHeaders;
+        if (endDate !== undefined) {
+            queryParameters.set('end_date', <any>endDate);
+        }
+
+        if (combineEndpoints !== undefined) {
+            queryParameters.set('combine_endpoints', <any>combineEndpoints);
+        }
+
+        if (method !== undefined) {
+            queryParameters.set('method', <any>method);
+        }
+
+        if (url !== undefined) {
+            queryParameters.set('url', <any>url);
+        }
+
+        if (size !== undefined) {
+            queryParameters.set('size', <any>size);
+        }
+
+        if (page !== undefined) {
+            queryParameters.set('page', <any>page);
+        }
+
+
+        // to determine the Accept header
+        let produces: string[] = [
+            'application/json'
+        ];
 
         // authentication (oauth2_client_credentials_grant) required
+        // oauth required
         if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
+            let accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
+            headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
         // authentication (oauth2_password_grant) required
+        // oauth required
         if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
+            let accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
+            headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-        // to determine the Accept header
-        let httpHeaderAccepts: string[] = [
-            'application/json'
-        ];
-        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
-        if (httpHeaderAcceptSelected != undefined) {
-            headers = headers.set('Accept', httpHeaderAcceptSelected);
+            
+        let requestOptions: RequestOptionsArgs = new RequestOptions({
+            method: RequestMethod.Get,
+            headers: headers,
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
+        });
+        // https://github.com/swagger-api/swagger-codegen/issues/4037
+        if (extraHttpRequestParams) {
+            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
         }
 
-        // to determine the Content-Type header
-        const consumes: string[] = [
-        ];
-
-        return this.httpClient.get<PageResourceUsageInfo>(`${this.basePath}/reporting/usage/day`,
-            {
-                params: queryParameters,
-                withCredentials: this.configuration.withCredentials,
-                headers: headers,
-                observe: observe,
-                reportProgress: reportProgress
-            }
-        );
+        return this.http.request(path, requestOptions);
     }
 
     /**
@@ -156,83 +304,86 @@ export class ReportingUsageService {
      * @param url Filter for a certain endpoint.  Must include method as well to work
      * @param size The number of objects returned per page
      * @param page The number of the page returned, starting with 1
-     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-     * @param reportProgress flag to report request and response progress.
      */
-    public getUsageByHour(startDate: number, endDate: number, combineEndpoints?: boolean, method?: 'GET' | 'HEAD' | 'POST' | 'PUT' | 'PATCH' | 'DELETE' | 'OPTIONS' | 'TRACE', url?: string, size?: number, page?: number, observe?: 'body', reportProgress?: boolean): Observable<PageResourceUsageInfo>;
-    public getUsageByHour(startDate: number, endDate: number, combineEndpoints?: boolean, method?: 'GET' | 'HEAD' | 'POST' | 'PUT' | 'PATCH' | 'DELETE' | 'OPTIONS' | 'TRACE', url?: string, size?: number, page?: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<PageResourceUsageInfo>>;
-    public getUsageByHour(startDate: number, endDate: number, combineEndpoints?: boolean, method?: 'GET' | 'HEAD' | 'POST' | 'PUT' | 'PATCH' | 'DELETE' | 'OPTIONS' | 'TRACE', url?: string, size?: number, page?: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<PageResourceUsageInfo>>;
-    public getUsageByHour(startDate: number, endDate: number, combineEndpoints?: boolean, method?: 'GET' | 'HEAD' | 'POST' | 'PUT' | 'PATCH' | 'DELETE' | 'OPTIONS' | 'TRACE', url?: string, size?: number, page?: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public getUsageByHourWithHttpInfo(startDate: number, endDate: number, combineEndpoints?: boolean, method?: string, url?: string, size?: number, page?: number, extraHttpRequestParams?: any): Observable<Response> {
+        const path = this.basePath + '/reporting/usage/hour';
+
+        let queryParameters = new URLSearchParams();
+        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
+        // verify required parameter 'startDate' is not null or undefined
         if (startDate === null || startDate === undefined) {
             throw new Error('Required parameter startDate was null or undefined when calling getUsageByHour.');
         }
+        // verify required parameter 'endDate' is not null or undefined
         if (endDate === null || endDate === undefined) {
             throw new Error('Required parameter endDate was null or undefined when calling getUsageByHour.');
         }
-
-        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
-        if (startDate !== undefined && startDate !== null) {
-            queryParameters = queryParameters.set('start_date', <any>startDate);
-        }
-        if (endDate !== undefined && endDate !== null) {
-            queryParameters = queryParameters.set('end_date', <any>endDate);
-        }
-        if (combineEndpoints !== undefined && combineEndpoints !== null) {
-            queryParameters = queryParameters.set('combine_endpoints', <any>combineEndpoints);
-        }
-        if (method !== undefined && method !== null) {
-            queryParameters = queryParameters.set('method', <any>method);
-        }
-        if (url !== undefined && url !== null) {
-            queryParameters = queryParameters.set('url', <any>url);
-        }
-        if (size !== undefined && size !== null) {
-            queryParameters = queryParameters.set('size', <any>size);
-        }
-        if (page !== undefined && page !== null) {
-            queryParameters = queryParameters.set('page', <any>page);
+        if (startDate !== undefined) {
+            queryParameters.set('start_date', <any>startDate);
         }
 
-        let headers = this.defaultHeaders;
+        if (endDate !== undefined) {
+            queryParameters.set('end_date', <any>endDate);
+        }
+
+        if (combineEndpoints !== undefined) {
+            queryParameters.set('combine_endpoints', <any>combineEndpoints);
+        }
+
+        if (method !== undefined) {
+            queryParameters.set('method', <any>method);
+        }
+
+        if (url !== undefined) {
+            queryParameters.set('url', <any>url);
+        }
+
+        if (size !== undefined) {
+            queryParameters.set('size', <any>size);
+        }
+
+        if (page !== undefined) {
+            queryParameters.set('page', <any>page);
+        }
+
+
+        // to determine the Accept header
+        let produces: string[] = [
+            'application/json'
+        ];
 
         // authentication (oauth2_client_credentials_grant) required
+        // oauth required
         if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
+            let accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
+            headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
         // authentication (oauth2_password_grant) required
+        // oauth required
         if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
+            let accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
+            headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-        // to determine the Accept header
-        let httpHeaderAccepts: string[] = [
-            'application/json'
-        ];
-        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
-        if (httpHeaderAcceptSelected != undefined) {
-            headers = headers.set('Accept', httpHeaderAcceptSelected);
+            
+        let requestOptions: RequestOptionsArgs = new RequestOptions({
+            method: RequestMethod.Get,
+            headers: headers,
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
+        });
+        // https://github.com/swagger-api/swagger-codegen/issues/4037
+        if (extraHttpRequestParams) {
+            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
         }
 
-        // to determine the Content-Type header
-        const consumes: string[] = [
-        ];
-
-        return this.httpClient.get<PageResourceUsageInfo>(`${this.basePath}/reporting/usage/hour`,
-            {
-                params: queryParameters,
-                withCredentials: this.configuration.withCredentials,
-                headers: headers,
-                observe: observe,
-                reportProgress: reportProgress
-            }
-        );
+        return this.http.request(path, requestOptions);
     }
 
     /**
@@ -245,83 +396,86 @@ export class ReportingUsageService {
      * @param url Filter for a certain endpoint.  Must include method as well to work
      * @param size The number of objects returned per page
      * @param page The number of the page returned, starting with 1
-     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-     * @param reportProgress flag to report request and response progress.
      */
-    public getUsageByMinute(startDate: number, endDate: number, combineEndpoints?: boolean, method?: 'GET' | 'HEAD' | 'POST' | 'PUT' | 'PATCH' | 'DELETE' | 'OPTIONS' | 'TRACE', url?: string, size?: number, page?: number, observe?: 'body', reportProgress?: boolean): Observable<PageResourceUsageInfo>;
-    public getUsageByMinute(startDate: number, endDate: number, combineEndpoints?: boolean, method?: 'GET' | 'HEAD' | 'POST' | 'PUT' | 'PATCH' | 'DELETE' | 'OPTIONS' | 'TRACE', url?: string, size?: number, page?: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<PageResourceUsageInfo>>;
-    public getUsageByMinute(startDate: number, endDate: number, combineEndpoints?: boolean, method?: 'GET' | 'HEAD' | 'POST' | 'PUT' | 'PATCH' | 'DELETE' | 'OPTIONS' | 'TRACE', url?: string, size?: number, page?: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<PageResourceUsageInfo>>;
-    public getUsageByMinute(startDate: number, endDate: number, combineEndpoints?: boolean, method?: 'GET' | 'HEAD' | 'POST' | 'PUT' | 'PATCH' | 'DELETE' | 'OPTIONS' | 'TRACE', url?: string, size?: number, page?: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public getUsageByMinuteWithHttpInfo(startDate: number, endDate: number, combineEndpoints?: boolean, method?: string, url?: string, size?: number, page?: number, extraHttpRequestParams?: any): Observable<Response> {
+        const path = this.basePath + '/reporting/usage/minute';
+
+        let queryParameters = new URLSearchParams();
+        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
+        // verify required parameter 'startDate' is not null or undefined
         if (startDate === null || startDate === undefined) {
             throw new Error('Required parameter startDate was null or undefined when calling getUsageByMinute.');
         }
+        // verify required parameter 'endDate' is not null or undefined
         if (endDate === null || endDate === undefined) {
             throw new Error('Required parameter endDate was null or undefined when calling getUsageByMinute.');
         }
-
-        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
-        if (startDate !== undefined && startDate !== null) {
-            queryParameters = queryParameters.set('start_date', <any>startDate);
-        }
-        if (endDate !== undefined && endDate !== null) {
-            queryParameters = queryParameters.set('end_date', <any>endDate);
-        }
-        if (combineEndpoints !== undefined && combineEndpoints !== null) {
-            queryParameters = queryParameters.set('combine_endpoints', <any>combineEndpoints);
-        }
-        if (method !== undefined && method !== null) {
-            queryParameters = queryParameters.set('method', <any>method);
-        }
-        if (url !== undefined && url !== null) {
-            queryParameters = queryParameters.set('url', <any>url);
-        }
-        if (size !== undefined && size !== null) {
-            queryParameters = queryParameters.set('size', <any>size);
-        }
-        if (page !== undefined && page !== null) {
-            queryParameters = queryParameters.set('page', <any>page);
+        if (startDate !== undefined) {
+            queryParameters.set('start_date', <any>startDate);
         }
 
-        let headers = this.defaultHeaders;
+        if (endDate !== undefined) {
+            queryParameters.set('end_date', <any>endDate);
+        }
+
+        if (combineEndpoints !== undefined) {
+            queryParameters.set('combine_endpoints', <any>combineEndpoints);
+        }
+
+        if (method !== undefined) {
+            queryParameters.set('method', <any>method);
+        }
+
+        if (url !== undefined) {
+            queryParameters.set('url', <any>url);
+        }
+
+        if (size !== undefined) {
+            queryParameters.set('size', <any>size);
+        }
+
+        if (page !== undefined) {
+            queryParameters.set('page', <any>page);
+        }
+
+
+        // to determine the Accept header
+        let produces: string[] = [
+            'application/json'
+        ];
 
         // authentication (oauth2_client_credentials_grant) required
+        // oauth required
         if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
+            let accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
+            headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
         // authentication (oauth2_password_grant) required
+        // oauth required
         if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
+            let accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
+            headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-        // to determine the Accept header
-        let httpHeaderAccepts: string[] = [
-            'application/json'
-        ];
-        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
-        if (httpHeaderAcceptSelected != undefined) {
-            headers = headers.set('Accept', httpHeaderAcceptSelected);
+            
+        let requestOptions: RequestOptionsArgs = new RequestOptions({
+            method: RequestMethod.Get,
+            headers: headers,
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
+        });
+        // https://github.com/swagger-api/swagger-codegen/issues/4037
+        if (extraHttpRequestParams) {
+            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
         }
 
-        // to determine the Content-Type header
-        const consumes: string[] = [
-        ];
-
-        return this.httpClient.get<PageResourceUsageInfo>(`${this.basePath}/reporting/usage/minute`,
-            {
-                params: queryParameters,
-                withCredentials: this.configuration.withCredentials,
-                headers: headers,
-                observe: observe,
-                reportProgress: reportProgress
-            }
-        );
+        return this.http.request(path, requestOptions);
     }
 
     /**
@@ -334,83 +488,86 @@ export class ReportingUsageService {
      * @param url Filter for a certain endpoint.  Must include method as well to work
      * @param size The number of objects returned per page
      * @param page The number of the page returned, starting with 1
-     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-     * @param reportProgress flag to report request and response progress.
      */
-    public getUsageByMonth(startDate: number, endDate: number, combineEndpoints?: boolean, method?: 'GET' | 'HEAD' | 'POST' | 'PUT' | 'PATCH' | 'DELETE' | 'OPTIONS' | 'TRACE', url?: string, size?: number, page?: number, observe?: 'body', reportProgress?: boolean): Observable<PageResourceUsageInfo>;
-    public getUsageByMonth(startDate: number, endDate: number, combineEndpoints?: boolean, method?: 'GET' | 'HEAD' | 'POST' | 'PUT' | 'PATCH' | 'DELETE' | 'OPTIONS' | 'TRACE', url?: string, size?: number, page?: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<PageResourceUsageInfo>>;
-    public getUsageByMonth(startDate: number, endDate: number, combineEndpoints?: boolean, method?: 'GET' | 'HEAD' | 'POST' | 'PUT' | 'PATCH' | 'DELETE' | 'OPTIONS' | 'TRACE', url?: string, size?: number, page?: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<PageResourceUsageInfo>>;
-    public getUsageByMonth(startDate: number, endDate: number, combineEndpoints?: boolean, method?: 'GET' | 'HEAD' | 'POST' | 'PUT' | 'PATCH' | 'DELETE' | 'OPTIONS' | 'TRACE', url?: string, size?: number, page?: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public getUsageByMonthWithHttpInfo(startDate: number, endDate: number, combineEndpoints?: boolean, method?: string, url?: string, size?: number, page?: number, extraHttpRequestParams?: any): Observable<Response> {
+        const path = this.basePath + '/reporting/usage/month';
+
+        let queryParameters = new URLSearchParams();
+        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
+        // verify required parameter 'startDate' is not null or undefined
         if (startDate === null || startDate === undefined) {
             throw new Error('Required parameter startDate was null or undefined when calling getUsageByMonth.');
         }
+        // verify required parameter 'endDate' is not null or undefined
         if (endDate === null || endDate === undefined) {
             throw new Error('Required parameter endDate was null or undefined when calling getUsageByMonth.');
         }
-
-        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
-        if (startDate !== undefined && startDate !== null) {
-            queryParameters = queryParameters.set('start_date', <any>startDate);
-        }
-        if (endDate !== undefined && endDate !== null) {
-            queryParameters = queryParameters.set('end_date', <any>endDate);
-        }
-        if (combineEndpoints !== undefined && combineEndpoints !== null) {
-            queryParameters = queryParameters.set('combine_endpoints', <any>combineEndpoints);
-        }
-        if (method !== undefined && method !== null) {
-            queryParameters = queryParameters.set('method', <any>method);
-        }
-        if (url !== undefined && url !== null) {
-            queryParameters = queryParameters.set('url', <any>url);
-        }
-        if (size !== undefined && size !== null) {
-            queryParameters = queryParameters.set('size', <any>size);
-        }
-        if (page !== undefined && page !== null) {
-            queryParameters = queryParameters.set('page', <any>page);
+        if (startDate !== undefined) {
+            queryParameters.set('start_date', <any>startDate);
         }
 
-        let headers = this.defaultHeaders;
+        if (endDate !== undefined) {
+            queryParameters.set('end_date', <any>endDate);
+        }
+
+        if (combineEndpoints !== undefined) {
+            queryParameters.set('combine_endpoints', <any>combineEndpoints);
+        }
+
+        if (method !== undefined) {
+            queryParameters.set('method', <any>method);
+        }
+
+        if (url !== undefined) {
+            queryParameters.set('url', <any>url);
+        }
+
+        if (size !== undefined) {
+            queryParameters.set('size', <any>size);
+        }
+
+        if (page !== undefined) {
+            queryParameters.set('page', <any>page);
+        }
+
+
+        // to determine the Accept header
+        let produces: string[] = [
+            'application/json'
+        ];
 
         // authentication (oauth2_client_credentials_grant) required
+        // oauth required
         if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
+            let accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
+            headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
         // authentication (oauth2_password_grant) required
+        // oauth required
         if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
+            let accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
+            headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-        // to determine the Accept header
-        let httpHeaderAccepts: string[] = [
-            'application/json'
-        ];
-        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
-        if (httpHeaderAcceptSelected != undefined) {
-            headers = headers.set('Accept', httpHeaderAcceptSelected);
+            
+        let requestOptions: RequestOptionsArgs = new RequestOptions({
+            method: RequestMethod.Get,
+            headers: headers,
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
+        });
+        // https://github.com/swagger-api/swagger-codegen/issues/4037
+        if (extraHttpRequestParams) {
+            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
         }
 
-        // to determine the Content-Type header
-        const consumes: string[] = [
-        ];
-
-        return this.httpClient.get<PageResourceUsageInfo>(`${this.basePath}/reporting/usage/month`,
-            {
-                params: queryParameters,
-                withCredentials: this.configuration.withCredentials,
-                headers: headers,
-                observe: observe,
-                reportProgress: reportProgress
-            }
-        );
+        return this.http.request(path, requestOptions);
     }
 
     /**
@@ -423,83 +580,86 @@ export class ReportingUsageService {
      * @param url Filter for a certain endpoint.  Must include method as well to work
      * @param size The number of objects returned per page
      * @param page The number of the page returned, starting with 1
-     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-     * @param reportProgress flag to report request and response progress.
      */
-    public getUsageByYear(startDate: number, endDate: number, combineEndpoints?: boolean, method?: 'GET' | 'HEAD' | 'POST' | 'PUT' | 'PATCH' | 'DELETE' | 'OPTIONS' | 'TRACE', url?: string, size?: number, page?: number, observe?: 'body', reportProgress?: boolean): Observable<PageResourceUsageInfo>;
-    public getUsageByYear(startDate: number, endDate: number, combineEndpoints?: boolean, method?: 'GET' | 'HEAD' | 'POST' | 'PUT' | 'PATCH' | 'DELETE' | 'OPTIONS' | 'TRACE', url?: string, size?: number, page?: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<PageResourceUsageInfo>>;
-    public getUsageByYear(startDate: number, endDate: number, combineEndpoints?: boolean, method?: 'GET' | 'HEAD' | 'POST' | 'PUT' | 'PATCH' | 'DELETE' | 'OPTIONS' | 'TRACE', url?: string, size?: number, page?: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<PageResourceUsageInfo>>;
-    public getUsageByYear(startDate: number, endDate: number, combineEndpoints?: boolean, method?: 'GET' | 'HEAD' | 'POST' | 'PUT' | 'PATCH' | 'DELETE' | 'OPTIONS' | 'TRACE', url?: string, size?: number, page?: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public getUsageByYearWithHttpInfo(startDate: number, endDate: number, combineEndpoints?: boolean, method?: string, url?: string, size?: number, page?: number, extraHttpRequestParams?: any): Observable<Response> {
+        const path = this.basePath + '/reporting/usage/year';
+
+        let queryParameters = new URLSearchParams();
+        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
+        // verify required parameter 'startDate' is not null or undefined
         if (startDate === null || startDate === undefined) {
             throw new Error('Required parameter startDate was null or undefined when calling getUsageByYear.');
         }
+        // verify required parameter 'endDate' is not null or undefined
         if (endDate === null || endDate === undefined) {
             throw new Error('Required parameter endDate was null or undefined when calling getUsageByYear.');
         }
-
-        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
-        if (startDate !== undefined && startDate !== null) {
-            queryParameters = queryParameters.set('start_date', <any>startDate);
-        }
-        if (endDate !== undefined && endDate !== null) {
-            queryParameters = queryParameters.set('end_date', <any>endDate);
-        }
-        if (combineEndpoints !== undefined && combineEndpoints !== null) {
-            queryParameters = queryParameters.set('combine_endpoints', <any>combineEndpoints);
-        }
-        if (method !== undefined && method !== null) {
-            queryParameters = queryParameters.set('method', <any>method);
-        }
-        if (url !== undefined && url !== null) {
-            queryParameters = queryParameters.set('url', <any>url);
-        }
-        if (size !== undefined && size !== null) {
-            queryParameters = queryParameters.set('size', <any>size);
-        }
-        if (page !== undefined && page !== null) {
-            queryParameters = queryParameters.set('page', <any>page);
+        if (startDate !== undefined) {
+            queryParameters.set('start_date', <any>startDate);
         }
 
-        let headers = this.defaultHeaders;
+        if (endDate !== undefined) {
+            queryParameters.set('end_date', <any>endDate);
+        }
+
+        if (combineEndpoints !== undefined) {
+            queryParameters.set('combine_endpoints', <any>combineEndpoints);
+        }
+
+        if (method !== undefined) {
+            queryParameters.set('method', <any>method);
+        }
+
+        if (url !== undefined) {
+            queryParameters.set('url', <any>url);
+        }
+
+        if (size !== undefined) {
+            queryParameters.set('size', <any>size);
+        }
+
+        if (page !== undefined) {
+            queryParameters.set('page', <any>page);
+        }
+
+
+        // to determine the Accept header
+        let produces: string[] = [
+            'application/json'
+        ];
 
         // authentication (oauth2_client_credentials_grant) required
+        // oauth required
         if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
+            let accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
+            headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
         // authentication (oauth2_password_grant) required
+        // oauth required
         if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
+            let accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
+            headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-        // to determine the Accept header
-        let httpHeaderAccepts: string[] = [
-            'application/json'
-        ];
-        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
-        if (httpHeaderAcceptSelected != undefined) {
-            headers = headers.set('Accept', httpHeaderAcceptSelected);
+            
+        let requestOptions: RequestOptionsArgs = new RequestOptions({
+            method: RequestMethod.Get,
+            headers: headers,
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
+        });
+        // https://github.com/swagger-api/swagger-codegen/issues/4037
+        if (extraHttpRequestParams) {
+            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
         }
 
-        // to determine the Content-Type header
-        const consumes: string[] = [
-        ];
-
-        return this.httpClient.get<PageResourceUsageInfo>(`${this.basePath}/reporting/usage/year`,
-            {
-                params: queryParameters,
-                withCredentials: this.configuration.withCredentials,
-                headers: headers,
-                observe: observe,
-                reportProgress: reportProgress
-            }
-        );
+        return this.http.request(path, requestOptions);
     }
 
     /**
@@ -507,68 +667,66 @@ export class ReportingUsageService {
      * &lt;b&gt;Permissions Needed:&lt;/b&gt; USAGE_ADMIN
      * @param startDate The beginning of the range being requested, unix timestamp in seconds
      * @param endDate The ending of the range being requested, unix timestamp in seconds
-     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-     * @param reportProgress flag to report request and response progress.
      */
-    public getUsageEndpoints(startDate: number, endDate: number, observe?: 'body', reportProgress?: boolean): Observable<Array<string>>;
-    public getUsageEndpoints(startDate: number, endDate: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Array<string>>>;
-    public getUsageEndpoints(startDate: number, endDate: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Array<string>>>;
-    public getUsageEndpoints(startDate: number, endDate: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public getUsageEndpointsWithHttpInfo(startDate: number, endDate: number, extraHttpRequestParams?: any): Observable<Response> {
+        const path = this.basePath + '/reporting/usage/endpoints';
+
+        let queryParameters = new URLSearchParams();
+        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
+        // verify required parameter 'startDate' is not null or undefined
         if (startDate === null || startDate === undefined) {
             throw new Error('Required parameter startDate was null or undefined when calling getUsageEndpoints.');
         }
+        // verify required parameter 'endDate' is not null or undefined
         if (endDate === null || endDate === undefined) {
             throw new Error('Required parameter endDate was null or undefined when calling getUsageEndpoints.');
         }
-
-        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
-        if (startDate !== undefined && startDate !== null) {
-            queryParameters = queryParameters.set('start_date', <any>startDate);
-        }
-        if (endDate !== undefined && endDate !== null) {
-            queryParameters = queryParameters.set('end_date', <any>endDate);
+        if (startDate !== undefined) {
+            queryParameters.set('start_date', <any>startDate);
         }
 
-        let headers = this.defaultHeaders;
+        if (endDate !== undefined) {
+            queryParameters.set('end_date', <any>endDate);
+        }
+
+
+        // to determine the Accept header
+        let produces: string[] = [
+            'application/json'
+        ];
 
         // authentication (oauth2_client_credentials_grant) required
+        // oauth required
         if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
+            let accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
+            headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
         // authentication (oauth2_password_grant) required
+        // oauth required
         if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
+            let accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
+            headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-        // to determine the Accept header
-        let httpHeaderAccepts: string[] = [
-            'application/json'
-        ];
-        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
-        if (httpHeaderAcceptSelected != undefined) {
-            headers = headers.set('Accept', httpHeaderAcceptSelected);
+            
+        let requestOptions: RequestOptionsArgs = new RequestOptions({
+            method: RequestMethod.Get,
+            headers: headers,
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
+        });
+        // https://github.com/swagger-api/swagger-codegen/issues/4037
+        if (extraHttpRequestParams) {
+            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
         }
 
-        // to determine the Content-Type header
-        const consumes: string[] = [
-        ];
-
-        return this.httpClient.get<Array<string>>(`${this.basePath}/reporting/usage/endpoints`,
-            {
-                params: queryParameters,
-                withCredentials: this.configuration.withCredentials,
-                headers: headers,
-                observe: observe,
-                reportProgress: reportProgress
-            }
-        );
+        return this.http.request(path, requestOptions);
     }
 
 }

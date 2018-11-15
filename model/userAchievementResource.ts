@@ -11,25 +11,31 @@
  */
 
 
-export interface UserAchievementResource { 
+
+export interface UserAchievementResource {
     /**
      * Flag indicating whether the user has earned the achievement
      */
-    readonly achieved?: boolean;
+    achieved?: boolean;
+
     /**
      * The achievement being tracked.  If used for Leveling, this represents the tier name
      */
     achievementName: string;
+
     /**
      * The date/time this resource was created in seconds since unix epoch
      */
-    readonly createdDate?: number;
+    createdDate?: number;
+
     /**
      * The date/time the achievement was earned as a unix timestamp in seconds
      */
-    readonly earnedDate?: number;
+    earnedDate?: number;
+
     /**
      * The date/time this resource was last updated in seconds since unix epoch
      */
-    readonly updatedDate?: number;
+    updatedDate?: number;
+
 }

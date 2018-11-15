@@ -11,10 +11,16 @@
  */
 
 
-export interface MongoDatabaseConfig { 
+
+export interface MongoDatabaseConfig {
     dbName?: string;
+
     options?: string;
+
     password?: string;
+
     servers?: string;
+
     username?: string;
+
 }

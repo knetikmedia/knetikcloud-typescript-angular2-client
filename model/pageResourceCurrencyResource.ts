@@ -9,18 +9,25 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
+
 import { CurrencyResource } from './currencyResource';
-import { Order } from './order';
 
 
-export interface PageResourceCurrencyResource { 
+export interface PageResourceCurrencyResource {
     content?: Array<CurrencyResource>;
+
     first?: boolean;
+
     last?: boolean;
+
     number?: number;
+
     numberOfElements?: number;
+
     size?: number;
-    sort?: Array<Order>;
+
     totalElements?: number;
+
     totalPages?: number;
+
 }

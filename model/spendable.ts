@@ -9,16 +9,19 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
+
 import { Behavior } from './behavior';
 
 
-export interface Spendable extends Behavior { 
+export interface Spendable extends Behavior {
     /**
      * The code of the currency
      */
     currencyCode?: string;
+
     /**
      * The spendable value
      */
     value?: number;
+
 }

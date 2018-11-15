@@ -11,17 +11,21 @@
  */
 
 
-export interface OauthAccessTokenResource { 
+
+export interface OauthAccessTokenResource {
     /**
      * The key of the client assosciated with the token
      */
     clientId?: string;
+
     /**
      * The token.  Not shown in list view
      */
     token?: string;
+
     /**
      * The username of the user associated with the token
      */
     username?: string;
+
 }

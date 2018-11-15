@@ -9,44 +9,48 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
-import { PropertyFieldListResource } from './propertyFieldListResource';
 
 
-export interface PropertyDefinitionResource { 
+
+export interface PropertyDefinitionResource {
     /**
      * The description of the property
      */
     description?: string;
-    /**
-     * A list of the fields on both the property definition and property of this type
-     */
-    readonly fieldList?: PropertyFieldListResource;
+
     /**
      * The friendly front-facing name of the property
      */
     friendlyName?: string;
+
     /**
-     * The name of the property
+     * The name of the property. Must start with a letter
      */
     name: string;
+
     /**
      * The JSON path to the option label
      */
     optionLabelPath?: string;
+
     /**
      * The JSON path to the option value
      */
     optionValuePath?: string;
+
     /**
      * URL of service containing the property options (assumed JSON array)
      */
     optionsUrl?: string;
+
     /**
      * Whether the property is required
      */
     required: boolean;
+
     /**
      * The type of the property. Used for polymorphic type recognition and thus must match an expected type with additional properties.
      */
     type: string;
+
 }

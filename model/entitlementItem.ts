@@ -9,10 +9,11 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
+
 import { Behavior } from './behavior';
 import { Item } from './item';
 import { Property } from './property';
 
 
-export interface EntitlementItem extends Item { 
+export interface EntitlementItem extends Item {
 }

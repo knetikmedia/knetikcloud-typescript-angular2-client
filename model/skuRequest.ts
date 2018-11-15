@@ -11,9 +11,11 @@
  */
 
 
-export interface SkuRequest { 
+
+export interface SkuRequest {
     /**
      * SKU code of the item
      */
     sku: string;
+
 }

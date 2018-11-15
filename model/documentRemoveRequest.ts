@@ -11,17 +11,16 @@
  */
 
 
-export interface DocumentRemoveRequest { 
+
+export interface DocumentRemoveRequest {
     /**
      * The id of the document
      */
-    id?: string;
-    /**
-     * The id of the template if this document is based on a templated resource
-     */
-    template?: string;
+    id: string;
+
     /**
      * The type of document
      */
-    type?: string;
+    type: string;
+
 }

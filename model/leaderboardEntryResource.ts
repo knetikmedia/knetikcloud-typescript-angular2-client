@@ -9,24 +9,29 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
+
 import { SimpleUserResource } from './simpleUserResource';
 
 
-export interface LeaderboardEntryResource { 
+export interface LeaderboardEntryResource {
     /**
      * The position of the user in the leaderboard. Null means non-compete or disqualification
      */
     rank?: number;
+
     /**
      * The raw score in this leaderboard. Null means non-compete or disqualification
      */
     score?: number;
+
     /**
      * The date this score was recorded or updated. Unix timestamp in seconds
      */
     updatedDate?: number;
+
     /**
      * The player for this entry
      */
     user: SimpleUserResource;
+
 }

@@ -9,26 +9,31 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
+
 import { BreTriggerResource } from './breTriggerResource';
 import { BroadcastableEvent } from './broadcastableEvent';
 import { ResourceTypeDescription } from './resourceTypeDescription';
 
 
-export interface ServiceDeployedEvent extends BroadcastableEvent { 
+export interface ServiceDeployedEvent extends BroadcastableEvent {
     /**
      * The events fired by this service
      */
     events: Array<BreTriggerResource>;
+
     /**
      * The resources managed by this service
      */
     resources: Array<ResourceTypeDescription>;
+
     /**
      * The unique name for the service. This serves as the unique identifier. Cannot be changed after creation
      */
     serviceName: string;
+
     /**
      * The url of the swagger doc
      */
     swaggerUrl: string;
+
 }

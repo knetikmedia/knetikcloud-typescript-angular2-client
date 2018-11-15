@@ -11,9 +11,14 @@
  */
 
 
-export interface Country { 
+
+export interface Country {
     id?: number;
+
     iso2?: string;
+
     iso3?: string;
+
     name?: string;
+
 }

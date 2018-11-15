@@ -9,74 +9,88 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
+
 import { Property } from './property';
 import { RewardSetResource } from './rewardSetResource';
 
 
-export interface CampaignResource { 
+export interface CampaignResource {
     /**
      * Whether the campaign is active or not.  Defaults to false
      */
     active?: boolean;
+
     /**
      * A map of additional properties, keyed on the property name.  Must match the names and types defined in the template for this item type
      */
     additionalProperties?: { [key: string]: Property; };
+
     /**
      * The date/time this resource was created in seconds since unix epoch
      */
-    readonly createdDate?: number;
+    createdDate?: number;
+
     /**
      * The unique ID for that resource
      */
-    readonly id?: number;
+    id?: number;
+
     /**
      * The strategy for calculating the leaderboard. Defaults to highest score. Value MUST come from the list of available strategies from the Leaderboard Service
      */
     leaderboardStrategy?: string;
+
     /**
      * The user friendly name of that resource. Defaults to blank string
      */
     longDescription?: string;
+
     /**
      * The user friendly name of that resource
      */
     name: string;
+
     /**
      * The name of the next challenge coming up
      */
-    readonly nextChallenge?: string;
+    nextChallenge?: string;
+
     /**
      * The date/time of the next challenge coming up
      */
-    readonly nextChallengeDate?: number;
+    nextChallengeDate?: number;
+
     /**
      * The rewards to give at the end of the campaign. When creating/updating only id is used. Reward set must be pre-existing
      */
     rewardSet?: RewardSetResource;
+
     /**
      * Indicate if the rewards have been given out already
      */
-    readonly rewardStatus?: CampaignResource.RewardStatusEnum;
+    rewardStatus?: CampaignResource.RewardStatusEnum;
+
     /**
      * The user friendly name of that resource. Defaults to blank string
      */
     shortDescription?: string;
+
     /**
      * A campaign template this campaign is validated against (private). May be null and no validation of additional_properties will be done
      */
     template?: string;
+
     /**
      * The date/time this resource was last updated in seconds since unix epoch
      */
-    readonly updatedDate?: number;
+    updatedDate?: number;
+
 }
 export namespace CampaignResource {
-    export type RewardStatusEnum = 'pending' | 'failed' | 'complete' | 'partial';
-    export const RewardStatusEnum = {
-        Pending: 'pending' as RewardStatusEnum,
-        Failed: 'failed' as RewardStatusEnum,
-        Complete: 'complete' as RewardStatusEnum,
-        Partial: 'partial' as RewardStatusEnum
-    };
+    export enum RewardStatusEnum {
+        Pending = <any> 'pending',
+        Failed = <any> 'failed',
+        Complete = <any> 'complete',
+        Partial = <any> 'partial'
+    }
 }

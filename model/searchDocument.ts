@@ -11,10 +11,12 @@
  */
 
 
-export interface SearchDocument { 
+
+export interface SearchDocument {
     data?: any;
+
     id?: string;
-    template?: string;
-    templateVersionData?: any;
+
     type?: string;
+
 }

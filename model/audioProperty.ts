@@ -9,8 +9,9 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
+
 import { FileProperty } from './fileProperty';
 
 
-export interface AudioProperty extends FileProperty { 
+export interface AudioProperty extends FileProperty {
 }

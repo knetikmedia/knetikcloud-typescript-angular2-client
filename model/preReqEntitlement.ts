@@ -9,12 +9,14 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
+
 import { Behavior } from './behavior';
 
 
-export interface PreReqEntitlement extends Behavior { 
+export interface PreReqEntitlement extends Behavior {
     /**
      * The item ids that must already be in the user's inventory
      */
     itemIds: Array<number>;
+
 }

@@ -9,10 +9,25 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
-import { BroadcastableEvent } from './broadcastableEvent';
-import { SearchObjectDefinition } from './searchObjectDefinition';
+
+import { MonitoringMetricResource } from './monitoringMetricResource';
 
 
-export interface SearchDefinitionCreated extends BroadcastableEvent { 
-    definition?: SearchObjectDefinition;
+export interface PageResourceMonitoringMetricResource {
+    content?: Array<MonitoringMetricResource>;
+
+    first?: boolean;
+
+    last?: boolean;
+
+    number?: number;
+
+    numberOfElements?: number;
+
+    size?: number;
+
+    totalElements?: number;
+
+    totalPages?: number;
+
 }

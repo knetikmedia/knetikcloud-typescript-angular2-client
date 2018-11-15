@@ -9,17 +9,19 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
+
 import { FileGroupPropertyDefinitionResource } from './fileGroupPropertyDefinitionResource';
-import { PropertyFieldListResource } from './propertyFieldListResource';
 
 
-export interface AudioGroupPropertyDefinitionResource extends FileGroupPropertyDefinitionResource { 
+export interface AudioGroupPropertyDefinitionResource extends FileGroupPropertyDefinitionResource {
     /**
      * If provided, the maximum length of the audio
      */
     maxLength?: number;
+
     /**
      * If provided, the minimum length of the audio
      */
     minLength?: number;
+
 }
