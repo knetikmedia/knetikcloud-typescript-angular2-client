@@ -11,33 +11,41 @@
  */
 
 
-export interface PermissionResource { 
+
+export interface PermissionResource {
     /**
      * The date the permission was added. Unix timestamp in seconds
      */
-    readonly createdDate?: number;
+    createdDate?: number;
+
     /**
      * The description of the permission
      */
     description?: string;
+
     /**
      * Whether a permission is locked from being deleted
      */
     locked?: boolean;
+
     /**
      * The name of the permission used for display purposes
      */
     name: string;
+
     /**
      * The name of the parent of the permission
      */
     parent?: string;
+
     /**
      * The keyword that defines the permission
      */
     permission: string;
+
     /**
      * The date the permission was updated. Unix timestamp in seconds
      */
-    readonly updatedDate?: number;
+    updatedDate?: number;
+
 }

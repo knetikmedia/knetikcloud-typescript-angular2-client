@@ -11,36 +11,42 @@
  */
 
 
-export interface NotificationResource { 
+
+export interface NotificationResource {
     /**
      * The data to send to websockets. Also used to fill in the templates
      */
     data?: any;
+
     /**
      * The id of this individual notification. Default: random
      */
     notificationId?: string;
+
     /**
      * The id of the notification type which will define message templates
      */
     notificationTypeId: string;
+
     /**
      * The id of the recipient, dependent on the recipient_type. The user's id or the topic's id
      */
     recipient: string;
+
     /**
      * The type of recipient for the notification. Either a user, or all users in a topic
      */
     recipientType: NotificationResource.RecipientTypeEnum;
+
     /**
      * The date this notification was sent
      */
-    readonly sendDate?: number;
+    sendDate?: number;
+
 }
 export namespace NotificationResource {
-    export type RecipientTypeEnum = 'user' | 'topic';
-    export const RecipientTypeEnum = {
-        User: 'user' as RecipientTypeEnum,
-        Topic: 'topic' as RecipientTypeEnum
-    };
+    export enum RecipientTypeEnum {
+        User = <any> 'user',
+        Topic = <any> 'topic'
+    }
 }

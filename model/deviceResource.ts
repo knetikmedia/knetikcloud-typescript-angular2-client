@@ -9,77 +9,95 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
+
 import { Property } from './property';
 import { SimpleUserResource } from './simpleUserResource';
 
 
-export interface DeviceResource { 
+export interface DeviceResource {
     /**
      * A map of additional properties, keyed on the property name.  Must match the names and types defined in the template if one is specified
      */
     additionalProperties?: { [key: string]: Property; };
+
     /**
      * The date the device log was created
      */
-    readonly createdDate?: number;
+    createdDate?: number;
+
     /**
      * The description of the device
      */
     description?: string;
+
     /**
      * The type of device. Use mobile_device to specifically register mobile devices. This particular type will be used to send and receive notifications
      */
     deviceType?: string;
+
     /**
      * The unique ID for this device. Cannot be changed after creation. Default: random
      */
     id?: string;
+
     /**
      * The physical location of the device, coordinates or named place (office, living room, etc)
      */
     location?: string;
+
     /**
      * The MAC (media access control) address of the device
      */
     macAddress?: string;
+
     /**
      * The make of the device
      */
     make?: string;
+
     /**
      * The model of the device
      */
     model?: string;
+
     /**
      * The name of the device
      */
     name?: string;
+
     /**
      * The OS (operating system) on the device
      */
     os?: string;
+
     /**
      * The user that owns the device
      */
     owner?: SimpleUserResource;
+
     /**
      * The serial number of the device
      */
     serial?: string;
+
     /**
      * Random tags to facilitate search
      */
-    readonly tags?: Array<string>;
+    tags?: Array<string>;
+
     /**
      * Use to describe and validate custom properties (custom schema). May be null and no validation of additional_properties will be done
      */
     template?: string;
+
     /**
      * The date the device log was updated
      */
-    readonly updatedDate?: number;
+    updatedDate?: number;
+
     /**
      * The users currently using the device
      */
     users?: Array<SimpleUserResource>;
+
 }

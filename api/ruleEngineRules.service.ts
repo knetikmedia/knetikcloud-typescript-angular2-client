@@ -9,20 +9,23 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
+
 /* tslint:disable:no-unused-variable member-ordering */
 
 import { Inject, Injectable, Optional }                      from '@angular/core';
-import { HttpClient, HttpHeaders, HttpParams,
-         HttpResponse, HttpEvent }                           from '@angular/common/http';
-import { CustomHttpUrlEncodingCodec }                        from '../encoder';
+import { Http, Headers, URLSearchParams }                    from '@angular/http';
+import { RequestMethod, RequestOptions, RequestOptionsArgs } from '@angular/http';
+import { Response, ResponseContentType }                     from '@angular/http';
 
 import { Observable }                                        from 'rxjs/Observable';
+import '../rxjs-operators';
 
 import { BooleanResource } from '../model/booleanResource';
 import { BreRule } from '../model/breRule';
 import { Expressionobject } from '../model/expressionobject';
 import { PageResourceBreRule } from '../model/pageResourceBreRule';
 import { Result } from '../model/result';
+import { StringWrapper } from '../model/stringWrapper';
 
 import { BASE_PATH, COLLECTION_FORMATS }                     from '../variables';
 import { Configuration }                                     from '../configuration';
@@ -31,18 +34,33 @@ import { Configuration }                                     from '../configurat
 @Injectable()
 export class RuleEngineRulesService {
 
-    protected basePath = 'https://jsapi-integration.us-east-1.elasticbeanstalk.com';
-    public defaultHeaders = new HttpHeaders();
-    public configuration = new Configuration();
+    protected basePath = 'https://devsandbox.knetikcloud.com';
+    public defaultHeaders: Headers = new Headers();
+    public configuration: Configuration = new Configuration();
 
-    constructor(protected httpClient: HttpClient, @Optional()@Inject(BASE_PATH) basePath: string, @Optional() configuration: Configuration) {
+    constructor(protected http: Http, @Optional()@Inject(BASE_PATH) basePath: string, @Optional() configuration: Configuration) {
         if (basePath) {
             this.basePath = basePath;
         }
         if (configuration) {
             this.configuration = configuration;
-            this.basePath = basePath || configuration.basePath || this.basePath;
+			this.basePath = basePath || configuration.basePath || this.basePath;
         }
+    }
+
+    /**
+     * 
+     * Extends object by coping non-existing properties.
+     * @param objA object to be extended
+     * @param objB source object
+     */
+    private extendObj<T1,T2>(objA: T1, objB: T2) {
+        for(let key in objB){
+            if(objB.hasOwnProperty(key)){
+                (objA as any)[key] = (objB as any)[key];
+            }
+        }
+        return <T1&T2>objA;
     }
 
     /**
@@ -51,7 +69,7 @@ export class RuleEngineRulesService {
      */
     private canConsumeForm(consumes: string[]): boolean {
         const form = 'multipart/form-data';
-        for (const consume of consumes) {
+        for (let consume of consumes) {
             if (form === consume) {
                 return true;
             }
@@ -59,235 +77,342 @@ export class RuleEngineRulesService {
         return false;
     }
 
+    /**
+     * Rules define which actions to run when a given event verifies the specified condition. Full list of predicates and other type of expressions can be found at GET /bre/expressions/. <br><br><b>Permissions Needed:</b> BRE_RULE_ENGINE_RULES_ADMIN
+     * @summary Create a rule
+     * @param breRule The BRE rule object
+     */
+    public createBRERule(breRule?: BreRule, extraHttpRequestParams?: any): Observable<BreRule> {
+        return this.createBRERuleWithHttpInfo(breRule, extraHttpRequestParams)
+            .map((response: Response) => {
+                if (response.status === 204) {
+                    return undefined;
+                } else {
+                    return response.json() || {};
+                }
+            });
+    }
+
+    /**
+     * May fail if there are existing rules against it. Cannot delete core rules. <br><br><b>Permissions Needed:</b> BRE_RULE_ENGINE_RULES_ADMIN
+     * @summary Delete a rule
+     * @param id The id of the rule
+     */
+    public deleteBRERule(id: string, extraHttpRequestParams?: any): Observable<{}> {
+        return this.deleteBRERuleWithHttpInfo(id, extraHttpRequestParams)
+            .map((response: Response) => {
+                if (response.status === 204) {
+                    return undefined;
+                } else {
+                    return response.json() || {};
+                }
+            });
+    }
+
+    /**
+     * <b>Permissions Needed:</b> BRE_RULE_ENGINE_RULES_ADMIN
+     * @summary Returns a string representation of the provided expression
+     * @param expression The expression
+     */
+    public getBREExpressionAsString(expression?: Expressionobject, extraHttpRequestParams?: any): Observable<StringWrapper> {
+        return this.getBREExpressionAsStringWithHttpInfo(expression, extraHttpRequestParams)
+            .map((response: Response) => {
+                if (response.status === 204) {
+                    return undefined;
+                } else {
+                    return response.json() || {};
+                }
+            });
+    }
+
+    /**
+     * <b>Permissions Needed:</b> BRE_RULE_ENGINE_RULES_ADMIN
+     * @summary Get a single rule
+     * @param id The id of the rule
+     */
+    public getBRERule(id: string, extraHttpRequestParams?: any): Observable<BreRule> {
+        return this.getBRERuleWithHttpInfo(id, extraHttpRequestParams)
+            .map((response: Response) => {
+                if (response.status === 204) {
+                    return undefined;
+                } else {
+                    return response.json() || {};
+                }
+            });
+    }
+
+    /**
+     * <b>Permissions Needed:</b> BRE_RULE_ENGINE_RULES_ADMIN
+     * @summary List rules
+     * @param filterName Filter for rules containing the given name
+     * @param filterEnabled Filter for rules by active status, null for both
+     * @param filterSystem Filter for rules that are system rules when true, or not when false. Leave off for both mixed
+     * @param filterTrigger Filter for rules that are for the trigger with the given name
+     * @param filterAction Filter for rules that use the action with the given name
+     * @param filterCondition Filter for rules that have a condition containing the given string
+     * @param size The number of objects returned per page
+     * @param page The number of the page returned, starting with 1
+     */
+    public getBRERules(filterName?: string, filterEnabled?: boolean, filterSystem?: boolean, filterTrigger?: string, filterAction?: string, filterCondition?: string, size?: number, page?: number, extraHttpRequestParams?: any): Observable<PageResourceBreRule> {
+        return this.getBRERulesWithHttpInfo(filterName, filterEnabled, filterSystem, filterTrigger, filterAction, filterCondition, size, page, extraHttpRequestParams)
+            .map((response: Response) => {
+                if (response.status === 204) {
+                    return undefined;
+                } else {
+                    return response.json() || {};
+                }
+            });
+    }
+
+    /**
+     * This is helpful for turning off systems rules which cannot be deleted or modified otherwise. <br><br><b>Permissions Needed:</b> BRE_RULE_ENGINE_RULES_ADMIN
+     * @summary Enable or disable a rule
+     * @param id The id of the rule
+     * @param enabled The boolean value
+     */
+    public setBRERule(id: string, enabled?: BooleanResource, extraHttpRequestParams?: any): Observable<{}> {
+        return this.setBRERuleWithHttpInfo(id, enabled, extraHttpRequestParams)
+            .map((response: Response) => {
+                if (response.status === 204) {
+                    return undefined;
+                } else {
+                    return response.json() || {};
+                }
+            });
+    }
+
+    /**
+     * Cannot update system rules. <br><br><b>Permissions Needed:</b> BRE_RULE_ENGINE_RULES_ADMIN
+     * @summary Update a rule
+     * @param id The id of the rule
+     * @param breRule The BRE rule object
+     */
+    public updateBRERule(id: string, breRule?: BreRule, extraHttpRequestParams?: any): Observable<BreRule> {
+        return this.updateBRERuleWithHttpInfo(id, breRule, extraHttpRequestParams)
+            .map((response: Response) => {
+                if (response.status === 204) {
+                    return undefined;
+                } else {
+                    return response.json() || {};
+                }
+            });
+    }
+
 
     /**
      * Create a rule
      * Rules define which actions to run when a given event verifies the specified condition. Full list of predicates and other type of expressions can be found at GET /bre/expressions/. &lt;br&gt;&lt;br&gt;&lt;b&gt;Permissions Needed:&lt;/b&gt; BRE_RULE_ENGINE_RULES_ADMIN
      * @param breRule The BRE rule object
-     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-     * @param reportProgress flag to report request and response progress.
      */
-    public createBRERule(breRule?: BreRule, observe?: 'body', reportProgress?: boolean): Observable<BreRule>;
-    public createBRERule(breRule?: BreRule, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<BreRule>>;
-    public createBRERule(breRule?: BreRule, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<BreRule>>;
-    public createBRERule(breRule?: BreRule, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public createBRERuleWithHttpInfo(breRule?: BreRule, extraHttpRequestParams?: any): Observable<Response> {
+        const path = this.basePath + '/bre/rules';
 
-        let headers = this.defaultHeaders;
+        let queryParameters = new URLSearchParams();
+        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
+
+        // to determine the Accept header
+        let produces: string[] = [
+            'application/json'
+        ];
 
         // authentication (oauth2_client_credentials_grant) required
+        // oauth required
         if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
+            let accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
+            headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
         // authentication (oauth2_password_grant) required
+        // oauth required
         if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
+            let accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
+            headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-        // to determine the Accept header
-        let httpHeaderAccepts: string[] = [
-            'application/json'
-        ];
-        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
-        if (httpHeaderAcceptSelected != undefined) {
-            headers = headers.set('Accept', httpHeaderAcceptSelected);
+            
+        headers.set('Content-Type', 'application/json');
+
+        let requestOptions: RequestOptionsArgs = new RequestOptions({
+            method: RequestMethod.Post,
+            headers: headers,
+            body: breRule == null ? '' : JSON.stringify(breRule), // https://github.com/angular/angular/issues/10612
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
+        });
+        // https://github.com/swagger-api/swagger-codegen/issues/4037
+        if (extraHttpRequestParams) {
+            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
         }
 
-        // to determine the Content-Type header
-        const consumes: string[] = [
-            'application/json'
-        ];
-        const httpContentTypeSelected: string | undefined = this.configuration.selectHeaderContentType(consumes);
-        if (httpContentTypeSelected != undefined) {
-            headers = headers.set('Content-Type', httpContentTypeSelected);
-        }
-
-        return this.httpClient.post<BreRule>(`${this.basePath}/bre/rules`,
-            breRule,
-            {
-                withCredentials: this.configuration.withCredentials,
-                headers: headers,
-                observe: observe,
-                reportProgress: reportProgress
-            }
-        );
+        return this.http.request(path, requestOptions);
     }
 
     /**
      * Delete a rule
      * May fail if there are existing rules against it. Cannot delete core rules. &lt;br&gt;&lt;br&gt;&lt;b&gt;Permissions Needed:&lt;/b&gt; BRE_RULE_ENGINE_RULES_ADMIN
      * @param id The id of the rule
-     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-     * @param reportProgress flag to report request and response progress.
      */
-    public deleteBRERule(id: string, observe?: 'body', reportProgress?: boolean): Observable<any>;
-    public deleteBRERule(id: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
-    public deleteBRERule(id: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
-    public deleteBRERule(id: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public deleteBRERuleWithHttpInfo(id: string, extraHttpRequestParams?: any): Observable<Response> {
+        const path = this.basePath + '/bre/rules/${id}'
+                    .replace('${' + 'id' + '}', String(id));
+
+        let queryParameters = new URLSearchParams();
+        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
+        // verify required parameter 'id' is not null or undefined
         if (id === null || id === undefined) {
             throw new Error('Required parameter id was null or undefined when calling deleteBRERule.');
         }
 
-        let headers = this.defaultHeaders;
+        // to determine the Accept header
+        let produces: string[] = [
+            'application/json'
+        ];
 
         // authentication (oauth2_client_credentials_grant) required
+        // oauth required
         if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
+            let accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
+            headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
         // authentication (oauth2_password_grant) required
+        // oauth required
         if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
+            let accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
+            headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-        // to determine the Accept header
-        let httpHeaderAccepts: string[] = [
-            'application/json'
-        ];
-        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
-        if (httpHeaderAcceptSelected != undefined) {
-            headers = headers.set('Accept', httpHeaderAcceptSelected);
+            
+        let requestOptions: RequestOptionsArgs = new RequestOptions({
+            method: RequestMethod.Delete,
+            headers: headers,
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
+        });
+        // https://github.com/swagger-api/swagger-codegen/issues/4037
+        if (extraHttpRequestParams) {
+            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
         }
 
-        // to determine the Content-Type header
-        const consumes: string[] = [
-        ];
-
-        return this.httpClient.delete<any>(`${this.basePath}/bre/rules/${encodeURIComponent(String(id))}`,
-            {
-                withCredentials: this.configuration.withCredentials,
-                headers: headers,
-                observe: observe,
-                reportProgress: reportProgress
-            }
-        );
+        return this.http.request(path, requestOptions);
     }
 
     /**
      * Returns a string representation of the provided expression
      * &lt;b&gt;Permissions Needed:&lt;/b&gt; BRE_RULE_ENGINE_RULES_ADMIN
      * @param expression The expression
-     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-     * @param reportProgress flag to report request and response progress.
      */
-    public getBREExpressionAsString(expression?: Expressionobject, observe?: 'body', reportProgress?: boolean): Observable<string>;
-    public getBREExpressionAsString(expression?: Expressionobject, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<string>>;
-    public getBREExpressionAsString(expression?: Expressionobject, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<string>>;
-    public getBREExpressionAsString(expression?: Expressionobject, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public getBREExpressionAsStringWithHttpInfo(expression?: Expressionobject, extraHttpRequestParams?: any): Observable<Response> {
+        const path = this.basePath + '/bre/rules/expression-as-string';
 
-        let headers = this.defaultHeaders;
+        let queryParameters = new URLSearchParams();
+        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
+
+        // to determine the Accept header
+        let produces: string[] = [
+            'application/json'
+        ];
 
         // authentication (oauth2_client_credentials_grant) required
+        // oauth required
         if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
+            let accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
+            headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
         // authentication (oauth2_password_grant) required
+        // oauth required
         if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
+            let accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
+            headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-        // to determine the Accept header
-        let httpHeaderAccepts: string[] = [
-            'application/json'
-        ];
-        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
-        if (httpHeaderAcceptSelected != undefined) {
-            headers = headers.set('Accept', httpHeaderAcceptSelected);
+            
+        headers.set('Content-Type', 'application/json');
+
+        let requestOptions: RequestOptionsArgs = new RequestOptions({
+            method: RequestMethod.Post,
+            headers: headers,
+            body: expression == null ? '' : JSON.stringify(expression), // https://github.com/angular/angular/issues/10612
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
+        });
+        // https://github.com/swagger-api/swagger-codegen/issues/4037
+        if (extraHttpRequestParams) {
+            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
         }
 
-        // to determine the Content-Type header
-        const consumes: string[] = [
-            'application/json'
-        ];
-        const httpContentTypeSelected: string | undefined = this.configuration.selectHeaderContentType(consumes);
-        if (httpContentTypeSelected != undefined) {
-            headers = headers.set('Content-Type', httpContentTypeSelected);
-        }
-
-        return this.httpClient.post<string>(`${this.basePath}/bre/rules/expression-as-string`,
-            expression,
-            {
-                withCredentials: this.configuration.withCredentials,
-                headers: headers,
-                observe: observe,
-                reportProgress: reportProgress
-            }
-        );
+        return this.http.request(path, requestOptions);
     }
 
     /**
      * Get a single rule
      * &lt;b&gt;Permissions Needed:&lt;/b&gt; BRE_RULE_ENGINE_RULES_ADMIN
      * @param id The id of the rule
-     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-     * @param reportProgress flag to report request and response progress.
      */
-    public getBRERule(id: string, observe?: 'body', reportProgress?: boolean): Observable<BreRule>;
-    public getBRERule(id: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<BreRule>>;
-    public getBRERule(id: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<BreRule>>;
-    public getBRERule(id: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public getBRERuleWithHttpInfo(id: string, extraHttpRequestParams?: any): Observable<Response> {
+        const path = this.basePath + '/bre/rules/${id}'
+                    .replace('${' + 'id' + '}', String(id));
+
+        let queryParameters = new URLSearchParams();
+        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
+        // verify required parameter 'id' is not null or undefined
         if (id === null || id === undefined) {
             throw new Error('Required parameter id was null or undefined when calling getBRERule.');
         }
 
-        let headers = this.defaultHeaders;
+        // to determine the Accept header
+        let produces: string[] = [
+            'application/json'
+        ];
 
         // authentication (oauth2_client_credentials_grant) required
+        // oauth required
         if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
+            let accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
+            headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
         // authentication (oauth2_password_grant) required
+        // oauth required
         if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
+            let accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
+            headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-        // to determine the Accept header
-        let httpHeaderAccepts: string[] = [
-            'application/json'
-        ];
-        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
-        if (httpHeaderAcceptSelected != undefined) {
-            headers = headers.set('Accept', httpHeaderAcceptSelected);
+            
+        let requestOptions: RequestOptionsArgs = new RequestOptions({
+            method: RequestMethod.Get,
+            headers: headers,
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
+        });
+        // https://github.com/swagger-api/swagger-codegen/issues/4037
+        if (extraHttpRequestParams) {
+            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
         }
 
-        // to determine the Content-Type header
-        const consumes: string[] = [
-        ];
-
-        return this.httpClient.get<BreRule>(`${this.basePath}/bre/rules/${encodeURIComponent(String(id))}`,
-            {
-                withCredentials: this.configuration.withCredentials,
-                headers: headers,
-                observe: observe,
-                reportProgress: reportProgress
-            }
-        );
+        return this.http.request(path, requestOptions);
     }
 
     /**
@@ -301,80 +426,82 @@ export class RuleEngineRulesService {
      * @param filterCondition Filter for rules that have a condition containing the given string
      * @param size The number of objects returned per page
      * @param page The number of the page returned, starting with 1
-     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-     * @param reportProgress flag to report request and response progress.
      */
-    public getBRERules(filterName?: string, filterEnabled?: boolean, filterSystem?: boolean, filterTrigger?: string, filterAction?: string, filterCondition?: string, size?: number, page?: number, observe?: 'body', reportProgress?: boolean): Observable<PageResourceBreRule>;
-    public getBRERules(filterName?: string, filterEnabled?: boolean, filterSystem?: boolean, filterTrigger?: string, filterAction?: string, filterCondition?: string, size?: number, page?: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<PageResourceBreRule>>;
-    public getBRERules(filterName?: string, filterEnabled?: boolean, filterSystem?: boolean, filterTrigger?: string, filterAction?: string, filterCondition?: string, size?: number, page?: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<PageResourceBreRule>>;
-    public getBRERules(filterName?: string, filterEnabled?: boolean, filterSystem?: boolean, filterTrigger?: string, filterAction?: string, filterCondition?: string, size?: number, page?: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public getBRERulesWithHttpInfo(filterName?: string, filterEnabled?: boolean, filterSystem?: boolean, filterTrigger?: string, filterAction?: string, filterCondition?: string, size?: number, page?: number, extraHttpRequestParams?: any): Observable<Response> {
+        const path = this.basePath + '/bre/rules';
 
-        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
-        if (filterName !== undefined && filterName !== null) {
-            queryParameters = queryParameters.set('filter_name', <any>filterName);
-        }
-        if (filterEnabled !== undefined && filterEnabled !== null) {
-            queryParameters = queryParameters.set('filter_enabled', <any>filterEnabled);
-        }
-        if (filterSystem !== undefined && filterSystem !== null) {
-            queryParameters = queryParameters.set('filter_system', <any>filterSystem);
-        }
-        if (filterTrigger !== undefined && filterTrigger !== null) {
-            queryParameters = queryParameters.set('filter_trigger', <any>filterTrigger);
-        }
-        if (filterAction !== undefined && filterAction !== null) {
-            queryParameters = queryParameters.set('filter_action', <any>filterAction);
-        }
-        if (filterCondition !== undefined && filterCondition !== null) {
-            queryParameters = queryParameters.set('filter_condition', <any>filterCondition);
-        }
-        if (size !== undefined && size !== null) {
-            queryParameters = queryParameters.set('size', <any>size);
-        }
-        if (page !== undefined && page !== null) {
-            queryParameters = queryParameters.set('page', <any>page);
+        let queryParameters = new URLSearchParams();
+        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
+        if (filterName !== undefined) {
+            queryParameters.set('filter_name', <any>filterName);
         }
 
-        let headers = this.defaultHeaders;
+        if (filterEnabled !== undefined) {
+            queryParameters.set('filter_enabled', <any>filterEnabled);
+        }
+
+        if (filterSystem !== undefined) {
+            queryParameters.set('filter_system', <any>filterSystem);
+        }
+
+        if (filterTrigger !== undefined) {
+            queryParameters.set('filter_trigger', <any>filterTrigger);
+        }
+
+        if (filterAction !== undefined) {
+            queryParameters.set('filter_action', <any>filterAction);
+        }
+
+        if (filterCondition !== undefined) {
+            queryParameters.set('filter_condition', <any>filterCondition);
+        }
+
+        if (size !== undefined) {
+            queryParameters.set('size', <any>size);
+        }
+
+        if (page !== undefined) {
+            queryParameters.set('page', <any>page);
+        }
+
+
+        // to determine the Accept header
+        let produces: string[] = [
+            'application/json'
+        ];
 
         // authentication (oauth2_client_credentials_grant) required
+        // oauth required
         if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
+            let accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
+            headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
         // authentication (oauth2_password_grant) required
+        // oauth required
         if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
+            let accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
+            headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-        // to determine the Accept header
-        let httpHeaderAccepts: string[] = [
-            'application/json'
-        ];
-        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
-        if (httpHeaderAcceptSelected != undefined) {
-            headers = headers.set('Accept', httpHeaderAcceptSelected);
+            
+        let requestOptions: RequestOptionsArgs = new RequestOptions({
+            method: RequestMethod.Get,
+            headers: headers,
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
+        });
+        // https://github.com/swagger-api/swagger-codegen/issues/4037
+        if (extraHttpRequestParams) {
+            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
         }
 
-        // to determine the Content-Type header
-        const consumes: string[] = [
-        ];
-
-        return this.httpClient.get<PageResourceBreRule>(`${this.basePath}/bre/rules`,
-            {
-                params: queryParameters,
-                withCredentials: this.configuration.withCredentials,
-                headers: headers,
-                observe: observe,
-                reportProgress: reportProgress
-            }
-        );
+        return this.http.request(path, requestOptions);
     }
 
     /**
@@ -382,62 +509,58 @@ export class RuleEngineRulesService {
      * This is helpful for turning off systems rules which cannot be deleted or modified otherwise. &lt;br&gt;&lt;br&gt;&lt;b&gt;Permissions Needed:&lt;/b&gt; BRE_RULE_ENGINE_RULES_ADMIN
      * @param id The id of the rule
      * @param enabled The boolean value
-     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-     * @param reportProgress flag to report request and response progress.
      */
-    public setBRERule(id: string, enabled?: BooleanResource, observe?: 'body', reportProgress?: boolean): Observable<any>;
-    public setBRERule(id: string, enabled?: BooleanResource, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
-    public setBRERule(id: string, enabled?: BooleanResource, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
-    public setBRERule(id: string, enabled?: BooleanResource, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public setBRERuleWithHttpInfo(id: string, enabled?: BooleanResource, extraHttpRequestParams?: any): Observable<Response> {
+        const path = this.basePath + '/bre/rules/${id}/enabled'
+                    .replace('${' + 'id' + '}', String(id));
+
+        let queryParameters = new URLSearchParams();
+        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
+        // verify required parameter 'id' is not null or undefined
         if (id === null || id === undefined) {
             throw new Error('Required parameter id was null or undefined when calling setBRERule.');
         }
 
-        let headers = this.defaultHeaders;
+        // to determine the Accept header
+        let produces: string[] = [
+            'application/json'
+        ];
 
         // authentication (oauth2_client_credentials_grant) required
+        // oauth required
         if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
+            let accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
+            headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
         // authentication (oauth2_password_grant) required
+        // oauth required
         if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
+            let accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
+            headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-        // to determine the Accept header
-        let httpHeaderAccepts: string[] = [
-            'application/json'
-        ];
-        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
-        if (httpHeaderAcceptSelected != undefined) {
-            headers = headers.set('Accept', httpHeaderAcceptSelected);
+            
+        headers.set('Content-Type', 'application/json');
+
+        let requestOptions: RequestOptionsArgs = new RequestOptions({
+            method: RequestMethod.Put,
+            headers: headers,
+            body: enabled == null ? '' : JSON.stringify(enabled), // https://github.com/angular/angular/issues/10612
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
+        });
+        // https://github.com/swagger-api/swagger-codegen/issues/4037
+        if (extraHttpRequestParams) {
+            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
         }
 
-        // to determine the Content-Type header
-        const consumes: string[] = [
-            'application/json'
-        ];
-        const httpContentTypeSelected: string | undefined = this.configuration.selectHeaderContentType(consumes);
-        if (httpContentTypeSelected != undefined) {
-            headers = headers.set('Content-Type', httpContentTypeSelected);
-        }
-
-        return this.httpClient.put<any>(`${this.basePath}/bre/rules/${encodeURIComponent(String(id))}/enabled`,
-            enabled,
-            {
-                withCredentials: this.configuration.withCredentials,
-                headers: headers,
-                observe: observe,
-                reportProgress: reportProgress
-            }
-        );
+        return this.http.request(path, requestOptions);
     }
 
     /**
@@ -445,62 +568,58 @@ export class RuleEngineRulesService {
      * Cannot update system rules. &lt;br&gt;&lt;br&gt;&lt;b&gt;Permissions Needed:&lt;/b&gt; BRE_RULE_ENGINE_RULES_ADMIN
      * @param id The id of the rule
      * @param breRule The BRE rule object
-     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-     * @param reportProgress flag to report request and response progress.
      */
-    public updateBRERule(id: string, breRule?: BreRule, observe?: 'body', reportProgress?: boolean): Observable<BreRule>;
-    public updateBRERule(id: string, breRule?: BreRule, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<BreRule>>;
-    public updateBRERule(id: string, breRule?: BreRule, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<BreRule>>;
-    public updateBRERule(id: string, breRule?: BreRule, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public updateBRERuleWithHttpInfo(id: string, breRule?: BreRule, extraHttpRequestParams?: any): Observable<Response> {
+        const path = this.basePath + '/bre/rules/${id}'
+                    .replace('${' + 'id' + '}', String(id));
+
+        let queryParameters = new URLSearchParams();
+        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
+        // verify required parameter 'id' is not null or undefined
         if (id === null || id === undefined) {
             throw new Error('Required parameter id was null or undefined when calling updateBRERule.');
         }
 
-        let headers = this.defaultHeaders;
+        // to determine the Accept header
+        let produces: string[] = [
+            'application/json'
+        ];
 
         // authentication (oauth2_client_credentials_grant) required
+        // oauth required
         if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
+            let accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
+            headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
         // authentication (oauth2_password_grant) required
+        // oauth required
         if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
+            let accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
+            headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-        // to determine the Accept header
-        let httpHeaderAccepts: string[] = [
-            'application/json'
-        ];
-        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
-        if (httpHeaderAcceptSelected != undefined) {
-            headers = headers.set('Accept', httpHeaderAcceptSelected);
+            
+        headers.set('Content-Type', 'application/json');
+
+        let requestOptions: RequestOptionsArgs = new RequestOptions({
+            method: RequestMethod.Put,
+            headers: headers,
+            body: breRule == null ? '' : JSON.stringify(breRule), // https://github.com/angular/angular/issues/10612
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
+        });
+        // https://github.com/swagger-api/swagger-codegen/issues/4037
+        if (extraHttpRequestParams) {
+            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
         }
 
-        // to determine the Content-Type header
-        const consumes: string[] = [
-            'application/json'
-        ];
-        const httpContentTypeSelected: string | undefined = this.configuration.selectHeaderContentType(consumes);
-        if (httpContentTypeSelected != undefined) {
-            headers = headers.set('Content-Type', httpContentTypeSelected);
-        }
-
-        return this.httpClient.put<BreRule>(`${this.basePath}/bre/rules/${encodeURIComponent(String(id))}`,
-            breRule,
-            {
-                withCredentials: this.configuration.withCredentials,
-                headers: headers,
-                observe: observe,
-                reportProgress: reportProgress
-            }
-        );
+        return this.http.request(path, requestOptions);
     }
 
 }

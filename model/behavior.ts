@@ -11,10 +11,13 @@
  */
 
 
-export interface Behavior { 
+
+export interface Behavior {
     description?: string;
+
     /**
      * Used for polymorphic type recognition and thus must match an expected type with additional properties
      */
     typeHint?: string;
+
 }

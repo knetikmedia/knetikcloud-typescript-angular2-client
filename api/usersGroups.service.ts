@@ -9,24 +9,27 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
+
 /* tslint:disable:no-unused-variable member-ordering */
 
 import { Inject, Injectable, Optional }                      from '@angular/core';
-import { HttpClient, HttpHeaders, HttpParams,
-         HttpResponse, HttpEvent }                           from '@angular/common/http';
-import { CustomHttpUrlEncodingCodec }                        from '../encoder';
+import { Http, Headers, URLSearchParams }                    from '@angular/http';
+import { RequestMethod, RequestOptions, RequestOptionsArgs } from '@angular/http';
+import { Response, ResponseContentType }                     from '@angular/http';
 
 import { Observable }                                        from 'rxjs/Observable';
+import '../rxjs-operators';
 
 import { ChatMessageRequest } from '../model/chatMessageRequest';
 import { ChatMessageResource } from '../model/chatMessageResource';
 import { GroupMemberResource } from '../model/groupMemberResource';
-import { GroupMemberStatusWrapper } from '../model/groupMemberStatusWrapper';
 import { GroupResource } from '../model/groupResource';
 import { PageResourceChatMessageResource } from '../model/pageResourceChatMessageResource';
 import { PageResourceGroupMemberResource } from '../model/pageResourceGroupMemberResource';
 import { PageResourceGroupResource } from '../model/pageResourceGroupResource';
 import { PageResourceTemplateResource } from '../model/pageResourceTemplateResource';
+import { PageResourcestring } from '../model/pageResourcestring';
+import { PatchResource } from '../model/patchResource';
 import { Result } from '../model/result';
 import { StringWrapper } from '../model/stringWrapper';
 import { TemplateResource } from '../model/templateResource';
@@ -39,18 +42,33 @@ import { Configuration }                                     from '../configurat
 @Injectable()
 export class UsersGroupsService {
 
-    protected basePath = 'https://jsapi-integration.us-east-1.elasticbeanstalk.com';
-    public defaultHeaders = new HttpHeaders();
-    public configuration = new Configuration();
+    protected basePath = 'https://devsandbox.knetikcloud.com';
+    public defaultHeaders: Headers = new Headers();
+    public configuration: Configuration = new Configuration();
 
-    constructor(protected httpClient: HttpClient, @Optional()@Inject(BASE_PATH) basePath: string, @Optional() configuration: Configuration) {
+    constructor(protected http: Http, @Optional()@Inject(BASE_PATH) basePath: string, @Optional() configuration: Configuration) {
         if (basePath) {
             this.basePath = basePath;
         }
         if (configuration) {
             this.configuration = configuration;
-            this.basePath = basePath || configuration.basePath || this.basePath;
+			this.basePath = basePath || configuration.basePath || this.basePath;
         }
+    }
+
+    /**
+     * 
+     * Extends object by coping non-existing properties.
+     * @param objA object to be extended
+     * @param objB source object
+     */
+    private extendObj<T1,T2>(objA: T1, objB: T2) {
+        for(let key in objB){
+            if(objB.hasOwnProperty(key)){
+                (objA as any)[key] = (objB as any)[key];
+            }
+        }
+        return <T1&T2>objA;
     }
 
     /**
@@ -59,7 +77,7 @@ export class UsersGroupsService {
      */
     private canConsumeForm(consumes: string[]): boolean {
         const form = 'multipart/form-data';
-        for (const consume of consumes) {
+        for (let consume of consumes) {
             if (form === consume) {
                 return true;
             }
@@ -67,1190 +85,335 @@ export class UsersGroupsService {
         return false;
     }
 
-
     /**
-     * Adds a new member to the group
-     * &lt;b&gt;Permissions Needed:&lt;/b&gt; GROUP_ADMIN or self if open
+     * <b>Permissions Needed:</b> POST or JOIN if self<br /><b>Permissions Needed:</b> NONE
+     * @summary Adds a new member to the group
      * @param uniqueName The group unique name
      * @param user The id and status for a user to add to the group
-     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-     * @param reportProgress flag to report request and response progress.
      */
-    public addMemberToGroup(uniqueName: string, user: GroupMemberResource, observe?: 'body', reportProgress?: boolean): Observable<GroupMemberResource>;
-    public addMemberToGroup(uniqueName: string, user: GroupMemberResource, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<GroupMemberResource>>;
-    public addMemberToGroup(uniqueName: string, user: GroupMemberResource, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<GroupMemberResource>>;
-    public addMemberToGroup(uniqueName: string, user: GroupMemberResource, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
-        if (uniqueName === null || uniqueName === undefined) {
-            throw new Error('Required parameter uniqueName was null or undefined when calling addMemberToGroup.');
-        }
-        if (user === null || user === undefined) {
-            throw new Error('Required parameter user was null or undefined when calling addMemberToGroup.');
-        }
-
-        let headers = this.defaultHeaders;
-
-        // authentication (oauth2_client_credentials_grant) required
-        if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
-                ? this.configuration.accessToken()
-                : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
-        }
-
-        // authentication (oauth2_password_grant) required
-        if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
-                ? this.configuration.accessToken()
-                : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
-        }
-
-        // to determine the Accept header
-        let httpHeaderAccepts: string[] = [
-            'application/json'
-        ];
-        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
-        if (httpHeaderAcceptSelected != undefined) {
-            headers = headers.set('Accept', httpHeaderAcceptSelected);
-        }
-
-        // to determine the Content-Type header
-        const consumes: string[] = [
-            'application/json'
-        ];
-        const httpContentTypeSelected: string | undefined = this.configuration.selectHeaderContentType(consumes);
-        if (httpContentTypeSelected != undefined) {
-            headers = headers.set('Content-Type', httpContentTypeSelected);
-        }
-
-        return this.httpClient.post<GroupMemberResource>(`${this.basePath}/users/groups/${encodeURIComponent(String(uniqueName))}/members`,
-            user,
-            {
-                withCredentials: this.configuration.withCredentials,
-                headers: headers,
-                observe: observe,
-                reportProgress: reportProgress
-            }
-        );
+    public addMemberToGroup(uniqueName: string, user: GroupMemberResource, extraHttpRequestParams?: any): Observable<GroupMemberResource> {
+        return this.addMemberToGroupWithHttpInfo(uniqueName, user, extraHttpRequestParams)
+            .map((response: Response) => {
+                if (response.status === 204) {
+                    return undefined;
+                } else {
+                    return response.json() || {};
+                }
+            });
     }
 
     /**
-     * Adds multiple members to the group
-     * &lt;b&gt;Permissions Needed:&lt;/b&gt; GROUP_ADMIN
+     * <b>Permissions Needed:</b> POST<br /><b>Permissions Needed:</b> POST
+     * @summary Adds multiple members to the group
      * @param uniqueName The group unique name
      * @param users The id and status for a list of users to add to the group
-     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-     * @param reportProgress flag to report request and response progress.
      */
-    public addMembersToGroup(uniqueName: string, users: Array<GroupMemberResource>, observe?: 'body', reportProgress?: boolean): Observable<Array<GroupMemberResource>>;
-    public addMembersToGroup(uniqueName: string, users: Array<GroupMemberResource>, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Array<GroupMemberResource>>>;
-    public addMembersToGroup(uniqueName: string, users: Array<GroupMemberResource>, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Array<GroupMemberResource>>>;
-    public addMembersToGroup(uniqueName: string, users: Array<GroupMemberResource>, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
-        if (uniqueName === null || uniqueName === undefined) {
-            throw new Error('Required parameter uniqueName was null or undefined when calling addMembersToGroup.');
-        }
-        if (users === null || users === undefined) {
-            throw new Error('Required parameter users was null or undefined when calling addMembersToGroup.');
-        }
-
-        let headers = this.defaultHeaders;
-
-        // authentication (oauth2_client_credentials_grant) required
-        if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
-                ? this.configuration.accessToken()
-                : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
-        }
-
-        // authentication (oauth2_password_grant) required
-        if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
-                ? this.configuration.accessToken()
-                : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
-        }
-
-        // to determine the Accept header
-        let httpHeaderAccepts: string[] = [
-            'application/json'
-        ];
-        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
-        if (httpHeaderAcceptSelected != undefined) {
-            headers = headers.set('Accept', httpHeaderAcceptSelected);
-        }
-
-        // to determine the Content-Type header
-        const consumes: string[] = [
-            'application/json'
-        ];
-        const httpContentTypeSelected: string | undefined = this.configuration.selectHeaderContentType(consumes);
-        if (httpContentTypeSelected != undefined) {
-            headers = headers.set('Content-Type', httpContentTypeSelected);
-        }
-
-        return this.httpClient.post<Array<GroupMemberResource>>(`${this.basePath}/users/groups/${encodeURIComponent(String(uniqueName))}/members/batch-add`,
-            users,
-            {
-                withCredentials: this.configuration.withCredentials,
-                headers: headers,
-                observe: observe,
-                reportProgress: reportProgress
-            }
-        );
+    public addMembersToGroup(uniqueName: string, users: Array<GroupMemberResource>, extraHttpRequestParams?: any): Observable<Array<GroupMemberResource>> {
+        return this.addMembersToGroupWithHttpInfo(uniqueName, users, extraHttpRequestParams)
+            .map((response: Response) => {
+                if (response.status === 204) {
+                    return undefined;
+                } else {
+                    return response.json() || {};
+                }
+            });
     }
 
     /**
-     * Create a group
-     * &lt;b&gt;Permissions Needed:&lt;/b&gt; GROUP_ADMIN
+     * <b>Permissions Needed:</b> POST<br /><b>Permissions Needed:</b> POST
+     * @summary Create a group
      * @param groupResource The new group
-     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-     * @param reportProgress flag to report request and response progress.
      */
-    public createGroup(groupResource?: GroupResource, observe?: 'body', reportProgress?: boolean): Observable<GroupResource>;
-    public createGroup(groupResource?: GroupResource, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<GroupResource>>;
-    public createGroup(groupResource?: GroupResource, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<GroupResource>>;
-    public createGroup(groupResource?: GroupResource, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
-
-        let headers = this.defaultHeaders;
-
-        // authentication (oauth2_client_credentials_grant) required
-        if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
-                ? this.configuration.accessToken()
-                : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
-        }
-
-        // authentication (oauth2_password_grant) required
-        if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
-                ? this.configuration.accessToken()
-                : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
-        }
-
-        // to determine the Accept header
-        let httpHeaderAccepts: string[] = [
-            'application/json'
-        ];
-        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
-        if (httpHeaderAcceptSelected != undefined) {
-            headers = headers.set('Accept', httpHeaderAcceptSelected);
-        }
-
-        // to determine the Content-Type header
-        const consumes: string[] = [
-            'application/json'
-        ];
-        const httpContentTypeSelected: string | undefined = this.configuration.selectHeaderContentType(consumes);
-        if (httpContentTypeSelected != undefined) {
-            headers = headers.set('Content-Type', httpContentTypeSelected);
-        }
-
-        return this.httpClient.post<GroupResource>(`${this.basePath}/users/groups`,
-            groupResource,
-            {
-                withCredentials: this.configuration.withCredentials,
-                headers: headers,
-                observe: observe,
-                reportProgress: reportProgress
-            }
-        );
+    public createGroup(groupResource?: GroupResource, extraHttpRequestParams?: any): Observable<GroupResource> {
+        return this.createGroupWithHttpInfo(groupResource, extraHttpRequestParams)
+            .map((response: Response) => {
+                if (response.status === 204) {
+                    return undefined;
+                } else {
+                    return response.json() || {};
+                }
+            });
     }
 
     /**
-     * Create an group member template
-     * GroupMember Templates define a type of group member and the properties they have. &lt;br&gt;&lt;br&gt;&lt;b&gt;Permissions Needed:&lt;/b&gt; TEMPLATE_ADMIN
+     * GroupMember Templates define a type of group member and the properties they have.<br /><b>Permissions Needed:</b> POST
+     * @summary Create a group member template
      * @param groupMemberTemplateResource The group member template resource object
-     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-     * @param reportProgress flag to report request and response progress.
      */
-    public createGroupMemberTemplate(groupMemberTemplateResource?: TemplateResource, observe?: 'body', reportProgress?: boolean): Observable<TemplateResource>;
-    public createGroupMemberTemplate(groupMemberTemplateResource?: TemplateResource, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<TemplateResource>>;
-    public createGroupMemberTemplate(groupMemberTemplateResource?: TemplateResource, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<TemplateResource>>;
-    public createGroupMemberTemplate(groupMemberTemplateResource?: TemplateResource, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
-
-        let headers = this.defaultHeaders;
-
-        // authentication (oauth2_client_credentials_grant) required
-        if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
-                ? this.configuration.accessToken()
-                : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
-        }
-
-        // authentication (oauth2_password_grant) required
-        if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
-                ? this.configuration.accessToken()
-                : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
-        }
-
-        // to determine the Accept header
-        let httpHeaderAccepts: string[] = [
-            'application/json'
-        ];
-        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
-        if (httpHeaderAcceptSelected != undefined) {
-            headers = headers.set('Accept', httpHeaderAcceptSelected);
-        }
-
-        // to determine the Content-Type header
-        const consumes: string[] = [
-            'application/json'
-        ];
-        const httpContentTypeSelected: string | undefined = this.configuration.selectHeaderContentType(consumes);
-        if (httpContentTypeSelected != undefined) {
-            headers = headers.set('Content-Type', httpContentTypeSelected);
-        }
-
-        return this.httpClient.post<TemplateResource>(`${this.basePath}/users/groups/members/templates`,
-            groupMemberTemplateResource,
-            {
-                withCredentials: this.configuration.withCredentials,
-                headers: headers,
-                observe: observe,
-                reportProgress: reportProgress
-            }
-        );
+    public createGroupMemberTemplate(groupMemberTemplateResource?: TemplateResource, extraHttpRequestParams?: any): Observable<TemplateResource> {
+        return this.createGroupMemberTemplateWithHttpInfo(groupMemberTemplateResource, extraHttpRequestParams)
+            .map((response: Response) => {
+                if (response.status === 204) {
+                    return undefined;
+                } else {
+                    return response.json() || {};
+                }
+            });
     }
 
     /**
-     * Create a group template
-     * Group Templates define a type of group and the properties they have. &lt;br&gt;&lt;br&gt;&lt;b&gt;Permissions Needed:&lt;/b&gt; TEMPLATE_ADMIN
+     * Group Templates define a type of group and the properties they have.<br /><b>Permissions Needed:</b> POST
+     * @summary Create a group template
      * @param groupTemplateResource The group template resource object
-     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-     * @param reportProgress flag to report request and response progress.
      */
-    public createGroupTemplate(groupTemplateResource?: TemplateResource, observe?: 'body', reportProgress?: boolean): Observable<TemplateResource>;
-    public createGroupTemplate(groupTemplateResource?: TemplateResource, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<TemplateResource>>;
-    public createGroupTemplate(groupTemplateResource?: TemplateResource, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<TemplateResource>>;
-    public createGroupTemplate(groupTemplateResource?: TemplateResource, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
-
-        let headers = this.defaultHeaders;
-
-        // authentication (oauth2_client_credentials_grant) required
-        if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
-                ? this.configuration.accessToken()
-                : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
-        }
-
-        // authentication (oauth2_password_grant) required
-        if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
-                ? this.configuration.accessToken()
-                : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
-        }
-
-        // to determine the Accept header
-        let httpHeaderAccepts: string[] = [
-            'application/json'
-        ];
-        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
-        if (httpHeaderAcceptSelected != undefined) {
-            headers = headers.set('Accept', httpHeaderAcceptSelected);
-        }
-
-        // to determine the Content-Type header
-        const consumes: string[] = [
-            'application/json'
-        ];
-        const httpContentTypeSelected: string | undefined = this.configuration.selectHeaderContentType(consumes);
-        if (httpContentTypeSelected != undefined) {
-            headers = headers.set('Content-Type', httpContentTypeSelected);
-        }
-
-        return this.httpClient.post<TemplateResource>(`${this.basePath}/users/groups/templates`,
-            groupTemplateResource,
-            {
-                withCredentials: this.configuration.withCredentials,
-                headers: headers,
-                observe: observe,
-                reportProgress: reportProgress
-            }
-        );
+    public createGroupTemplate(groupTemplateResource?: TemplateResource, extraHttpRequestParams?: any): Observable<TemplateResource> {
+        return this.createGroupTemplateWithHttpInfo(groupTemplateResource, extraHttpRequestParams)
+            .map((response: Response) => {
+                if (response.status === 204) {
+                    return undefined;
+                } else {
+                    return response.json() || {};
+                }
+            });
     }
 
     /**
-     * Removes a group from the system
-     * All groups listing this as the parent are also removed and users are in turn removed from this and those groups. This may result in users no longer being in this group&#39;s parent if they were not added to it directly as well. &lt;br&gt;&lt;br&gt;&lt;b&gt;Permissions Needed:&lt;/b&gt; GROUP_ADMIN
+     * All groups listing this as the parent are also removed and users are in turn removed from this and those groups. This may result in users no longer being in this group's parent if they were not added to it directly as well. <br><br><b>Permissions Needed:</b> DELETE<br /><b>Permissions Needed:</b> DELETE
+     * @summary Removes a group from the system
      * @param uniqueName The group unique name
-     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-     * @param reportProgress flag to report request and response progress.
      */
-    public deleteGroup(uniqueName: string, observe?: 'body', reportProgress?: boolean): Observable<any>;
-    public deleteGroup(uniqueName: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
-    public deleteGroup(uniqueName: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
-    public deleteGroup(uniqueName: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
-        if (uniqueName === null || uniqueName === undefined) {
-            throw new Error('Required parameter uniqueName was null or undefined when calling deleteGroup.');
-        }
-
-        let headers = this.defaultHeaders;
-
-        // authentication (oauth2_client_credentials_grant) required
-        if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
-                ? this.configuration.accessToken()
-                : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
-        }
-
-        // authentication (oauth2_password_grant) required
-        if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
-                ? this.configuration.accessToken()
-                : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
-        }
-
-        // to determine the Accept header
-        let httpHeaderAccepts: string[] = [
-            'application/json'
-        ];
-        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
-        if (httpHeaderAcceptSelected != undefined) {
-            headers = headers.set('Accept', httpHeaderAcceptSelected);
-        }
-
-        // to determine the Content-Type header
-        const consumes: string[] = [
-        ];
-
-        return this.httpClient.delete<any>(`${this.basePath}/users/groups/${encodeURIComponent(String(uniqueName))}`,
-            {
-                withCredentials: this.configuration.withCredentials,
-                headers: headers,
-                observe: observe,
-                reportProgress: reportProgress
-            }
-        );
+    public deleteGroup(uniqueName: string, extraHttpRequestParams?: any): Observable<{}> {
+        return this.deleteGroupWithHttpInfo(uniqueName, extraHttpRequestParams)
+            .map((response: Response) => {
+                if (response.status === 204) {
+                    return undefined;
+                } else {
+                    return response.json() || {};
+                }
+            });
     }
 
     /**
-     * Delete an group member template
-     * If cascade &#x3D; &#39;detach&#39;, it will force delete the template even if it&#39;s attached to other objects. &lt;br&gt;&lt;br&gt;&lt;b&gt;Permissions Needed:&lt;/b&gt; TEMPLATE_ADMIN
+     * If cascade = 'detach', it will force delete the template even if it's attached to other objects.<br /><b>Permissions Needed:</b> DELETE
+     * @summary Delete a group member template
      * @param id The id of the template
      * @param cascade The value needed to delete used templates
-     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-     * @param reportProgress flag to report request and response progress.
      */
-    public deleteGroupMemberTemplate(id: string, cascade?: string, observe?: 'body', reportProgress?: boolean): Observable<any>;
-    public deleteGroupMemberTemplate(id: string, cascade?: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
-    public deleteGroupMemberTemplate(id: string, cascade?: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
-    public deleteGroupMemberTemplate(id: string, cascade?: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
-        if (id === null || id === undefined) {
-            throw new Error('Required parameter id was null or undefined when calling deleteGroupMemberTemplate.');
-        }
-
-        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
-        if (cascade !== undefined && cascade !== null) {
-            queryParameters = queryParameters.set('cascade', <any>cascade);
-        }
-
-        let headers = this.defaultHeaders;
-
-        // authentication (oauth2_client_credentials_grant) required
-        if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
-                ? this.configuration.accessToken()
-                : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
-        }
-
-        // authentication (oauth2_password_grant) required
-        if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
-                ? this.configuration.accessToken()
-                : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
-        }
-
-        // to determine the Accept header
-        let httpHeaderAccepts: string[] = [
-            'application/json'
-        ];
-        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
-        if (httpHeaderAcceptSelected != undefined) {
-            headers = headers.set('Accept', httpHeaderAcceptSelected);
-        }
-
-        // to determine the Content-Type header
-        const consumes: string[] = [
-        ];
-
-        return this.httpClient.delete<any>(`${this.basePath}/users/groups/members/templates/${encodeURIComponent(String(id))}`,
-            {
-                params: queryParameters,
-                withCredentials: this.configuration.withCredentials,
-                headers: headers,
-                observe: observe,
-                reportProgress: reportProgress
-            }
-        );
+    public deleteGroupMemberTemplate(id: string, cascade?: string, extraHttpRequestParams?: any): Observable<{}> {
+        return this.deleteGroupMemberTemplateWithHttpInfo(id, cascade, extraHttpRequestParams)
+            .map((response: Response) => {
+                if (response.status === 204) {
+                    return undefined;
+                } else {
+                    return response.json() || {};
+                }
+            });
     }
 
     /**
-     * Delete a group template
-     * If cascade &#x3D; &#39;detach&#39;, it will force delete the template even if it&#39;s attached to other objects. &lt;br&gt;&lt;br&gt;&lt;b&gt;Permissions Needed:&lt;/b&gt; TEMPLATE_ADMIN
+     * If cascade = 'detach', it will force delete the template even if it's attached to other objects.<br /><b>Permissions Needed:</b> DELETE
+     * @summary Delete a group template
      * @param id The id of the template
      * @param cascade The value needed to delete used templates
-     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-     * @param reportProgress flag to report request and response progress.
      */
-    public deleteGroupTemplate(id: string, cascade?: string, observe?: 'body', reportProgress?: boolean): Observable<any>;
-    public deleteGroupTemplate(id: string, cascade?: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
-    public deleteGroupTemplate(id: string, cascade?: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
-    public deleteGroupTemplate(id: string, cascade?: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
-        if (id === null || id === undefined) {
-            throw new Error('Required parameter id was null or undefined when calling deleteGroupTemplate.');
-        }
-
-        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
-        if (cascade !== undefined && cascade !== null) {
-            queryParameters = queryParameters.set('cascade', <any>cascade);
-        }
-
-        let headers = this.defaultHeaders;
-
-        // authentication (oauth2_client_credentials_grant) required
-        if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
-                ? this.configuration.accessToken()
-                : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
-        }
-
-        // authentication (oauth2_password_grant) required
-        if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
-                ? this.configuration.accessToken()
-                : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
-        }
-
-        // to determine the Accept header
-        let httpHeaderAccepts: string[] = [
-            'application/json'
-        ];
-        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
-        if (httpHeaderAcceptSelected != undefined) {
-            headers = headers.set('Accept', httpHeaderAcceptSelected);
-        }
-
-        // to determine the Content-Type header
-        const consumes: string[] = [
-        ];
-
-        return this.httpClient.delete<any>(`${this.basePath}/users/groups/templates/${encodeURIComponent(String(id))}`,
-            {
-                params: queryParameters,
-                withCredentials: this.configuration.withCredentials,
-                headers: headers,
-                observe: observe,
-                reportProgress: reportProgress
-            }
-        );
+    public deleteGroupTemplate(id: string, cascade?: string, extraHttpRequestParams?: any): Observable<{}> {
+        return this.deleteGroupTemplateWithHttpInfo(id, cascade, extraHttpRequestParams)
+            .map((response: Response) => {
+                if (response.status === 204) {
+                    return undefined;
+                } else {
+                    return response.json() || {};
+                }
+            });
     }
 
     /**
-     * Enable or disable notification of group messages
-     * &lt;b&gt;Permissions Needed:&lt;/b&gt; TOPICS_ADMIN or self
+     * <b>Permissions Needed:</b> TOPICS_ADMIN or self
+     * @summary Enable or disable notification of group messages
      * @param uniqueName The group unique name
      * @param userId The user id of the member or &#39;me&#39;
      * @param disabled disabled
-     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-     * @param reportProgress flag to report request and response progress.
      */
-    public disableGroupNotification(uniqueName: string, userId: string, disabled: ValueWrapperboolean, observe?: 'body', reportProgress?: boolean): Observable<any>;
-    public disableGroupNotification(uniqueName: string, userId: string, disabled: ValueWrapperboolean, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
-    public disableGroupNotification(uniqueName: string, userId: string, disabled: ValueWrapperboolean, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
-    public disableGroupNotification(uniqueName: string, userId: string, disabled: ValueWrapperboolean, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
-        if (uniqueName === null || uniqueName === undefined) {
-            throw new Error('Required parameter uniqueName was null or undefined when calling disableGroupNotification.');
-        }
-        if (userId === null || userId === undefined) {
-            throw new Error('Required parameter userId was null or undefined when calling disableGroupNotification.');
-        }
-        if (disabled === null || disabled === undefined) {
-            throw new Error('Required parameter disabled was null or undefined when calling disableGroupNotification.');
-        }
-
-        let headers = this.defaultHeaders;
-
-        // authentication (oauth2_client_credentials_grant) required
-        if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
-                ? this.configuration.accessToken()
-                : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
-        }
-
-        // authentication (oauth2_password_grant) required
-        if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
-                ? this.configuration.accessToken()
-                : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
-        }
-
-        // to determine the Accept header
-        let httpHeaderAccepts: string[] = [
-            'application/json'
-        ];
-        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
-        if (httpHeaderAcceptSelected != undefined) {
-            headers = headers.set('Accept', httpHeaderAcceptSelected);
-        }
-
-        // to determine the Content-Type header
-        const consumes: string[] = [
-            'application/json'
-        ];
-        const httpContentTypeSelected: string | undefined = this.configuration.selectHeaderContentType(consumes);
-        if (httpContentTypeSelected != undefined) {
-            headers = headers.set('Content-Type', httpContentTypeSelected);
-        }
-
-        return this.httpClient.put<any>(`${this.basePath}/users/groups/${encodeURIComponent(String(uniqueName))}/members/${encodeURIComponent(String(userId))}/messages/disabled`,
-            disabled,
-            {
-                withCredentials: this.configuration.withCredentials,
-                headers: headers,
-                observe: observe,
-                reportProgress: reportProgress
-            }
-        );
+    public disableGroupNotification(uniqueName: string, userId: string, disabled: ValueWrapperboolean, extraHttpRequestParams?: any): Observable<{}> {
+        return this.disableGroupNotificationWithHttpInfo(uniqueName, userId, disabled, extraHttpRequestParams)
+            .map((response: Response) => {
+                if (response.status === 204) {
+                    return undefined;
+                } else {
+                    return response.json() || {};
+                }
+            });
     }
 
     /**
-     * Loads a specific group&#39;s details
-     * &lt;b&gt;Permissions Needed:&lt;/b&gt; ANY
+     * <b>Permissions Needed:</b> GET<br /><b>Permissions Needed:</b> GET
+     * @summary Loads a specific group's details
      * @param uniqueName The group unique name
-     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-     * @param reportProgress flag to report request and response progress.
      */
-    public getGroup(uniqueName: string, observe?: 'body', reportProgress?: boolean): Observable<GroupResource>;
-    public getGroup(uniqueName: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<GroupResource>>;
-    public getGroup(uniqueName: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<GroupResource>>;
-    public getGroup(uniqueName: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
-        if (uniqueName === null || uniqueName === undefined) {
-            throw new Error('Required parameter uniqueName was null or undefined when calling getGroup.');
-        }
-
-        let headers = this.defaultHeaders;
-
-        // authentication (oauth2_client_credentials_grant) required
-        if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
-                ? this.configuration.accessToken()
-                : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
-        }
-
-        // authentication (oauth2_password_grant) required
-        if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
-                ? this.configuration.accessToken()
-                : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
-        }
-
-        // to determine the Accept header
-        let httpHeaderAccepts: string[] = [
-            'application/json'
-        ];
-        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
-        if (httpHeaderAcceptSelected != undefined) {
-            headers = headers.set('Accept', httpHeaderAcceptSelected);
-        }
-
-        // to determine the Content-Type header
-        const consumes: string[] = [
-        ];
-
-        return this.httpClient.get<GroupResource>(`${this.basePath}/users/groups/${encodeURIComponent(String(uniqueName))}`,
-            {
-                withCredentials: this.configuration.withCredentials,
-                headers: headers,
-                observe: observe,
-                reportProgress: reportProgress
-            }
-        );
+    public getGroup(uniqueName: string, extraHttpRequestParams?: any): Observable<GroupResource> {
+        return this.getGroupWithHttpInfo(uniqueName, extraHttpRequestParams)
+            .map((response: Response) => {
+                if (response.status === 204) {
+                    return undefined;
+                } else {
+                    return response.json() || {};
+                }
+            });
     }
 
     /**
-     * Get group ancestors
-     * Returns a list of ancestor groups in reverse order (parent, then grandparent, etc). &lt;br&gt;&lt;br&gt;&lt;b&gt;Permissions Needed:&lt;/b&gt; ANY
+     * Returns a list of ancestor groups in reverse order (parent, then grandparent, etc). <br><br><b>Permissions Needed:</b> ANY<br /><b>Permissions Needed:</b> LIST
+     * @summary Get group ancestors
      * @param uniqueName The group unique name
-     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-     * @param reportProgress flag to report request and response progress.
+     * @param size The number of objects returned per page
+     * @param page The number of the page returned, starting with 1
      */
-    public getGroupAncestors(uniqueName: string, observe?: 'body', reportProgress?: boolean): Observable<Array<GroupResource>>;
-    public getGroupAncestors(uniqueName: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Array<GroupResource>>>;
-    public getGroupAncestors(uniqueName: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Array<GroupResource>>>;
-    public getGroupAncestors(uniqueName: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
-        if (uniqueName === null || uniqueName === undefined) {
-            throw new Error('Required parameter uniqueName was null or undefined when calling getGroupAncestors.');
-        }
-
-        let headers = this.defaultHeaders;
-
-        // authentication (oauth2_client_credentials_grant) required
-        if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
-                ? this.configuration.accessToken()
-                : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
-        }
-
-        // authentication (oauth2_password_grant) required
-        if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
-                ? this.configuration.accessToken()
-                : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
-        }
-
-        // to determine the Accept header
-        let httpHeaderAccepts: string[] = [
-            'application/json'
-        ];
-        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
-        if (httpHeaderAcceptSelected != undefined) {
-            headers = headers.set('Accept', httpHeaderAcceptSelected);
-        }
-
-        // to determine the Content-Type header
-        const consumes: string[] = [
-        ];
-
-        return this.httpClient.get<Array<GroupResource>>(`${this.basePath}/users/groups/${encodeURIComponent(String(uniqueName))}/ancestors`,
-            {
-                withCredentials: this.configuration.withCredentials,
-                headers: headers,
-                observe: observe,
-                reportProgress: reportProgress
-            }
-        );
+    public getGroupAncestors(uniqueName: string, size?: number, page?: number, extraHttpRequestParams?: any): Observable<PageResourceGroupResource> {
+        return this.getGroupAncestorsWithHttpInfo(uniqueName, size, page, extraHttpRequestParams)
+            .map((response: Response) => {
+                if (response.status === 204) {
+                    return undefined;
+                } else {
+                    return response.json() || {};
+                }
+            });
     }
 
     /**
-     * Get a user from a group
-     * &lt;b&gt;Permissions Needed:&lt;/b&gt; ANY
+     * <b>Permissions Needed:</b> GET<br /><b>Permissions Needed:</b> GET
+     * @summary Get a user from a group
      * @param uniqueName The group unique name
      * @param userId The id of the user
-     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-     * @param reportProgress flag to report request and response progress.
      */
-    public getGroupMember(uniqueName: string, userId: number, observe?: 'body', reportProgress?: boolean): Observable<GroupMemberResource>;
-    public getGroupMember(uniqueName: string, userId: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<GroupMemberResource>>;
-    public getGroupMember(uniqueName: string, userId: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<GroupMemberResource>>;
-    public getGroupMember(uniqueName: string, userId: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
-        if (uniqueName === null || uniqueName === undefined) {
-            throw new Error('Required parameter uniqueName was null or undefined when calling getGroupMember.');
-        }
-        if (userId === null || userId === undefined) {
-            throw new Error('Required parameter userId was null or undefined when calling getGroupMember.');
-        }
-
-        let headers = this.defaultHeaders;
-
-        // authentication (oauth2_client_credentials_grant) required
-        if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
-                ? this.configuration.accessToken()
-                : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
-        }
-
-        // authentication (oauth2_password_grant) required
-        if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
-                ? this.configuration.accessToken()
-                : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
-        }
-
-        // to determine the Accept header
-        let httpHeaderAccepts: string[] = [
-            'application/json'
-        ];
-        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
-        if (httpHeaderAcceptSelected != undefined) {
-            headers = headers.set('Accept', httpHeaderAcceptSelected);
-        }
-
-        // to determine the Content-Type header
-        const consumes: string[] = [
-        ];
-
-        return this.httpClient.get<GroupMemberResource>(`${this.basePath}/users/groups/${encodeURIComponent(String(uniqueName))}/members/${encodeURIComponent(String(userId))}`,
-            {
-                withCredentials: this.configuration.withCredentials,
-                headers: headers,
-                observe: observe,
-                reportProgress: reportProgress
-            }
-        );
+    public getGroupMember(uniqueName: string, userId: number, extraHttpRequestParams?: any): Observable<GroupMemberResource> {
+        return this.getGroupMemberWithHttpInfo(uniqueName, userId, extraHttpRequestParams)
+            .map((response: Response) => {
+                if (response.status === 204) {
+                    return undefined;
+                } else {
+                    return response.json() || {};
+                }
+            });
     }
 
     /**
-     * Get a single group member template
-     * &lt;b&gt;Permissions Needed:&lt;/b&gt; TEMPLATE_ADMIN or GROUP_ADMIN
+     * <b>Permissions Needed:</b> GET
+     * @summary Get a single group member template
      * @param id The id of the template
-     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-     * @param reportProgress flag to report request and response progress.
      */
-    public getGroupMemberTemplate(id: string, observe?: 'body', reportProgress?: boolean): Observable<TemplateResource>;
-    public getGroupMemberTemplate(id: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<TemplateResource>>;
-    public getGroupMemberTemplate(id: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<TemplateResource>>;
-    public getGroupMemberTemplate(id: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
-        if (id === null || id === undefined) {
-            throw new Error('Required parameter id was null or undefined when calling getGroupMemberTemplate.');
-        }
-
-        let headers = this.defaultHeaders;
-
-        // authentication (oauth2_client_credentials_grant) required
-        if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
-                ? this.configuration.accessToken()
-                : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
-        }
-
-        // authentication (oauth2_password_grant) required
-        if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
-                ? this.configuration.accessToken()
-                : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
-        }
-
-        // to determine the Accept header
-        let httpHeaderAccepts: string[] = [
-            'application/json'
-        ];
-        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
-        if (httpHeaderAcceptSelected != undefined) {
-            headers = headers.set('Accept', httpHeaderAcceptSelected);
-        }
-
-        // to determine the Content-Type header
-        const consumes: string[] = [
-        ];
-
-        return this.httpClient.get<TemplateResource>(`${this.basePath}/users/groups/members/templates/${encodeURIComponent(String(id))}`,
-            {
-                withCredentials: this.configuration.withCredentials,
-                headers: headers,
-                observe: observe,
-                reportProgress: reportProgress
-            }
-        );
+    public getGroupMemberTemplate(id: string, extraHttpRequestParams?: any): Observable<TemplateResource> {
+        return this.getGroupMemberTemplateWithHttpInfo(id, extraHttpRequestParams)
+            .map((response: Response) => {
+                if (response.status === 204) {
+                    return undefined;
+                } else {
+                    return response.json() || {};
+                }
+            });
     }
 
     /**
-     * List and search group member templates
-     * &lt;b&gt;Permissions Needed:&lt;/b&gt; TEMPLATE_ADMIN or GROUP_ADMIN
+     * <b>Permissions Needed:</b> LIST
+     * @summary List and search group member templates
      * @param size The number of objects returned per page
      * @param page The number of the page returned, starting with 1
      * @param order A comma separated list of sorting requirements in priority order, each entry matching PROPERTY_NAME:[ASC|DESC]
-     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-     * @param reportProgress flag to report request and response progress.
      */
-    public getGroupMemberTemplates(size?: number, page?: number, order?: string, observe?: 'body', reportProgress?: boolean): Observable<PageResourceTemplateResource>;
-    public getGroupMemberTemplates(size?: number, page?: number, order?: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<PageResourceTemplateResource>>;
-    public getGroupMemberTemplates(size?: number, page?: number, order?: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<PageResourceTemplateResource>>;
-    public getGroupMemberTemplates(size?: number, page?: number, order?: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
-
-        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
-        if (size !== undefined && size !== null) {
-            queryParameters = queryParameters.set('size', <any>size);
-        }
-        if (page !== undefined && page !== null) {
-            queryParameters = queryParameters.set('page', <any>page);
-        }
-        if (order !== undefined && order !== null) {
-            queryParameters = queryParameters.set('order', <any>order);
-        }
-
-        let headers = this.defaultHeaders;
-
-        // authentication (oauth2_client_credentials_grant) required
-        if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
-                ? this.configuration.accessToken()
-                : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
-        }
-
-        // authentication (oauth2_password_grant) required
-        if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
-                ? this.configuration.accessToken()
-                : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
-        }
-
-        // to determine the Accept header
-        let httpHeaderAccepts: string[] = [
-            'application/json'
-        ];
-        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
-        if (httpHeaderAcceptSelected != undefined) {
-            headers = headers.set('Accept', httpHeaderAcceptSelected);
-        }
-
-        // to determine the Content-Type header
-        const consumes: string[] = [
-        ];
-
-        return this.httpClient.get<PageResourceTemplateResource>(`${this.basePath}/users/groups/members/templates`,
-            {
-                params: queryParameters,
-                withCredentials: this.configuration.withCredentials,
-                headers: headers,
-                observe: observe,
-                reportProgress: reportProgress
-            }
-        );
+    public getGroupMemberTemplates(size?: number, page?: number, order?: string, extraHttpRequestParams?: any): Observable<PageResourceTemplateResource> {
+        return this.getGroupMemberTemplatesWithHttpInfo(size, page, order, extraHttpRequestParams)
+            .map((response: Response) => {
+                if (response.status === 204) {
+                    return undefined;
+                } else {
+                    return response.json() || {};
+                }
+            });
     }
 
     /**
-     * Lists members of the group
-     * &lt;b&gt;Permissions Needed:&lt;/b&gt; ANY
+     * <b>Permissions Needed:</b> LIST<br /><b>Permissions Needed:</b> LIST
+     * @summary Lists members of the group
      * @param uniqueName The group unique name
      * @param size The number of objects returned per page
      * @param page The number of the page returned, starting with 1
      * @param order A comma separated list of sorting requirements in priority order, each entry matching PROPERTY_NAME:[ASC|DESC]
-     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-     * @param reportProgress flag to report request and response progress.
      */
-    public getGroupMembers(uniqueName: string, size?: number, page?: number, order?: string, observe?: 'body', reportProgress?: boolean): Observable<PageResourceGroupMemberResource>;
-    public getGroupMembers(uniqueName: string, size?: number, page?: number, order?: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<PageResourceGroupMemberResource>>;
-    public getGroupMembers(uniqueName: string, size?: number, page?: number, order?: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<PageResourceGroupMemberResource>>;
-    public getGroupMembers(uniqueName: string, size?: number, page?: number, order?: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
-        if (uniqueName === null || uniqueName === undefined) {
-            throw new Error('Required parameter uniqueName was null or undefined when calling getGroupMembers.');
-        }
-
-        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
-        if (size !== undefined && size !== null) {
-            queryParameters = queryParameters.set('size', <any>size);
-        }
-        if (page !== undefined && page !== null) {
-            queryParameters = queryParameters.set('page', <any>page);
-        }
-        if (order !== undefined && order !== null) {
-            queryParameters = queryParameters.set('order', <any>order);
-        }
-
-        let headers = this.defaultHeaders;
-
-        // authentication (oauth2_client_credentials_grant) required
-        if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
-                ? this.configuration.accessToken()
-                : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
-        }
-
-        // authentication (oauth2_password_grant) required
-        if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
-                ? this.configuration.accessToken()
-                : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
-        }
-
-        // to determine the Accept header
-        let httpHeaderAccepts: string[] = [
-            'application/json'
-        ];
-        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
-        if (httpHeaderAcceptSelected != undefined) {
-            headers = headers.set('Accept', httpHeaderAcceptSelected);
-        }
-
-        // to determine the Content-Type header
-        const consumes: string[] = [
-        ];
-
-        return this.httpClient.get<PageResourceGroupMemberResource>(`${this.basePath}/users/groups/${encodeURIComponent(String(uniqueName))}/members`,
-            {
-                params: queryParameters,
-                withCredentials: this.configuration.withCredentials,
-                headers: headers,
-                observe: observe,
-                reportProgress: reportProgress
-            }
-        );
+    public getGroupMembers(uniqueName: string, size?: number, page?: number, order?: string, extraHttpRequestParams?: any): Observable<PageResourceGroupMemberResource> {
+        return this.getGroupMembersWithHttpInfo(uniqueName, size, page, order, extraHttpRequestParams)
+            .map((response: Response) => {
+                if (response.status === 204) {
+                    return undefined;
+                } else {
+                    return response.json() || {};
+                }
+            });
     }
 
     /**
-     * Get a list of group messages
-     * &lt;b&gt;Permissions Needed:&lt;/b&gt; ANY
+     * <b>Permissions Needed:</b> ANY
+     * @summary Get a list of group messages
      * @param uniqueName The group unique name
      * @param size The number of objects returned per page
      * @param page The number of the page returned, starting with 1
-     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-     * @param reportProgress flag to report request and response progress.
+     * @param order A comma separated list of sorting requirements in priority order, each entry matching PROPERTY_NAME:[ASC|DESC]
      */
-    public getGroupMessages(uniqueName: string, size?: number, page?: number, observe?: 'body', reportProgress?: boolean): Observable<PageResourceChatMessageResource>;
-    public getGroupMessages(uniqueName: string, size?: number, page?: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<PageResourceChatMessageResource>>;
-    public getGroupMessages(uniqueName: string, size?: number, page?: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<PageResourceChatMessageResource>>;
-    public getGroupMessages(uniqueName: string, size?: number, page?: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
-        if (uniqueName === null || uniqueName === undefined) {
-            throw new Error('Required parameter uniqueName was null or undefined when calling getGroupMessages.');
-        }
-
-        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
-        if (size !== undefined && size !== null) {
-            queryParameters = queryParameters.set('size', <any>size);
-        }
-        if (page !== undefined && page !== null) {
-            queryParameters = queryParameters.set('page', <any>page);
-        }
-
-        let headers = this.defaultHeaders;
-
-        // authentication (oauth2_client_credentials_grant) required
-        if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
-                ? this.configuration.accessToken()
-                : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
-        }
-
-        // authentication (oauth2_password_grant) required
-        if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
-                ? this.configuration.accessToken()
-                : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
-        }
-
-        // to determine the Accept header
-        let httpHeaderAccepts: string[] = [
-            'application/json'
-        ];
-        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
-        if (httpHeaderAcceptSelected != undefined) {
-            headers = headers.set('Accept', httpHeaderAcceptSelected);
-        }
-
-        // to determine the Content-Type header
-        const consumes: string[] = [
-        ];
-
-        return this.httpClient.get<PageResourceChatMessageResource>(`${this.basePath}/users/groups/${encodeURIComponent(String(uniqueName))}/messages`,
-            {
-                params: queryParameters,
-                withCredentials: this.configuration.withCredentials,
-                headers: headers,
-                observe: observe,
-                reportProgress: reportProgress
-            }
-        );
+    public getGroupMessages(uniqueName: string, size?: number, page?: number, order?: string, extraHttpRequestParams?: any): Observable<PageResourceChatMessageResource> {
+        return this.getGroupMessagesWithHttpInfo(uniqueName, size, page, order, extraHttpRequestParams)
+            .map((response: Response) => {
+                if (response.status === 204) {
+                    return undefined;
+                } else {
+                    return response.json() || {};
+                }
+            });
     }
 
     /**
-     * Get a single group template
-     * &lt;b&gt;Permissions Needed:&lt;/b&gt; TEMPLATE_ADMIN or GROUP_ADMIN
+     * <b>Permissions Needed:</b> GET
+     * @summary Get a single group template
      * @param id The id of the template
-     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-     * @param reportProgress flag to report request and response progress.
      */
-    public getGroupTemplate(id: string, observe?: 'body', reportProgress?: boolean): Observable<TemplateResource>;
-    public getGroupTemplate(id: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<TemplateResource>>;
-    public getGroupTemplate(id: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<TemplateResource>>;
-    public getGroupTemplate(id: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
-        if (id === null || id === undefined) {
-            throw new Error('Required parameter id was null or undefined when calling getGroupTemplate.');
-        }
-
-        let headers = this.defaultHeaders;
-
-        // authentication (oauth2_client_credentials_grant) required
-        if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
-                ? this.configuration.accessToken()
-                : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
-        }
-
-        // authentication (oauth2_password_grant) required
-        if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
-                ? this.configuration.accessToken()
-                : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
-        }
-
-        // to determine the Accept header
-        let httpHeaderAccepts: string[] = [
-            'application/json'
-        ];
-        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
-        if (httpHeaderAcceptSelected != undefined) {
-            headers = headers.set('Accept', httpHeaderAcceptSelected);
-        }
-
-        // to determine the Content-Type header
-        const consumes: string[] = [
-        ];
-
-        return this.httpClient.get<TemplateResource>(`${this.basePath}/users/groups/templates/${encodeURIComponent(String(id))}`,
-            {
-                withCredentials: this.configuration.withCredentials,
-                headers: headers,
-                observe: observe,
-                reportProgress: reportProgress
-            }
-        );
+    public getGroupTemplate(id: string, extraHttpRequestParams?: any): Observable<TemplateResource> {
+        return this.getGroupTemplateWithHttpInfo(id, extraHttpRequestParams)
+            .map((response: Response) => {
+                if (response.status === 204) {
+                    return undefined;
+                } else {
+                    return response.json() || {};
+                }
+            });
     }
 
     /**
-     * List and search group templates
-     * &lt;b&gt;Permissions Needed:&lt;/b&gt; TEMPLATE_ADMIN or GROUP_ADMIN
+     * <b>Permissions Needed:</b> LIST
+     * @summary List and search group templates
      * @param size The number of objects returned per page
      * @param page The number of the page returned, starting with 1
      * @param order a comma separated list of sorting requirements in priority order, each entry matching PROPERTY_NAME:[ASC|DESC]
-     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-     * @param reportProgress flag to report request and response progress.
      */
-    public getGroupTemplates(size?: number, page?: number, order?: string, observe?: 'body', reportProgress?: boolean): Observable<PageResourceTemplateResource>;
-    public getGroupTemplates(size?: number, page?: number, order?: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<PageResourceTemplateResource>>;
-    public getGroupTemplates(size?: number, page?: number, order?: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<PageResourceTemplateResource>>;
-    public getGroupTemplates(size?: number, page?: number, order?: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
-
-        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
-        if (size !== undefined && size !== null) {
-            queryParameters = queryParameters.set('size', <any>size);
-        }
-        if (page !== undefined && page !== null) {
-            queryParameters = queryParameters.set('page', <any>page);
-        }
-        if (order !== undefined && order !== null) {
-            queryParameters = queryParameters.set('order', <any>order);
-        }
-
-        let headers = this.defaultHeaders;
-
-        // authentication (oauth2_client_credentials_grant) required
-        if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
-                ? this.configuration.accessToken()
-                : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
-        }
-
-        // authentication (oauth2_password_grant) required
-        if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
-                ? this.configuration.accessToken()
-                : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
-        }
-
-        // to determine the Accept header
-        let httpHeaderAccepts: string[] = [
-            'application/json'
-        ];
-        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
-        if (httpHeaderAcceptSelected != undefined) {
-            headers = headers.set('Accept', httpHeaderAcceptSelected);
-        }
-
-        // to determine the Content-Type header
-        const consumes: string[] = [
-        ];
-
-        return this.httpClient.get<PageResourceTemplateResource>(`${this.basePath}/users/groups/templates`,
-            {
-                params: queryParameters,
-                withCredentials: this.configuration.withCredentials,
-                headers: headers,
-                observe: observe,
-                reportProgress: reportProgress
-            }
-        );
+    public getGroupTemplates(size?: number, page?: number, order?: string, extraHttpRequestParams?: any): Observable<PageResourceTemplateResource> {
+        return this.getGroupTemplatesWithHttpInfo(size, page, order, extraHttpRequestParams)
+            .map((response: Response) => {
+                if (response.status === 204) {
+                    return undefined;
+                } else {
+                    return response.json() || {};
+                }
+            });
     }
 
     /**
-     * List groups a user is in
-     * &lt;b&gt;Permissions Needed:&lt;/b&gt; ANY
+     * <b>Permissions Needed:</b> LIST_GROUPS<br /><b>Permissions Needed:</b> LIST_GROUPS
+     * @summary List groups a user is in
      * @param userId The id of the user
+     * @param size The number of objects returned per page
+     * @param page The number of the page returned, starting with 1
      * @param filterChildren Whether to limit group list to children of groups only. If true, shows only groups with parents. If false, shows only groups with no parent.
-     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-     * @param reportProgress flag to report request and response progress.
      */
-    public getGroupsForUser(userId: number, filterChildren?: boolean, observe?: 'body', reportProgress?: boolean): Observable<Array<string>>;
-    public getGroupsForUser(userId: number, filterChildren?: boolean, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Array<string>>>;
-    public getGroupsForUser(userId: number, filterChildren?: boolean, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Array<string>>>;
-    public getGroupsForUser(userId: number, filterChildren?: boolean, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
-        if (userId === null || userId === undefined) {
-            throw new Error('Required parameter userId was null or undefined when calling getGroupsForUser.');
-        }
-
-        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
-        if (filterChildren !== undefined && filterChildren !== null) {
-            queryParameters = queryParameters.set('filter_children', <any>filterChildren);
-        }
-
-        let headers = this.defaultHeaders;
-
-        // authentication (oauth2_client_credentials_grant) required
-        if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
-                ? this.configuration.accessToken()
-                : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
-        }
-
-        // authentication (oauth2_password_grant) required
-        if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
-                ? this.configuration.accessToken()
-                : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
-        }
-
-        // to determine the Accept header
-        let httpHeaderAccepts: string[] = [
-            'application/json'
-        ];
-        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
-        if (httpHeaderAcceptSelected != undefined) {
-            headers = headers.set('Accept', httpHeaderAcceptSelected);
-        }
-
-        // to determine the Content-Type header
-        const consumes: string[] = [
-        ];
-
-        return this.httpClient.get<Array<string>>(`${this.basePath}/users/${encodeURIComponent(String(userId))}/groups`,
-            {
-                params: queryParameters,
-                withCredentials: this.configuration.withCredentials,
-                headers: headers,
-                observe: observe,
-                reportProgress: reportProgress
-            }
-        );
+    public getGroupsForUser(userId: number, size?: number, page?: number, filterChildren?: boolean, extraHttpRequestParams?: any): Observable<PageResourcestring> {
+        return this.getGroupsForUserWithHttpInfo(userId, size, page, filterChildren, extraHttpRequestParams)
+            .map((response: Response) => {
+                if (response.status === 204) {
+                    return undefined;
+                } else {
+                    return response.json() || {};
+                }
+            });
     }
 
     /**
-     * List and search groups
-     * &lt;b&gt;Permissions Needed:&lt;/b&gt; ANY
+     * <b>Permissions Needed:</b> LIST<br /><b>Permissions Needed:</b> LIST
+     * @summary List and search groups
      * @param filterTemplate Filter for groups using a specific template, by id
      * @param filterMemberCount Filters groups by member count. Multiple values possible for range search. Format: filter_member_count&#x3D;OP,ts&amp;... where OP in (GT, LT, GOE, LOE, EQ). Ex: filter_member_count&#x3D;GT,14,LT,17
      * @param filterName Filter for groups with names starting with the given string
@@ -1260,83 +423,1410 @@ export class UsersGroupsService {
      * @param size The number of objects returned per page
      * @param page The number of the page returned, starting with 1
      * @param order A comma separated list of sorting requirements in priority order, each entry matching PROPERTY_NAME:[ASC|DESC]
-     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-     * @param reportProgress flag to report request and response progress.
      */
-    public listGroups(filterTemplate?: string, filterMemberCount?: string, filterName?: string, filterUniqueName?: string, filterParent?: string, filterStatus?: 'open' | 'closed', size?: number, page?: number, order?: string, observe?: 'body', reportProgress?: boolean): Observable<PageResourceGroupResource>;
-    public listGroups(filterTemplate?: string, filterMemberCount?: string, filterName?: string, filterUniqueName?: string, filterParent?: string, filterStatus?: 'open' | 'closed', size?: number, page?: number, order?: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<PageResourceGroupResource>>;
-    public listGroups(filterTemplate?: string, filterMemberCount?: string, filterName?: string, filterUniqueName?: string, filterParent?: string, filterStatus?: 'open' | 'closed', size?: number, page?: number, order?: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<PageResourceGroupResource>>;
-    public listGroups(filterTemplate?: string, filterMemberCount?: string, filterName?: string, filterUniqueName?: string, filterParent?: string, filterStatus?: 'open' | 'closed', size?: number, page?: number, order?: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public listGroups(filterTemplate?: string, filterMemberCount?: string, filterName?: string, filterUniqueName?: string, filterParent?: string, filterStatus?: string, size?: number, page?: number, order?: string, extraHttpRequestParams?: any): Observable<PageResourceGroupResource> {
+        return this.listGroupsWithHttpInfo(filterTemplate, filterMemberCount, filterName, filterUniqueName, filterParent, filterStatus, size, page, order, extraHttpRequestParams)
+            .map((response: Response) => {
+                if (response.status === 204) {
+                    return undefined;
+                } else {
+                    return response.json() || {};
+                }
+            });
+    }
 
-        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
-        if (filterTemplate !== undefined && filterTemplate !== null) {
-            queryParameters = queryParameters.set('filter_template', <any>filterTemplate);
-        }
-        if (filterMemberCount !== undefined && filterMemberCount !== null) {
-            queryParameters = queryParameters.set('filter_member_count', <any>filterMemberCount);
-        }
-        if (filterName !== undefined && filterName !== null) {
-            queryParameters = queryParameters.set('filter_name', <any>filterName);
-        }
-        if (filterUniqueName !== undefined && filterUniqueName !== null) {
-            queryParameters = queryParameters.set('filter_unique_name', <any>filterUniqueName);
-        }
-        if (filterParent !== undefined && filterParent !== null) {
-            queryParameters = queryParameters.set('filter_parent', <any>filterParent);
-        }
-        if (filterStatus !== undefined && filterStatus !== null) {
-            queryParameters = queryParameters.set('filter_status', <any>filterStatus);
-        }
-        if (size !== undefined && size !== null) {
-            queryParameters = queryParameters.set('size', <any>size);
-        }
-        if (page !== undefined && page !== null) {
-            queryParameters = queryParameters.set('page', <any>page);
-        }
-        if (order !== undefined && order !== null) {
-            queryParameters = queryParameters.set('order', <any>order);
-        }
+    /**
+     * 
+     * @summary Send a group message
+     * @param uniqueName The group unique name
+     * @param chatMessageRequest The chat message request
+     */
+    public postGroupMessage(uniqueName: string, chatMessageRequest?: ChatMessageRequest, extraHttpRequestParams?: any): Observable<ChatMessageResource> {
+        return this.postGroupMessageWithHttpInfo(uniqueName, chatMessageRequest, extraHttpRequestParams)
+            .map((response: Response) => {
+                if (response.status === 204) {
+                    return undefined;
+                } else {
+                    return response.json() || {};
+                }
+            });
+    }
 
-        let headers = this.defaultHeaders;
+    /**
+     * <b>Permissions Needed:</b> DELETE<br /><b>Permissions Needed:</b> DELETE
+     * @summary Removes a user from a group
+     * @param uniqueName The group unique name
+     * @param userId The id of the user to remove
+     */
+    public removeGroupMember(uniqueName: string, userId: number, extraHttpRequestParams?: any): Observable<{}> {
+        return this.removeGroupMemberWithHttpInfo(uniqueName, userId, extraHttpRequestParams)
+            .map((response: Response) => {
+                if (response.status === 204) {
+                    return undefined;
+                } else {
+                    return response.json() || {};
+                }
+            });
+    }
 
-        // authentication (oauth2_client_credentials_grant) required
-        if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
-                ? this.configuration.accessToken()
-                : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
+    /**
+     * If adding/removing/changing parent, user membership in group/new parent groups may be modified. The parent being removed will remove members from this sub group unless they were added explicitly to the parent and the new parent will gain members unless they were already a part of it. <br><br><b>Permissions Needed:</b> PUT<br /><b>Permissions Needed:</b> PUT
+     * @summary Update a group
+     * @param uniqueName The group unique name
+     * @param groupResource The updated group
+     */
+    public updateGroup(uniqueName: string, groupResource?: GroupResource, extraHttpRequestParams?: any): Observable<{}> {
+        return this.updateGroupWithHttpInfo(uniqueName, groupResource, extraHttpRequestParams)
+            .map((response: Response) => {
+                if (response.status === 204) {
+                    return undefined;
+                } else {
+                    return response.json() || {};
+                }
+            });
+    }
+
+    /**
+     * <b>Permissions Needed:</b> PUT<br /><b>Permissions Needed:</b> PUT
+     * @summary Change a user's order
+     * @param uniqueName The group unique name
+     * @param userId The user id of the member to modify
+     * @param order The new order for the membership
+     */
+    public updateGroupMemberOrder(uniqueName: string, userId: number, order: StringWrapper, extraHttpRequestParams?: any): Observable<{}> {
+        return this.updateGroupMemberOrderWithHttpInfo(uniqueName, userId, order, extraHttpRequestParams)
+            .map((response: Response) => {
+                if (response.status === 204) {
+                    return undefined;
+                } else {
+                    return response.json() || {};
+                }
+            });
+    }
+
+    /**
+     * <b>Permissions Needed:</b> PUT<br /><b>Permissions Needed:</b> PUT
+     * @summary Change a user's membership properties
+     * @param uniqueName The group unique name
+     * @param userId The user id of the member to modify
+     * @param properties The new properties for the membership
+     */
+    public updateGroupMemberProperties(uniqueName: string, userId: number, properties: any, extraHttpRequestParams?: any): Observable<{}> {
+        return this.updateGroupMemberPropertiesWithHttpInfo(uniqueName, userId, properties, extraHttpRequestParams)
+            .map((response: Response) => {
+                if (response.status === 204) {
+                    return undefined;
+                } else {
+                    return response.json() || {};
+                }
+            });
+    }
+
+    /**
+     * <b>Permissions Needed:</b> PUT<br /><b>Permissions Needed:</b> PUT
+     * @summary Change a user's status
+     * @param uniqueName The group unique name
+     * @param userId The user id of the member to modify
+     * @param status The new status for the user
+     */
+    public updateGroupMemberStatus(uniqueName: string, userId: number, status: StringWrapper, extraHttpRequestParams?: any): Observable<{}> {
+        return this.updateGroupMemberStatusWithHttpInfo(uniqueName, userId, status, extraHttpRequestParams)
+            .map((response: Response) => {
+                if (response.status === 204) {
+                    return undefined;
+                } else {
+                    return response.json() || {};
+                }
+            });
+    }
+
+    /**
+     * <b>Permissions Needed:</b> PUT
+     * @summary Update a group member template
+     * @param id The id of the template
+     * @param templatePatchResource The patch resource object
+     * @param testValidation If true, this will test validation but not submit the patch request
+     */
+    public updateGroupMemberTemplate(id: string, templatePatchResource?: PatchResource, testValidation?: boolean, extraHttpRequestParams?: any): Observable<TemplateResource> {
+        return this.updateGroupMemberTemplateWithHttpInfo(id, templatePatchResource, testValidation, extraHttpRequestParams)
+            .map((response: Response) => {
+                if (response.status === 204) {
+                    return undefined;
+                } else {
+                    return response.json() || {};
+                }
+            });
+    }
+
+    /**
+     * <b>Permissions Needed:</b> PUT
+     * @summary Update a group template
+     * @param id The id of the template
+     * @param templatePatchResource The patch resource object
+     * @param testValidation If true, this will test validation but not submit the patch request
+     */
+    public updateGroupTemplate(id: string, templatePatchResource?: PatchResource, testValidation?: boolean, extraHttpRequestParams?: any): Observable<TemplateResource> {
+        return this.updateGroupTemplateWithHttpInfo(id, templatePatchResource, testValidation, extraHttpRequestParams)
+            .map((response: Response) => {
+                if (response.status === 204) {
+                    return undefined;
+                } else {
+                    return response.json() || {};
+                }
+            });
+    }
+
+
+    /**
+     * Adds a new member to the group
+     * &lt;b&gt;Permissions Needed:&lt;/b&gt; POST or JOIN if self&lt;br /&gt;&lt;b&gt;Permissions Needed:&lt;/b&gt; NONE
+     * @param uniqueName The group unique name
+     * @param user The id and status for a user to add to the group
+     */
+    public addMemberToGroupWithHttpInfo(uniqueName: string, user: GroupMemberResource, extraHttpRequestParams?: any): Observable<Response> {
+        const path = this.basePath + '/users/groups/${unique_name}/members'
+                    .replace('${' + 'unique_name' + '}', String(uniqueName));
+
+        let queryParameters = new URLSearchParams();
+        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
+        // verify required parameter 'uniqueName' is not null or undefined
+        if (uniqueName === null || uniqueName === undefined) {
+            throw new Error('Required parameter uniqueName was null or undefined when calling addMemberToGroup.');
         }
-
-        // authentication (oauth2_password_grant) required
-        if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
-                ? this.configuration.accessToken()
-                : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
+        // verify required parameter 'user' is not null or undefined
+        if (user === null || user === undefined) {
+            throw new Error('Required parameter user was null or undefined when calling addMemberToGroup.');
         }
 
         // to determine the Accept header
-        let httpHeaderAccepts: string[] = [
+        let produces: string[] = [
             'application/json'
         ];
-        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
-        if (httpHeaderAcceptSelected != undefined) {
-            headers = headers.set('Accept', httpHeaderAcceptSelected);
+
+        // authentication (oauth2_client_credentials_grant) required
+        // oauth required
+        if (this.configuration.accessToken) {
+            let accessToken = typeof this.configuration.accessToken === 'function'
+                ? this.configuration.accessToken()
+                : this.configuration.accessToken;
+            headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-        // to determine the Content-Type header
-        const consumes: string[] = [
+        // authentication (oauth2_password_grant) required
+        // oauth required
+        if (this.configuration.accessToken) {
+            let accessToken = typeof this.configuration.accessToken === 'function'
+                ? this.configuration.accessToken()
+                : this.configuration.accessToken;
+            headers.set('Authorization', 'Bearer ' + accessToken);
+        }
+
+            
+        headers.set('Content-Type', 'application/json');
+
+        let requestOptions: RequestOptionsArgs = new RequestOptions({
+            method: RequestMethod.Post,
+            headers: headers,
+            body: user == null ? '' : JSON.stringify(user), // https://github.com/angular/angular/issues/10612
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
+        });
+        // https://github.com/swagger-api/swagger-codegen/issues/4037
+        if (extraHttpRequestParams) {
+            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
+        }
+
+        return this.http.request(path, requestOptions);
+    }
+
+    /**
+     * Adds multiple members to the group
+     * &lt;b&gt;Permissions Needed:&lt;/b&gt; POST&lt;br /&gt;&lt;b&gt;Permissions Needed:&lt;/b&gt; POST
+     * @param uniqueName The group unique name
+     * @param users The id and status for a list of users to add to the group
+     */
+    public addMembersToGroupWithHttpInfo(uniqueName: string, users: Array<GroupMemberResource>, extraHttpRequestParams?: any): Observable<Response> {
+        const path = this.basePath + '/users/groups/${unique_name}/members/batch-add'
+                    .replace('${' + 'unique_name' + '}', String(uniqueName));
+
+        let queryParameters = new URLSearchParams();
+        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
+        // verify required parameter 'uniqueName' is not null or undefined
+        if (uniqueName === null || uniqueName === undefined) {
+            throw new Error('Required parameter uniqueName was null or undefined when calling addMembersToGroup.');
+        }
+        // verify required parameter 'users' is not null or undefined
+        if (users === null || users === undefined) {
+            throw new Error('Required parameter users was null or undefined when calling addMembersToGroup.');
+        }
+
+        // to determine the Accept header
+        let produces: string[] = [
+            'application/json'
         ];
 
-        return this.httpClient.get<PageResourceGroupResource>(`${this.basePath}/users/groups`,
-            {
-                params: queryParameters,
-                withCredentials: this.configuration.withCredentials,
-                headers: headers,
-                observe: observe,
-                reportProgress: reportProgress
-            }
-        );
+        // authentication (oauth2_client_credentials_grant) required
+        // oauth required
+        if (this.configuration.accessToken) {
+            let accessToken = typeof this.configuration.accessToken === 'function'
+                ? this.configuration.accessToken()
+                : this.configuration.accessToken;
+            headers.set('Authorization', 'Bearer ' + accessToken);
+        }
+
+        // authentication (oauth2_password_grant) required
+        // oauth required
+        if (this.configuration.accessToken) {
+            let accessToken = typeof this.configuration.accessToken === 'function'
+                ? this.configuration.accessToken()
+                : this.configuration.accessToken;
+            headers.set('Authorization', 'Bearer ' + accessToken);
+        }
+
+            
+        headers.set('Content-Type', 'application/json');
+
+        let requestOptions: RequestOptionsArgs = new RequestOptions({
+            method: RequestMethod.Post,
+            headers: headers,
+            body: users == null ? '' : JSON.stringify(users), // https://github.com/angular/angular/issues/10612
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
+        });
+        // https://github.com/swagger-api/swagger-codegen/issues/4037
+        if (extraHttpRequestParams) {
+            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
+        }
+
+        return this.http.request(path, requestOptions);
+    }
+
+    /**
+     * Create a group
+     * &lt;b&gt;Permissions Needed:&lt;/b&gt; POST&lt;br /&gt;&lt;b&gt;Permissions Needed:&lt;/b&gt; POST
+     * @param groupResource The new group
+     */
+    public createGroupWithHttpInfo(groupResource?: GroupResource, extraHttpRequestParams?: any): Observable<Response> {
+        const path = this.basePath + '/users/groups';
+
+        let queryParameters = new URLSearchParams();
+        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
+
+        // to determine the Accept header
+        let produces: string[] = [
+            'application/json'
+        ];
+
+        // authentication (oauth2_client_credentials_grant) required
+        // oauth required
+        if (this.configuration.accessToken) {
+            let accessToken = typeof this.configuration.accessToken === 'function'
+                ? this.configuration.accessToken()
+                : this.configuration.accessToken;
+            headers.set('Authorization', 'Bearer ' + accessToken);
+        }
+
+        // authentication (oauth2_password_grant) required
+        // oauth required
+        if (this.configuration.accessToken) {
+            let accessToken = typeof this.configuration.accessToken === 'function'
+                ? this.configuration.accessToken()
+                : this.configuration.accessToken;
+            headers.set('Authorization', 'Bearer ' + accessToken);
+        }
+
+            
+        headers.set('Content-Type', 'application/json');
+
+        let requestOptions: RequestOptionsArgs = new RequestOptions({
+            method: RequestMethod.Post,
+            headers: headers,
+            body: groupResource == null ? '' : JSON.stringify(groupResource), // https://github.com/angular/angular/issues/10612
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
+        });
+        // https://github.com/swagger-api/swagger-codegen/issues/4037
+        if (extraHttpRequestParams) {
+            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
+        }
+
+        return this.http.request(path, requestOptions);
+    }
+
+    /**
+     * Create a group member template
+     * GroupMember Templates define a type of group member and the properties they have.&lt;br /&gt;&lt;b&gt;Permissions Needed:&lt;/b&gt; POST
+     * @param groupMemberTemplateResource The group member template resource object
+     */
+    public createGroupMemberTemplateWithHttpInfo(groupMemberTemplateResource?: TemplateResource, extraHttpRequestParams?: any): Observable<Response> {
+        const path = this.basePath + '/users/groups/members/templates';
+
+        let queryParameters = new URLSearchParams();
+        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
+
+        // to determine the Accept header
+        let produces: string[] = [
+            'application/json'
+        ];
+
+        // authentication (oauth2_client_credentials_grant) required
+        // oauth required
+        if (this.configuration.accessToken) {
+            let accessToken = typeof this.configuration.accessToken === 'function'
+                ? this.configuration.accessToken()
+                : this.configuration.accessToken;
+            headers.set('Authorization', 'Bearer ' + accessToken);
+        }
+
+        // authentication (oauth2_password_grant) required
+        // oauth required
+        if (this.configuration.accessToken) {
+            let accessToken = typeof this.configuration.accessToken === 'function'
+                ? this.configuration.accessToken()
+                : this.configuration.accessToken;
+            headers.set('Authorization', 'Bearer ' + accessToken);
+        }
+
+            
+        headers.set('Content-Type', 'application/json');
+
+        let requestOptions: RequestOptionsArgs = new RequestOptions({
+            method: RequestMethod.Post,
+            headers: headers,
+            body: groupMemberTemplateResource == null ? '' : JSON.stringify(groupMemberTemplateResource), // https://github.com/angular/angular/issues/10612
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
+        });
+        // https://github.com/swagger-api/swagger-codegen/issues/4037
+        if (extraHttpRequestParams) {
+            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
+        }
+
+        return this.http.request(path, requestOptions);
+    }
+
+    /**
+     * Create a group template
+     * Group Templates define a type of group and the properties they have.&lt;br /&gt;&lt;b&gt;Permissions Needed:&lt;/b&gt; POST
+     * @param groupTemplateResource The group template resource object
+     */
+    public createGroupTemplateWithHttpInfo(groupTemplateResource?: TemplateResource, extraHttpRequestParams?: any): Observable<Response> {
+        const path = this.basePath + '/users/groups/templates';
+
+        let queryParameters = new URLSearchParams();
+        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
+
+        // to determine the Accept header
+        let produces: string[] = [
+            'application/json'
+        ];
+
+        // authentication (oauth2_client_credentials_grant) required
+        // oauth required
+        if (this.configuration.accessToken) {
+            let accessToken = typeof this.configuration.accessToken === 'function'
+                ? this.configuration.accessToken()
+                : this.configuration.accessToken;
+            headers.set('Authorization', 'Bearer ' + accessToken);
+        }
+
+        // authentication (oauth2_password_grant) required
+        // oauth required
+        if (this.configuration.accessToken) {
+            let accessToken = typeof this.configuration.accessToken === 'function'
+                ? this.configuration.accessToken()
+                : this.configuration.accessToken;
+            headers.set('Authorization', 'Bearer ' + accessToken);
+        }
+
+            
+        headers.set('Content-Type', 'application/json');
+
+        let requestOptions: RequestOptionsArgs = new RequestOptions({
+            method: RequestMethod.Post,
+            headers: headers,
+            body: groupTemplateResource == null ? '' : JSON.stringify(groupTemplateResource), // https://github.com/angular/angular/issues/10612
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
+        });
+        // https://github.com/swagger-api/swagger-codegen/issues/4037
+        if (extraHttpRequestParams) {
+            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
+        }
+
+        return this.http.request(path, requestOptions);
+    }
+
+    /**
+     * Removes a group from the system
+     * All groups listing this as the parent are also removed and users are in turn removed from this and those groups. This may result in users no longer being in this group&#39;s parent if they were not added to it directly as well. &lt;br&gt;&lt;br&gt;&lt;b&gt;Permissions Needed:&lt;/b&gt; DELETE&lt;br /&gt;&lt;b&gt;Permissions Needed:&lt;/b&gt; DELETE
+     * @param uniqueName The group unique name
+     */
+    public deleteGroupWithHttpInfo(uniqueName: string, extraHttpRequestParams?: any): Observable<Response> {
+        const path = this.basePath + '/users/groups/${unique_name}'
+                    .replace('${' + 'unique_name' + '}', String(uniqueName));
+
+        let queryParameters = new URLSearchParams();
+        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
+        // verify required parameter 'uniqueName' is not null or undefined
+        if (uniqueName === null || uniqueName === undefined) {
+            throw new Error('Required parameter uniqueName was null or undefined when calling deleteGroup.');
+        }
+
+        // to determine the Accept header
+        let produces: string[] = [
+            'application/json'
+        ];
+
+        // authentication (oauth2_client_credentials_grant) required
+        // oauth required
+        if (this.configuration.accessToken) {
+            let accessToken = typeof this.configuration.accessToken === 'function'
+                ? this.configuration.accessToken()
+                : this.configuration.accessToken;
+            headers.set('Authorization', 'Bearer ' + accessToken);
+        }
+
+        // authentication (oauth2_password_grant) required
+        // oauth required
+        if (this.configuration.accessToken) {
+            let accessToken = typeof this.configuration.accessToken === 'function'
+                ? this.configuration.accessToken()
+                : this.configuration.accessToken;
+            headers.set('Authorization', 'Bearer ' + accessToken);
+        }
+
+            
+        let requestOptions: RequestOptionsArgs = new RequestOptions({
+            method: RequestMethod.Delete,
+            headers: headers,
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
+        });
+        // https://github.com/swagger-api/swagger-codegen/issues/4037
+        if (extraHttpRequestParams) {
+            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
+        }
+
+        return this.http.request(path, requestOptions);
+    }
+
+    /**
+     * Delete a group member template
+     * If cascade &#x3D; &#39;detach&#39;, it will force delete the template even if it&#39;s attached to other objects.&lt;br /&gt;&lt;b&gt;Permissions Needed:&lt;/b&gt; DELETE
+     * @param id The id of the template
+     * @param cascade The value needed to delete used templates
+     */
+    public deleteGroupMemberTemplateWithHttpInfo(id: string, cascade?: string, extraHttpRequestParams?: any): Observable<Response> {
+        const path = this.basePath + '/users/groups/members/templates/${id}'
+                    .replace('${' + 'id' + '}', String(id));
+
+        let queryParameters = new URLSearchParams();
+        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
+        // verify required parameter 'id' is not null or undefined
+        if (id === null || id === undefined) {
+            throw new Error('Required parameter id was null or undefined when calling deleteGroupMemberTemplate.');
+        }
+        if (cascade !== undefined) {
+            queryParameters.set('cascade', <any>cascade);
+        }
+
+
+        // to determine the Accept header
+        let produces: string[] = [
+            'application/json'
+        ];
+
+        // authentication (oauth2_client_credentials_grant) required
+        // oauth required
+        if (this.configuration.accessToken) {
+            let accessToken = typeof this.configuration.accessToken === 'function'
+                ? this.configuration.accessToken()
+                : this.configuration.accessToken;
+            headers.set('Authorization', 'Bearer ' + accessToken);
+        }
+
+        // authentication (oauth2_password_grant) required
+        // oauth required
+        if (this.configuration.accessToken) {
+            let accessToken = typeof this.configuration.accessToken === 'function'
+                ? this.configuration.accessToken()
+                : this.configuration.accessToken;
+            headers.set('Authorization', 'Bearer ' + accessToken);
+        }
+
+            
+        let requestOptions: RequestOptionsArgs = new RequestOptions({
+            method: RequestMethod.Delete,
+            headers: headers,
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
+        });
+        // https://github.com/swagger-api/swagger-codegen/issues/4037
+        if (extraHttpRequestParams) {
+            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
+        }
+
+        return this.http.request(path, requestOptions);
+    }
+
+    /**
+     * Delete a group template
+     * If cascade &#x3D; &#39;detach&#39;, it will force delete the template even if it&#39;s attached to other objects.&lt;br /&gt;&lt;b&gt;Permissions Needed:&lt;/b&gt; DELETE
+     * @param id The id of the template
+     * @param cascade The value needed to delete used templates
+     */
+    public deleteGroupTemplateWithHttpInfo(id: string, cascade?: string, extraHttpRequestParams?: any): Observable<Response> {
+        const path = this.basePath + '/users/groups/templates/${id}'
+                    .replace('${' + 'id' + '}', String(id));
+
+        let queryParameters = new URLSearchParams();
+        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
+        // verify required parameter 'id' is not null or undefined
+        if (id === null || id === undefined) {
+            throw new Error('Required parameter id was null or undefined when calling deleteGroupTemplate.');
+        }
+        if (cascade !== undefined) {
+            queryParameters.set('cascade', <any>cascade);
+        }
+
+
+        // to determine the Accept header
+        let produces: string[] = [
+            'application/json'
+        ];
+
+        // authentication (oauth2_client_credentials_grant) required
+        // oauth required
+        if (this.configuration.accessToken) {
+            let accessToken = typeof this.configuration.accessToken === 'function'
+                ? this.configuration.accessToken()
+                : this.configuration.accessToken;
+            headers.set('Authorization', 'Bearer ' + accessToken);
+        }
+
+        // authentication (oauth2_password_grant) required
+        // oauth required
+        if (this.configuration.accessToken) {
+            let accessToken = typeof this.configuration.accessToken === 'function'
+                ? this.configuration.accessToken()
+                : this.configuration.accessToken;
+            headers.set('Authorization', 'Bearer ' + accessToken);
+        }
+
+            
+        let requestOptions: RequestOptionsArgs = new RequestOptions({
+            method: RequestMethod.Delete,
+            headers: headers,
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
+        });
+        // https://github.com/swagger-api/swagger-codegen/issues/4037
+        if (extraHttpRequestParams) {
+            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
+        }
+
+        return this.http.request(path, requestOptions);
+    }
+
+    /**
+     * Enable or disable notification of group messages
+     * &lt;b&gt;Permissions Needed:&lt;/b&gt; TOPICS_ADMIN or self
+     * @param uniqueName The group unique name
+     * @param userId The user id of the member or &#39;me&#39;
+     * @param disabled disabled
+     */
+    public disableGroupNotificationWithHttpInfo(uniqueName: string, userId: string, disabled: ValueWrapperboolean, extraHttpRequestParams?: any): Observable<Response> {
+        const path = this.basePath + '/users/groups/${unique_name}/members/${user_id}/messages/disabled'
+                    .replace('${' + 'unique_name' + '}', String(uniqueName))
+                    .replace('${' + 'user_id' + '}', String(userId));
+
+        let queryParameters = new URLSearchParams();
+        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
+        // verify required parameter 'uniqueName' is not null or undefined
+        if (uniqueName === null || uniqueName === undefined) {
+            throw new Error('Required parameter uniqueName was null or undefined when calling disableGroupNotification.');
+        }
+        // verify required parameter 'userId' is not null or undefined
+        if (userId === null || userId === undefined) {
+            throw new Error('Required parameter userId was null or undefined when calling disableGroupNotification.');
+        }
+        // verify required parameter 'disabled' is not null or undefined
+        if (disabled === null || disabled === undefined) {
+            throw new Error('Required parameter disabled was null or undefined when calling disableGroupNotification.');
+        }
+
+        // to determine the Accept header
+        let produces: string[] = [
+            'application/json'
+        ];
+
+        // authentication (oauth2_client_credentials_grant) required
+        // oauth required
+        if (this.configuration.accessToken) {
+            let accessToken = typeof this.configuration.accessToken === 'function'
+                ? this.configuration.accessToken()
+                : this.configuration.accessToken;
+            headers.set('Authorization', 'Bearer ' + accessToken);
+        }
+
+        // authentication (oauth2_password_grant) required
+        // oauth required
+        if (this.configuration.accessToken) {
+            let accessToken = typeof this.configuration.accessToken === 'function'
+                ? this.configuration.accessToken()
+                : this.configuration.accessToken;
+            headers.set('Authorization', 'Bearer ' + accessToken);
+        }
+
+            
+        headers.set('Content-Type', 'application/json');
+
+        let requestOptions: RequestOptionsArgs = new RequestOptions({
+            method: RequestMethod.Put,
+            headers: headers,
+            body: disabled == null ? '' : JSON.stringify(disabled), // https://github.com/angular/angular/issues/10612
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
+        });
+        // https://github.com/swagger-api/swagger-codegen/issues/4037
+        if (extraHttpRequestParams) {
+            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
+        }
+
+        return this.http.request(path, requestOptions);
+    }
+
+    /**
+     * Loads a specific group&#39;s details
+     * &lt;b&gt;Permissions Needed:&lt;/b&gt; GET&lt;br /&gt;&lt;b&gt;Permissions Needed:&lt;/b&gt; GET
+     * @param uniqueName The group unique name
+     */
+    public getGroupWithHttpInfo(uniqueName: string, extraHttpRequestParams?: any): Observable<Response> {
+        const path = this.basePath + '/users/groups/${unique_name}'
+                    .replace('${' + 'unique_name' + '}', String(uniqueName));
+
+        let queryParameters = new URLSearchParams();
+        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
+        // verify required parameter 'uniqueName' is not null or undefined
+        if (uniqueName === null || uniqueName === undefined) {
+            throw new Error('Required parameter uniqueName was null or undefined when calling getGroup.');
+        }
+
+        // to determine the Accept header
+        let produces: string[] = [
+            'application/json'
+        ];
+
+        // authentication (oauth2_client_credentials_grant) required
+        // oauth required
+        if (this.configuration.accessToken) {
+            let accessToken = typeof this.configuration.accessToken === 'function'
+                ? this.configuration.accessToken()
+                : this.configuration.accessToken;
+            headers.set('Authorization', 'Bearer ' + accessToken);
+        }
+
+        // authentication (oauth2_password_grant) required
+        // oauth required
+        if (this.configuration.accessToken) {
+            let accessToken = typeof this.configuration.accessToken === 'function'
+                ? this.configuration.accessToken()
+                : this.configuration.accessToken;
+            headers.set('Authorization', 'Bearer ' + accessToken);
+        }
+
+            
+        let requestOptions: RequestOptionsArgs = new RequestOptions({
+            method: RequestMethod.Get,
+            headers: headers,
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
+        });
+        // https://github.com/swagger-api/swagger-codegen/issues/4037
+        if (extraHttpRequestParams) {
+            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
+        }
+
+        return this.http.request(path, requestOptions);
+    }
+
+    /**
+     * Get group ancestors
+     * Returns a list of ancestor groups in reverse order (parent, then grandparent, etc). &lt;br&gt;&lt;br&gt;&lt;b&gt;Permissions Needed:&lt;/b&gt; ANY&lt;br /&gt;&lt;b&gt;Permissions Needed:&lt;/b&gt; LIST
+     * @param uniqueName The group unique name
+     * @param size The number of objects returned per page
+     * @param page The number of the page returned, starting with 1
+     */
+    public getGroupAncestorsWithHttpInfo(uniqueName: string, size?: number, page?: number, extraHttpRequestParams?: any): Observable<Response> {
+        const path = this.basePath + '/users/groups/${unique_name}/ancestors'
+                    .replace('${' + 'unique_name' + '}', String(uniqueName));
+
+        let queryParameters = new URLSearchParams();
+        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
+        // verify required parameter 'uniqueName' is not null or undefined
+        if (uniqueName === null || uniqueName === undefined) {
+            throw new Error('Required parameter uniqueName was null or undefined when calling getGroupAncestors.');
+        }
+        if (size !== undefined) {
+            queryParameters.set('size', <any>size);
+        }
+
+        if (page !== undefined) {
+            queryParameters.set('page', <any>page);
+        }
+
+
+        // to determine the Accept header
+        let produces: string[] = [
+            'application/json'
+        ];
+
+        // authentication (oauth2_client_credentials_grant) required
+        // oauth required
+        if (this.configuration.accessToken) {
+            let accessToken = typeof this.configuration.accessToken === 'function'
+                ? this.configuration.accessToken()
+                : this.configuration.accessToken;
+            headers.set('Authorization', 'Bearer ' + accessToken);
+        }
+
+        // authentication (oauth2_password_grant) required
+        // oauth required
+        if (this.configuration.accessToken) {
+            let accessToken = typeof this.configuration.accessToken === 'function'
+                ? this.configuration.accessToken()
+                : this.configuration.accessToken;
+            headers.set('Authorization', 'Bearer ' + accessToken);
+        }
+
+            
+        let requestOptions: RequestOptionsArgs = new RequestOptions({
+            method: RequestMethod.Get,
+            headers: headers,
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
+        });
+        // https://github.com/swagger-api/swagger-codegen/issues/4037
+        if (extraHttpRequestParams) {
+            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
+        }
+
+        return this.http.request(path, requestOptions);
+    }
+
+    /**
+     * Get a user from a group
+     * &lt;b&gt;Permissions Needed:&lt;/b&gt; GET&lt;br /&gt;&lt;b&gt;Permissions Needed:&lt;/b&gt; GET
+     * @param uniqueName The group unique name
+     * @param userId The id of the user
+     */
+    public getGroupMemberWithHttpInfo(uniqueName: string, userId: number, extraHttpRequestParams?: any): Observable<Response> {
+        const path = this.basePath + '/users/groups/${unique_name}/members/${user_id}'
+                    .replace('${' + 'unique_name' + '}', String(uniqueName))
+                    .replace('${' + 'user_id' + '}', String(userId));
+
+        let queryParameters = new URLSearchParams();
+        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
+        // verify required parameter 'uniqueName' is not null or undefined
+        if (uniqueName === null || uniqueName === undefined) {
+            throw new Error('Required parameter uniqueName was null or undefined when calling getGroupMember.');
+        }
+        // verify required parameter 'userId' is not null or undefined
+        if (userId === null || userId === undefined) {
+            throw new Error('Required parameter userId was null or undefined when calling getGroupMember.');
+        }
+
+        // to determine the Accept header
+        let produces: string[] = [
+            'application/json'
+        ];
+
+        // authentication (oauth2_client_credentials_grant) required
+        // oauth required
+        if (this.configuration.accessToken) {
+            let accessToken = typeof this.configuration.accessToken === 'function'
+                ? this.configuration.accessToken()
+                : this.configuration.accessToken;
+            headers.set('Authorization', 'Bearer ' + accessToken);
+        }
+
+        // authentication (oauth2_password_grant) required
+        // oauth required
+        if (this.configuration.accessToken) {
+            let accessToken = typeof this.configuration.accessToken === 'function'
+                ? this.configuration.accessToken()
+                : this.configuration.accessToken;
+            headers.set('Authorization', 'Bearer ' + accessToken);
+        }
+
+            
+        let requestOptions: RequestOptionsArgs = new RequestOptions({
+            method: RequestMethod.Get,
+            headers: headers,
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
+        });
+        // https://github.com/swagger-api/swagger-codegen/issues/4037
+        if (extraHttpRequestParams) {
+            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
+        }
+
+        return this.http.request(path, requestOptions);
+    }
+
+    /**
+     * Get a single group member template
+     * &lt;b&gt;Permissions Needed:&lt;/b&gt; GET
+     * @param id The id of the template
+     */
+    public getGroupMemberTemplateWithHttpInfo(id: string, extraHttpRequestParams?: any): Observable<Response> {
+        const path = this.basePath + '/users/groups/members/templates/${id}'
+                    .replace('${' + 'id' + '}', String(id));
+
+        let queryParameters = new URLSearchParams();
+        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
+        // verify required parameter 'id' is not null or undefined
+        if (id === null || id === undefined) {
+            throw new Error('Required parameter id was null or undefined when calling getGroupMemberTemplate.');
+        }
+
+        // to determine the Accept header
+        let produces: string[] = [
+            'application/json'
+        ];
+
+        // authentication (oauth2_client_credentials_grant) required
+        // oauth required
+        if (this.configuration.accessToken) {
+            let accessToken = typeof this.configuration.accessToken === 'function'
+                ? this.configuration.accessToken()
+                : this.configuration.accessToken;
+            headers.set('Authorization', 'Bearer ' + accessToken);
+        }
+
+        // authentication (oauth2_password_grant) required
+        // oauth required
+        if (this.configuration.accessToken) {
+            let accessToken = typeof this.configuration.accessToken === 'function'
+                ? this.configuration.accessToken()
+                : this.configuration.accessToken;
+            headers.set('Authorization', 'Bearer ' + accessToken);
+        }
+
+            
+        let requestOptions: RequestOptionsArgs = new RequestOptions({
+            method: RequestMethod.Get,
+            headers: headers,
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
+        });
+        // https://github.com/swagger-api/swagger-codegen/issues/4037
+        if (extraHttpRequestParams) {
+            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
+        }
+
+        return this.http.request(path, requestOptions);
+    }
+
+    /**
+     * List and search group member templates
+     * &lt;b&gt;Permissions Needed:&lt;/b&gt; LIST
+     * @param size The number of objects returned per page
+     * @param page The number of the page returned, starting with 1
+     * @param order A comma separated list of sorting requirements in priority order, each entry matching PROPERTY_NAME:[ASC|DESC]
+     */
+    public getGroupMemberTemplatesWithHttpInfo(size?: number, page?: number, order?: string, extraHttpRequestParams?: any): Observable<Response> {
+        const path = this.basePath + '/users/groups/members/templates';
+
+        let queryParameters = new URLSearchParams();
+        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
+        if (size !== undefined) {
+            queryParameters.set('size', <any>size);
+        }
+
+        if (page !== undefined) {
+            queryParameters.set('page', <any>page);
+        }
+
+        if (order !== undefined) {
+            queryParameters.set('order', <any>order);
+        }
+
+
+        // to determine the Accept header
+        let produces: string[] = [
+            'application/json'
+        ];
+
+        // authentication (oauth2_client_credentials_grant) required
+        // oauth required
+        if (this.configuration.accessToken) {
+            let accessToken = typeof this.configuration.accessToken === 'function'
+                ? this.configuration.accessToken()
+                : this.configuration.accessToken;
+            headers.set('Authorization', 'Bearer ' + accessToken);
+        }
+
+        // authentication (oauth2_password_grant) required
+        // oauth required
+        if (this.configuration.accessToken) {
+            let accessToken = typeof this.configuration.accessToken === 'function'
+                ? this.configuration.accessToken()
+                : this.configuration.accessToken;
+            headers.set('Authorization', 'Bearer ' + accessToken);
+        }
+
+            
+        let requestOptions: RequestOptionsArgs = new RequestOptions({
+            method: RequestMethod.Get,
+            headers: headers,
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
+        });
+        // https://github.com/swagger-api/swagger-codegen/issues/4037
+        if (extraHttpRequestParams) {
+            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
+        }
+
+        return this.http.request(path, requestOptions);
+    }
+
+    /**
+     * Lists members of the group
+     * &lt;b&gt;Permissions Needed:&lt;/b&gt; LIST&lt;br /&gt;&lt;b&gt;Permissions Needed:&lt;/b&gt; LIST
+     * @param uniqueName The group unique name
+     * @param size The number of objects returned per page
+     * @param page The number of the page returned, starting with 1
+     * @param order A comma separated list of sorting requirements in priority order, each entry matching PROPERTY_NAME:[ASC|DESC]
+     */
+    public getGroupMembersWithHttpInfo(uniqueName: string, size?: number, page?: number, order?: string, extraHttpRequestParams?: any): Observable<Response> {
+        const path = this.basePath + '/users/groups/${unique_name}/members'
+                    .replace('${' + 'unique_name' + '}', String(uniqueName));
+
+        let queryParameters = new URLSearchParams();
+        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
+        // verify required parameter 'uniqueName' is not null or undefined
+        if (uniqueName === null || uniqueName === undefined) {
+            throw new Error('Required parameter uniqueName was null or undefined when calling getGroupMembers.');
+        }
+        if (size !== undefined) {
+            queryParameters.set('size', <any>size);
+        }
+
+        if (page !== undefined) {
+            queryParameters.set('page', <any>page);
+        }
+
+        if (order !== undefined) {
+            queryParameters.set('order', <any>order);
+        }
+
+
+        // to determine the Accept header
+        let produces: string[] = [
+            'application/json'
+        ];
+
+        // authentication (oauth2_client_credentials_grant) required
+        // oauth required
+        if (this.configuration.accessToken) {
+            let accessToken = typeof this.configuration.accessToken === 'function'
+                ? this.configuration.accessToken()
+                : this.configuration.accessToken;
+            headers.set('Authorization', 'Bearer ' + accessToken);
+        }
+
+        // authentication (oauth2_password_grant) required
+        // oauth required
+        if (this.configuration.accessToken) {
+            let accessToken = typeof this.configuration.accessToken === 'function'
+                ? this.configuration.accessToken()
+                : this.configuration.accessToken;
+            headers.set('Authorization', 'Bearer ' + accessToken);
+        }
+
+            
+        let requestOptions: RequestOptionsArgs = new RequestOptions({
+            method: RequestMethod.Get,
+            headers: headers,
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
+        });
+        // https://github.com/swagger-api/swagger-codegen/issues/4037
+        if (extraHttpRequestParams) {
+            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
+        }
+
+        return this.http.request(path, requestOptions);
+    }
+
+    /**
+     * Get a list of group messages
+     * &lt;b&gt;Permissions Needed:&lt;/b&gt; ANY
+     * @param uniqueName The group unique name
+     * @param size The number of objects returned per page
+     * @param page The number of the page returned, starting with 1
+     * @param order A comma separated list of sorting requirements in priority order, each entry matching PROPERTY_NAME:[ASC|DESC]
+     */
+    public getGroupMessagesWithHttpInfo(uniqueName: string, size?: number, page?: number, order?: string, extraHttpRequestParams?: any): Observable<Response> {
+        const path = this.basePath + '/users/groups/${unique_name}/messages'
+                    .replace('${' + 'unique_name' + '}', String(uniqueName));
+
+        let queryParameters = new URLSearchParams();
+        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
+        // verify required parameter 'uniqueName' is not null or undefined
+        if (uniqueName === null || uniqueName === undefined) {
+            throw new Error('Required parameter uniqueName was null or undefined when calling getGroupMessages.');
+        }
+        if (size !== undefined) {
+            queryParameters.set('size', <any>size);
+        }
+
+        if (page !== undefined) {
+            queryParameters.set('page', <any>page);
+        }
+
+        if (order !== undefined) {
+            queryParameters.set('order', <any>order);
+        }
+
+
+        // to determine the Accept header
+        let produces: string[] = [
+            'application/json'
+        ];
+
+        // authentication (oauth2_client_credentials_grant) required
+        // oauth required
+        if (this.configuration.accessToken) {
+            let accessToken = typeof this.configuration.accessToken === 'function'
+                ? this.configuration.accessToken()
+                : this.configuration.accessToken;
+            headers.set('Authorization', 'Bearer ' + accessToken);
+        }
+
+        // authentication (oauth2_password_grant) required
+        // oauth required
+        if (this.configuration.accessToken) {
+            let accessToken = typeof this.configuration.accessToken === 'function'
+                ? this.configuration.accessToken()
+                : this.configuration.accessToken;
+            headers.set('Authorization', 'Bearer ' + accessToken);
+        }
+
+            
+        let requestOptions: RequestOptionsArgs = new RequestOptions({
+            method: RequestMethod.Get,
+            headers: headers,
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
+        });
+        // https://github.com/swagger-api/swagger-codegen/issues/4037
+        if (extraHttpRequestParams) {
+            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
+        }
+
+        return this.http.request(path, requestOptions);
+    }
+
+    /**
+     * Get a single group template
+     * &lt;b&gt;Permissions Needed:&lt;/b&gt; GET
+     * @param id The id of the template
+     */
+    public getGroupTemplateWithHttpInfo(id: string, extraHttpRequestParams?: any): Observable<Response> {
+        const path = this.basePath + '/users/groups/templates/${id}'
+                    .replace('${' + 'id' + '}', String(id));
+
+        let queryParameters = new URLSearchParams();
+        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
+        // verify required parameter 'id' is not null or undefined
+        if (id === null || id === undefined) {
+            throw new Error('Required parameter id was null or undefined when calling getGroupTemplate.');
+        }
+
+        // to determine the Accept header
+        let produces: string[] = [
+            'application/json'
+        ];
+
+        // authentication (oauth2_client_credentials_grant) required
+        // oauth required
+        if (this.configuration.accessToken) {
+            let accessToken = typeof this.configuration.accessToken === 'function'
+                ? this.configuration.accessToken()
+                : this.configuration.accessToken;
+            headers.set('Authorization', 'Bearer ' + accessToken);
+        }
+
+        // authentication (oauth2_password_grant) required
+        // oauth required
+        if (this.configuration.accessToken) {
+            let accessToken = typeof this.configuration.accessToken === 'function'
+                ? this.configuration.accessToken()
+                : this.configuration.accessToken;
+            headers.set('Authorization', 'Bearer ' + accessToken);
+        }
+
+            
+        let requestOptions: RequestOptionsArgs = new RequestOptions({
+            method: RequestMethod.Get,
+            headers: headers,
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
+        });
+        // https://github.com/swagger-api/swagger-codegen/issues/4037
+        if (extraHttpRequestParams) {
+            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
+        }
+
+        return this.http.request(path, requestOptions);
+    }
+
+    /**
+     * List and search group templates
+     * &lt;b&gt;Permissions Needed:&lt;/b&gt; LIST
+     * @param size The number of objects returned per page
+     * @param page The number of the page returned, starting with 1
+     * @param order a comma separated list of sorting requirements in priority order, each entry matching PROPERTY_NAME:[ASC|DESC]
+     */
+    public getGroupTemplatesWithHttpInfo(size?: number, page?: number, order?: string, extraHttpRequestParams?: any): Observable<Response> {
+        const path = this.basePath + '/users/groups/templates';
+
+        let queryParameters = new URLSearchParams();
+        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
+        if (size !== undefined) {
+            queryParameters.set('size', <any>size);
+        }
+
+        if (page !== undefined) {
+            queryParameters.set('page', <any>page);
+        }
+
+        if (order !== undefined) {
+            queryParameters.set('order', <any>order);
+        }
+
+
+        // to determine the Accept header
+        let produces: string[] = [
+            'application/json'
+        ];
+
+        // authentication (oauth2_client_credentials_grant) required
+        // oauth required
+        if (this.configuration.accessToken) {
+            let accessToken = typeof this.configuration.accessToken === 'function'
+                ? this.configuration.accessToken()
+                : this.configuration.accessToken;
+            headers.set('Authorization', 'Bearer ' + accessToken);
+        }
+
+        // authentication (oauth2_password_grant) required
+        // oauth required
+        if (this.configuration.accessToken) {
+            let accessToken = typeof this.configuration.accessToken === 'function'
+                ? this.configuration.accessToken()
+                : this.configuration.accessToken;
+            headers.set('Authorization', 'Bearer ' + accessToken);
+        }
+
+            
+        let requestOptions: RequestOptionsArgs = new RequestOptions({
+            method: RequestMethod.Get,
+            headers: headers,
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
+        });
+        // https://github.com/swagger-api/swagger-codegen/issues/4037
+        if (extraHttpRequestParams) {
+            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
+        }
+
+        return this.http.request(path, requestOptions);
+    }
+
+    /**
+     * List groups a user is in
+     * &lt;b&gt;Permissions Needed:&lt;/b&gt; LIST_GROUPS&lt;br /&gt;&lt;b&gt;Permissions Needed:&lt;/b&gt; LIST_GROUPS
+     * @param userId The id of the user
+     * @param size The number of objects returned per page
+     * @param page The number of the page returned, starting with 1
+     * @param filterChildren Whether to limit group list to children of groups only. If true, shows only groups with parents. If false, shows only groups with no parent.
+     */
+    public getGroupsForUserWithHttpInfo(userId: number, size?: number, page?: number, filterChildren?: boolean, extraHttpRequestParams?: any): Observable<Response> {
+        const path = this.basePath + '/users/${user_id}/groups'
+                    .replace('${' + 'user_id' + '}', String(userId));
+
+        let queryParameters = new URLSearchParams();
+        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
+        // verify required parameter 'userId' is not null or undefined
+        if (userId === null || userId === undefined) {
+            throw new Error('Required parameter userId was null or undefined when calling getGroupsForUser.');
+        }
+        if (size !== undefined) {
+            queryParameters.set('size', <any>size);
+        }
+
+        if (page !== undefined) {
+            queryParameters.set('page', <any>page);
+        }
+
+        if (filterChildren !== undefined) {
+            queryParameters.set('filter_children', <any>filterChildren);
+        }
+
+
+        // to determine the Accept header
+        let produces: string[] = [
+            'application/json'
+        ];
+
+        // authentication (oauth2_client_credentials_grant) required
+        // oauth required
+        if (this.configuration.accessToken) {
+            let accessToken = typeof this.configuration.accessToken === 'function'
+                ? this.configuration.accessToken()
+                : this.configuration.accessToken;
+            headers.set('Authorization', 'Bearer ' + accessToken);
+        }
+
+        // authentication (oauth2_password_grant) required
+        // oauth required
+        if (this.configuration.accessToken) {
+            let accessToken = typeof this.configuration.accessToken === 'function'
+                ? this.configuration.accessToken()
+                : this.configuration.accessToken;
+            headers.set('Authorization', 'Bearer ' + accessToken);
+        }
+
+            
+        let requestOptions: RequestOptionsArgs = new RequestOptions({
+            method: RequestMethod.Get,
+            headers: headers,
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
+        });
+        // https://github.com/swagger-api/swagger-codegen/issues/4037
+        if (extraHttpRequestParams) {
+            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
+        }
+
+        return this.http.request(path, requestOptions);
+    }
+
+    /**
+     * List and search groups
+     * &lt;b&gt;Permissions Needed:&lt;/b&gt; LIST&lt;br /&gt;&lt;b&gt;Permissions Needed:&lt;/b&gt; LIST
+     * @param filterTemplate Filter for groups using a specific template, by id
+     * @param filterMemberCount Filters groups by member count. Multiple values possible for range search. Format: filter_member_count&#x3D;OP,ts&amp;... where OP in (GT, LT, GOE, LOE, EQ). Ex: filter_member_count&#x3D;GT,14,LT,17
+     * @param filterName Filter for groups with names starting with the given string
+     * @param filterUniqueName Filter for groups whose unique_name starts with provided string
+     * @param filterParent Filter for groups with a specific parent, by unique name
+     * @param filterStatus Filter for groups with a certain status
+     * @param size The number of objects returned per page
+     * @param page The number of the page returned, starting with 1
+     * @param order A comma separated list of sorting requirements in priority order, each entry matching PROPERTY_NAME:[ASC|DESC]
+     */
+    public listGroupsWithHttpInfo(filterTemplate?: string, filterMemberCount?: string, filterName?: string, filterUniqueName?: string, filterParent?: string, filterStatus?: string, size?: number, page?: number, order?: string, extraHttpRequestParams?: any): Observable<Response> {
+        const path = this.basePath + '/users/groups';
+
+        let queryParameters = new URLSearchParams();
+        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
+        if (filterTemplate !== undefined) {
+            queryParameters.set('filter_template', <any>filterTemplate);
+        }
+
+        if (filterMemberCount !== undefined) {
+            queryParameters.set('filter_member_count', <any>filterMemberCount);
+        }
+
+        if (filterName !== undefined) {
+            queryParameters.set('filter_name', <any>filterName);
+        }
+
+        if (filterUniqueName !== undefined) {
+            queryParameters.set('filter_unique_name', <any>filterUniqueName);
+        }
+
+        if (filterParent !== undefined) {
+            queryParameters.set('filter_parent', <any>filterParent);
+        }
+
+        if (filterStatus !== undefined) {
+            queryParameters.set('filter_status', <any>filterStatus);
+        }
+
+        if (size !== undefined) {
+            queryParameters.set('size', <any>size);
+        }
+
+        if (page !== undefined) {
+            queryParameters.set('page', <any>page);
+        }
+
+        if (order !== undefined) {
+            queryParameters.set('order', <any>order);
+        }
+
+
+        // to determine the Accept header
+        let produces: string[] = [
+            'application/json'
+        ];
+
+        // authentication (oauth2_client_credentials_grant) required
+        // oauth required
+        if (this.configuration.accessToken) {
+            let accessToken = typeof this.configuration.accessToken === 'function'
+                ? this.configuration.accessToken()
+                : this.configuration.accessToken;
+            headers.set('Authorization', 'Bearer ' + accessToken);
+        }
+
+        // authentication (oauth2_password_grant) required
+        // oauth required
+        if (this.configuration.accessToken) {
+            let accessToken = typeof this.configuration.accessToken === 'function'
+                ? this.configuration.accessToken()
+                : this.configuration.accessToken;
+            headers.set('Authorization', 'Bearer ' + accessToken);
+        }
+
+            
+        let requestOptions: RequestOptionsArgs = new RequestOptions({
+            method: RequestMethod.Get,
+            headers: headers,
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
+        });
+        // https://github.com/swagger-api/swagger-codegen/issues/4037
+        if (extraHttpRequestParams) {
+            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
+        }
+
+        return this.http.request(path, requestOptions);
     }
 
     /**
@@ -1344,505 +1834,513 @@ export class UsersGroupsService {
      * 
      * @param uniqueName The group unique name
      * @param chatMessageRequest The chat message request
-     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-     * @param reportProgress flag to report request and response progress.
      */
-    public postGroupMessage(uniqueName: string, chatMessageRequest?: ChatMessageRequest, observe?: 'body', reportProgress?: boolean): Observable<ChatMessageResource>;
-    public postGroupMessage(uniqueName: string, chatMessageRequest?: ChatMessageRequest, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<ChatMessageResource>>;
-    public postGroupMessage(uniqueName: string, chatMessageRequest?: ChatMessageRequest, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<ChatMessageResource>>;
-    public postGroupMessage(uniqueName: string, chatMessageRequest?: ChatMessageRequest, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public postGroupMessageWithHttpInfo(uniqueName: string, chatMessageRequest?: ChatMessageRequest, extraHttpRequestParams?: any): Observable<Response> {
+        const path = this.basePath + '/users/groups/${unique_name}/messages'
+                    .replace('${' + 'unique_name' + '}', String(uniqueName));
+
+        let queryParameters = new URLSearchParams();
+        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
+        // verify required parameter 'uniqueName' is not null or undefined
         if (uniqueName === null || uniqueName === undefined) {
             throw new Error('Required parameter uniqueName was null or undefined when calling postGroupMessage.');
         }
 
-        let headers = this.defaultHeaders;
-
         // to determine the Accept header
-        let httpHeaderAccepts: string[] = [
+        let produces: string[] = [
             'application/json'
         ];
-        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
-        if (httpHeaderAcceptSelected != undefined) {
-            headers = headers.set('Accept', httpHeaderAcceptSelected);
+
+        // authentication (oauth2_client_credentials_grant) required
+        // oauth required
+        if (this.configuration.accessToken) {
+            let accessToken = typeof this.configuration.accessToken === 'function'
+                ? this.configuration.accessToken()
+                : this.configuration.accessToken;
+            headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-        // to determine the Content-Type header
-        const consumes: string[] = [
-            'application/json'
-        ];
-        const httpContentTypeSelected: string | undefined = this.configuration.selectHeaderContentType(consumes);
-        if (httpContentTypeSelected != undefined) {
-            headers = headers.set('Content-Type', httpContentTypeSelected);
+        // authentication (oauth2_password_grant) required
+        // oauth required
+        if (this.configuration.accessToken) {
+            let accessToken = typeof this.configuration.accessToken === 'function'
+                ? this.configuration.accessToken()
+                : this.configuration.accessToken;
+            headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-        return this.httpClient.post<ChatMessageResource>(`${this.basePath}/users/groups/${encodeURIComponent(String(uniqueName))}/messages`,
-            chatMessageRequest,
-            {
-                withCredentials: this.configuration.withCredentials,
-                headers: headers,
-                observe: observe,
-                reportProgress: reportProgress
-            }
-        );
+            
+        headers.set('Content-Type', 'application/json');
+
+        let requestOptions: RequestOptionsArgs = new RequestOptions({
+            method: RequestMethod.Post,
+            headers: headers,
+            body: chatMessageRequest == null ? '' : JSON.stringify(chatMessageRequest), // https://github.com/angular/angular/issues/10612
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
+        });
+        // https://github.com/swagger-api/swagger-codegen/issues/4037
+        if (extraHttpRequestParams) {
+            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
+        }
+
+        return this.http.request(path, requestOptions);
     }
 
     /**
      * Removes a user from a group
-     * &lt;b&gt;Permissions Needed:&lt;/b&gt; GROUP_ADMIN or self if open
+     * &lt;b&gt;Permissions Needed:&lt;/b&gt; DELETE&lt;br /&gt;&lt;b&gt;Permissions Needed:&lt;/b&gt; DELETE
      * @param uniqueName The group unique name
      * @param userId The id of the user to remove
-     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-     * @param reportProgress flag to report request and response progress.
      */
-    public removeGroupMember(uniqueName: string, userId: number, observe?: 'body', reportProgress?: boolean): Observable<any>;
-    public removeGroupMember(uniqueName: string, userId: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
-    public removeGroupMember(uniqueName: string, userId: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
-    public removeGroupMember(uniqueName: string, userId: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public removeGroupMemberWithHttpInfo(uniqueName: string, userId: number, extraHttpRequestParams?: any): Observable<Response> {
+        const path = this.basePath + '/users/groups/${unique_name}/members/${user_id}'
+                    .replace('${' + 'unique_name' + '}', String(uniqueName))
+                    .replace('${' + 'user_id' + '}', String(userId));
+
+        let queryParameters = new URLSearchParams();
+        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
+        // verify required parameter 'uniqueName' is not null or undefined
         if (uniqueName === null || uniqueName === undefined) {
             throw new Error('Required parameter uniqueName was null or undefined when calling removeGroupMember.');
         }
+        // verify required parameter 'userId' is not null or undefined
         if (userId === null || userId === undefined) {
             throw new Error('Required parameter userId was null or undefined when calling removeGroupMember.');
         }
 
-        let headers = this.defaultHeaders;
+        // to determine the Accept header
+        let produces: string[] = [
+            'application/json'
+        ];
 
         // authentication (oauth2_client_credentials_grant) required
+        // oauth required
         if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
+            let accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
+            headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
         // authentication (oauth2_password_grant) required
+        // oauth required
         if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
+            let accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
+            headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-        // to determine the Accept header
-        let httpHeaderAccepts: string[] = [
-            'application/json'
-        ];
-        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
-        if (httpHeaderAcceptSelected != undefined) {
-            headers = headers.set('Accept', httpHeaderAcceptSelected);
+            
+        let requestOptions: RequestOptionsArgs = new RequestOptions({
+            method: RequestMethod.Delete,
+            headers: headers,
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
+        });
+        // https://github.com/swagger-api/swagger-codegen/issues/4037
+        if (extraHttpRequestParams) {
+            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
         }
 
-        // to determine the Content-Type header
-        const consumes: string[] = [
-        ];
-
-        return this.httpClient.delete<any>(`${this.basePath}/users/groups/${encodeURIComponent(String(uniqueName))}/members/${encodeURIComponent(String(userId))}`,
-            {
-                withCredentials: this.configuration.withCredentials,
-                headers: headers,
-                observe: observe,
-                reportProgress: reportProgress
-            }
-        );
+        return this.http.request(path, requestOptions);
     }
 
     /**
      * Update a group
-     * If adding/removing/changing parent, user membership in group/new parent groups may be modified. The parent being removed will remove members from this sub group unless they were added explicitly to the parent and the new parent will gain members unless they were already a part of it. &lt;br&gt;&lt;br&gt;&lt;b&gt;Permissions Needed:&lt;/b&gt; GROUP_ADMIN or admin of the group
+     * If adding/removing/changing parent, user membership in group/new parent groups may be modified. The parent being removed will remove members from this sub group unless they were added explicitly to the parent and the new parent will gain members unless they were already a part of it. &lt;br&gt;&lt;br&gt;&lt;b&gt;Permissions Needed:&lt;/b&gt; PUT&lt;br /&gt;&lt;b&gt;Permissions Needed:&lt;/b&gt; PUT
      * @param uniqueName The group unique name
      * @param groupResource The updated group
-     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-     * @param reportProgress flag to report request and response progress.
      */
-    public updateGroup(uniqueName: string, groupResource?: GroupResource, observe?: 'body', reportProgress?: boolean): Observable<any>;
-    public updateGroup(uniqueName: string, groupResource?: GroupResource, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
-    public updateGroup(uniqueName: string, groupResource?: GroupResource, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
-    public updateGroup(uniqueName: string, groupResource?: GroupResource, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public updateGroupWithHttpInfo(uniqueName: string, groupResource?: GroupResource, extraHttpRequestParams?: any): Observable<Response> {
+        const path = this.basePath + '/users/groups/${unique_name}'
+                    .replace('${' + 'unique_name' + '}', String(uniqueName));
+
+        let queryParameters = new URLSearchParams();
+        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
+        // verify required parameter 'uniqueName' is not null or undefined
         if (uniqueName === null || uniqueName === undefined) {
             throw new Error('Required parameter uniqueName was null or undefined when calling updateGroup.');
         }
 
-        let headers = this.defaultHeaders;
+        // to determine the Accept header
+        let produces: string[] = [
+            'application/json'
+        ];
 
         // authentication (oauth2_client_credentials_grant) required
+        // oauth required
         if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
+            let accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
+            headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
         // authentication (oauth2_password_grant) required
+        // oauth required
         if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
+            let accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
+            headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-        // to determine the Accept header
-        let httpHeaderAccepts: string[] = [
-            'application/json'
-        ];
-        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
-        if (httpHeaderAcceptSelected != undefined) {
-            headers = headers.set('Accept', httpHeaderAcceptSelected);
+            
+        headers.set('Content-Type', 'application/json');
+
+        let requestOptions: RequestOptionsArgs = new RequestOptions({
+            method: RequestMethod.Put,
+            headers: headers,
+            body: groupResource == null ? '' : JSON.stringify(groupResource), // https://github.com/angular/angular/issues/10612
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
+        });
+        // https://github.com/swagger-api/swagger-codegen/issues/4037
+        if (extraHttpRequestParams) {
+            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
         }
 
-        // to determine the Content-Type header
-        const consumes: string[] = [
-            'application/json'
-        ];
-        const httpContentTypeSelected: string | undefined = this.configuration.selectHeaderContentType(consumes);
-        if (httpContentTypeSelected != undefined) {
-            headers = headers.set('Content-Type', httpContentTypeSelected);
-        }
-
-        return this.httpClient.put<any>(`${this.basePath}/users/groups/${encodeURIComponent(String(uniqueName))}`,
-            groupResource,
-            {
-                withCredentials: this.configuration.withCredentials,
-                headers: headers,
-                observe: observe,
-                reportProgress: reportProgress
-            }
-        );
+        return this.http.request(path, requestOptions);
     }
 
     /**
      * Change a user&#39;s order
-     * &lt;b&gt;Permissions Needed:&lt;/b&gt; GROUP_ADMIN
+     * &lt;b&gt;Permissions Needed:&lt;/b&gt; PUT&lt;br /&gt;&lt;b&gt;Permissions Needed:&lt;/b&gt; PUT
      * @param uniqueName The group unique name
      * @param userId The user id of the member to modify
      * @param order The new order for the membership
-     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-     * @param reportProgress flag to report request and response progress.
      */
-    public updateGroupMemberProperties(uniqueName: string, userId: number, order: StringWrapper, observe?: 'body', reportProgress?: boolean): Observable<any>;
-    public updateGroupMemberProperties(uniqueName: string, userId: number, order: StringWrapper, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
-    public updateGroupMemberProperties(uniqueName: string, userId: number, order: StringWrapper, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
-    public updateGroupMemberProperties(uniqueName: string, userId: number, order: StringWrapper, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public updateGroupMemberOrderWithHttpInfo(uniqueName: string, userId: number, order: StringWrapper, extraHttpRequestParams?: any): Observable<Response> {
+        const path = this.basePath + '/users/groups/${unique_name}/members/${user_id}/order'
+                    .replace('${' + 'unique_name' + '}', String(uniqueName))
+                    .replace('${' + 'user_id' + '}', String(userId));
+
+        let queryParameters = new URLSearchParams();
+        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
+        // verify required parameter 'uniqueName' is not null or undefined
         if (uniqueName === null || uniqueName === undefined) {
-            throw new Error('Required parameter uniqueName was null or undefined when calling updateGroupMemberProperties.');
+            throw new Error('Required parameter uniqueName was null or undefined when calling updateGroupMemberOrder.');
         }
+        // verify required parameter 'userId' is not null or undefined
         if (userId === null || userId === undefined) {
-            throw new Error('Required parameter userId was null or undefined when calling updateGroupMemberProperties.');
+            throw new Error('Required parameter userId was null or undefined when calling updateGroupMemberOrder.');
         }
+        // verify required parameter 'order' is not null or undefined
         if (order === null || order === undefined) {
-            throw new Error('Required parameter order was null or undefined when calling updateGroupMemberProperties.');
-        }
-
-        let headers = this.defaultHeaders;
-
-        // authentication (oauth2_client_credentials_grant) required
-        if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
-                ? this.configuration.accessToken()
-                : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
-        }
-
-        // authentication (oauth2_password_grant) required
-        if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
-                ? this.configuration.accessToken()
-                : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
+            throw new Error('Required parameter order was null or undefined when calling updateGroupMemberOrder.');
         }
 
         // to determine the Accept header
-        let httpHeaderAccepts: string[] = [
+        let produces: string[] = [
             'application/json'
         ];
-        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
-        if (httpHeaderAcceptSelected != undefined) {
-            headers = headers.set('Accept', httpHeaderAcceptSelected);
+
+        // authentication (oauth2_client_credentials_grant) required
+        // oauth required
+        if (this.configuration.accessToken) {
+            let accessToken = typeof this.configuration.accessToken === 'function'
+                ? this.configuration.accessToken()
+                : this.configuration.accessToken;
+            headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-        // to determine the Content-Type header
-        const consumes: string[] = [
-            'application/json'
-        ];
-        const httpContentTypeSelected: string | undefined = this.configuration.selectHeaderContentType(consumes);
-        if (httpContentTypeSelected != undefined) {
-            headers = headers.set('Content-Type', httpContentTypeSelected);
+        // authentication (oauth2_password_grant) required
+        // oauth required
+        if (this.configuration.accessToken) {
+            let accessToken = typeof this.configuration.accessToken === 'function'
+                ? this.configuration.accessToken()
+                : this.configuration.accessToken;
+            headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-        return this.httpClient.put<any>(`${this.basePath}/users/groups/${encodeURIComponent(String(uniqueName))}/members/${encodeURIComponent(String(userId))}/order`,
-            order,
-            {
-                withCredentials: this.configuration.withCredentials,
-                headers: headers,
-                observe: observe,
-                reportProgress: reportProgress
-            }
-        );
+            
+        headers.set('Content-Type', 'application/json');
+
+        let requestOptions: RequestOptionsArgs = new RequestOptions({
+            method: RequestMethod.Put,
+            headers: headers,
+            body: order == null ? '' : JSON.stringify(order), // https://github.com/angular/angular/issues/10612
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
+        });
+        // https://github.com/swagger-api/swagger-codegen/issues/4037
+        if (extraHttpRequestParams) {
+            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
+        }
+
+        return this.http.request(path, requestOptions);
     }
 
     /**
      * Change a user&#39;s membership properties
-     * &lt;b&gt;Permissions Needed:&lt;/b&gt; GROUP_ADMIN
+     * &lt;b&gt;Permissions Needed:&lt;/b&gt; PUT&lt;br /&gt;&lt;b&gt;Permissions Needed:&lt;/b&gt; PUT
      * @param uniqueName The group unique name
      * @param userId The user id of the member to modify
      * @param properties The new properties for the membership
-     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-     * @param reportProgress flag to report request and response progress.
      */
-    public updateGroupMemberProperties1(uniqueName: string, userId: number, properties: any, observe?: 'body', reportProgress?: boolean): Observable<any>;
-    public updateGroupMemberProperties1(uniqueName: string, userId: number, properties: any, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
-    public updateGroupMemberProperties1(uniqueName: string, userId: number, properties: any, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
-    public updateGroupMemberProperties1(uniqueName: string, userId: number, properties: any, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public updateGroupMemberPropertiesWithHttpInfo(uniqueName: string, userId: number, properties: any, extraHttpRequestParams?: any): Observable<Response> {
+        const path = this.basePath + '/users/groups/${unique_name}/members/${user_id}/properties'
+                    .replace('${' + 'unique_name' + '}', String(uniqueName))
+                    .replace('${' + 'user_id' + '}', String(userId));
+
+        let queryParameters = new URLSearchParams();
+        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
+        // verify required parameter 'uniqueName' is not null or undefined
         if (uniqueName === null || uniqueName === undefined) {
-            throw new Error('Required parameter uniqueName was null or undefined when calling updateGroupMemberProperties1.');
+            throw new Error('Required parameter uniqueName was null or undefined when calling updateGroupMemberProperties.');
         }
+        // verify required parameter 'userId' is not null or undefined
         if (userId === null || userId === undefined) {
-            throw new Error('Required parameter userId was null or undefined when calling updateGroupMemberProperties1.');
+            throw new Error('Required parameter userId was null or undefined when calling updateGroupMemberProperties.');
         }
+        // verify required parameter 'properties' is not null or undefined
         if (properties === null || properties === undefined) {
-            throw new Error('Required parameter properties was null or undefined when calling updateGroupMemberProperties1.');
-        }
-
-        let headers = this.defaultHeaders;
-
-        // authentication (oauth2_client_credentials_grant) required
-        if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
-                ? this.configuration.accessToken()
-                : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
-        }
-
-        // authentication (oauth2_password_grant) required
-        if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
-                ? this.configuration.accessToken()
-                : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
+            throw new Error('Required parameter properties was null or undefined when calling updateGroupMemberProperties.');
         }
 
         // to determine the Accept header
-        let httpHeaderAccepts: string[] = [
+        let produces: string[] = [
             'application/json'
         ];
-        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
-        if (httpHeaderAcceptSelected != undefined) {
-            headers = headers.set('Accept', httpHeaderAcceptSelected);
+
+        // authentication (oauth2_client_credentials_grant) required
+        // oauth required
+        if (this.configuration.accessToken) {
+            let accessToken = typeof this.configuration.accessToken === 'function'
+                ? this.configuration.accessToken()
+                : this.configuration.accessToken;
+            headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-        // to determine the Content-Type header
-        const consumes: string[] = [
-            'application/json'
-        ];
-        const httpContentTypeSelected: string | undefined = this.configuration.selectHeaderContentType(consumes);
-        if (httpContentTypeSelected != undefined) {
-            headers = headers.set('Content-Type', httpContentTypeSelected);
+        // authentication (oauth2_password_grant) required
+        // oauth required
+        if (this.configuration.accessToken) {
+            let accessToken = typeof this.configuration.accessToken === 'function'
+                ? this.configuration.accessToken()
+                : this.configuration.accessToken;
+            headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-        return this.httpClient.put<any>(`${this.basePath}/users/groups/${encodeURIComponent(String(uniqueName))}/members/${encodeURIComponent(String(userId))}/properties`,
-            properties,
-            {
-                withCredentials: this.configuration.withCredentials,
-                headers: headers,
-                observe: observe,
-                reportProgress: reportProgress
-            }
-        );
+            
+        headers.set('Content-Type', 'application/json');
+
+        let requestOptions: RequestOptionsArgs = new RequestOptions({
+            method: RequestMethod.Put,
+            headers: headers,
+            body: properties == null ? '' : JSON.stringify(properties), // https://github.com/angular/angular/issues/10612
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
+        });
+        // https://github.com/swagger-api/swagger-codegen/issues/4037
+        if (extraHttpRequestParams) {
+            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
+        }
+
+        return this.http.request(path, requestOptions);
     }
 
     /**
      * Change a user&#39;s status
-     * &lt;b&gt;Permissions Needed:&lt;/b&gt; GROUP_ADMIN
+     * &lt;b&gt;Permissions Needed:&lt;/b&gt; PUT&lt;br /&gt;&lt;b&gt;Permissions Needed:&lt;/b&gt; PUT
      * @param uniqueName The group unique name
      * @param userId The user id of the member to modify
      * @param status The new status for the user
-     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-     * @param reportProgress flag to report request and response progress.
      */
-    public updateGroupMemberStatus(uniqueName: string, userId: number, status: GroupMemberStatusWrapper, observe?: 'body', reportProgress?: boolean): Observable<any>;
-    public updateGroupMemberStatus(uniqueName: string, userId: number, status: GroupMemberStatusWrapper, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
-    public updateGroupMemberStatus(uniqueName: string, userId: number, status: GroupMemberStatusWrapper, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
-    public updateGroupMemberStatus(uniqueName: string, userId: number, status: GroupMemberStatusWrapper, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public updateGroupMemberStatusWithHttpInfo(uniqueName: string, userId: number, status: StringWrapper, extraHttpRequestParams?: any): Observable<Response> {
+        const path = this.basePath + '/users/groups/${unique_name}/members/${user_id}/status'
+                    .replace('${' + 'unique_name' + '}', String(uniqueName))
+                    .replace('${' + 'user_id' + '}', String(userId));
+
+        let queryParameters = new URLSearchParams();
+        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
+        // verify required parameter 'uniqueName' is not null or undefined
         if (uniqueName === null || uniqueName === undefined) {
             throw new Error('Required parameter uniqueName was null or undefined when calling updateGroupMemberStatus.');
         }
+        // verify required parameter 'userId' is not null or undefined
         if (userId === null || userId === undefined) {
             throw new Error('Required parameter userId was null or undefined when calling updateGroupMemberStatus.');
         }
+        // verify required parameter 'status' is not null or undefined
         if (status === null || status === undefined) {
             throw new Error('Required parameter status was null or undefined when calling updateGroupMemberStatus.');
         }
 
-        let headers = this.defaultHeaders;
+        // to determine the Accept header
+        let produces: string[] = [
+            'application/json'
+        ];
 
         // authentication (oauth2_client_credentials_grant) required
+        // oauth required
         if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
+            let accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
+            headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
         // authentication (oauth2_password_grant) required
+        // oauth required
         if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
+            let accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
+            headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-        // to determine the Accept header
-        let httpHeaderAccepts: string[] = [
-            'application/json'
-        ];
-        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
-        if (httpHeaderAcceptSelected != undefined) {
-            headers = headers.set('Accept', httpHeaderAcceptSelected);
+            
+        headers.set('Content-Type', 'application/json');
+
+        let requestOptions: RequestOptionsArgs = new RequestOptions({
+            method: RequestMethod.Put,
+            headers: headers,
+            body: status == null ? '' : JSON.stringify(status), // https://github.com/angular/angular/issues/10612
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
+        });
+        // https://github.com/swagger-api/swagger-codegen/issues/4037
+        if (extraHttpRequestParams) {
+            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
         }
 
-        // to determine the Content-Type header
-        const consumes: string[] = [
-            'application/json'
-        ];
-        const httpContentTypeSelected: string | undefined = this.configuration.selectHeaderContentType(consumes);
-        if (httpContentTypeSelected != undefined) {
-            headers = headers.set('Content-Type', httpContentTypeSelected);
-        }
-
-        return this.httpClient.put<any>(`${this.basePath}/users/groups/${encodeURIComponent(String(uniqueName))}/members/${encodeURIComponent(String(userId))}/status`,
-            status,
-            {
-                withCredentials: this.configuration.withCredentials,
-                headers: headers,
-                observe: observe,
-                reportProgress: reportProgress
-            }
-        );
+        return this.http.request(path, requestOptions);
     }
 
     /**
-     * Update an group member template
-     * &lt;b&gt;Permissions Needed:&lt;/b&gt; TEMPLATE_ADMIN
+     * Update a group member template
+     * &lt;b&gt;Permissions Needed:&lt;/b&gt; PUT
      * @param id The id of the template
-     * @param groupMemberTemplateResource The group member template resource object
-     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-     * @param reportProgress flag to report request and response progress.
+     * @param templatePatchResource The patch resource object
+     * @param testValidation If true, this will test validation but not submit the patch request
      */
-    public updateGroupMemberTemplate(id: string, groupMemberTemplateResource?: TemplateResource, observe?: 'body', reportProgress?: boolean): Observable<TemplateResource>;
-    public updateGroupMemberTemplate(id: string, groupMemberTemplateResource?: TemplateResource, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<TemplateResource>>;
-    public updateGroupMemberTemplate(id: string, groupMemberTemplateResource?: TemplateResource, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<TemplateResource>>;
-    public updateGroupMemberTemplate(id: string, groupMemberTemplateResource?: TemplateResource, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public updateGroupMemberTemplateWithHttpInfo(id: string, templatePatchResource?: PatchResource, testValidation?: boolean, extraHttpRequestParams?: any): Observable<Response> {
+        const path = this.basePath + '/users/groups/members/templates/${id}'
+                    .replace('${' + 'id' + '}', String(id));
+
+        let queryParameters = new URLSearchParams();
+        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
+        // verify required parameter 'id' is not null or undefined
         if (id === null || id === undefined) {
             throw new Error('Required parameter id was null or undefined when calling updateGroupMemberTemplate.');
         }
+        if (testValidation !== undefined) {
+            queryParameters.set('test_validation', <any>testValidation);
+        }
 
-        let headers = this.defaultHeaders;
+
+        // to determine the Accept header
+        let produces: string[] = [
+            'application/json'
+        ];
 
         // authentication (oauth2_client_credentials_grant) required
+        // oauth required
         if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
+            let accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
+            headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
         // authentication (oauth2_password_grant) required
+        // oauth required
         if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
+            let accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
+            headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-        // to determine the Accept header
-        let httpHeaderAccepts: string[] = [
-            'application/json'
-        ];
-        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
-        if (httpHeaderAcceptSelected != undefined) {
-            headers = headers.set('Accept', httpHeaderAcceptSelected);
+            
+        headers.set('Content-Type', 'application/json');
+
+        let requestOptions: RequestOptionsArgs = new RequestOptions({
+            method: RequestMethod.Patch,
+            headers: headers,
+            body: templatePatchResource == null ? '' : JSON.stringify(templatePatchResource), // https://github.com/angular/angular/issues/10612
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
+        });
+        // https://github.com/swagger-api/swagger-codegen/issues/4037
+        if (extraHttpRequestParams) {
+            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
         }
 
-        // to determine the Content-Type header
-        const consumes: string[] = [
-            'application/json'
-        ];
-        const httpContentTypeSelected: string | undefined = this.configuration.selectHeaderContentType(consumes);
-        if (httpContentTypeSelected != undefined) {
-            headers = headers.set('Content-Type', httpContentTypeSelected);
-        }
-
-        return this.httpClient.put<TemplateResource>(`${this.basePath}/users/groups/members/templates/${encodeURIComponent(String(id))}`,
-            groupMemberTemplateResource,
-            {
-                withCredentials: this.configuration.withCredentials,
-                headers: headers,
-                observe: observe,
-                reportProgress: reportProgress
-            }
-        );
+        return this.http.request(path, requestOptions);
     }
 
     /**
      * Update a group template
-     * &lt;b&gt;Permissions Needed:&lt;/b&gt; TEMPLATE_ADMIN
+     * &lt;b&gt;Permissions Needed:&lt;/b&gt; PUT
      * @param id The id of the template
-     * @param groupTemplateResource The group template resource object
-     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-     * @param reportProgress flag to report request and response progress.
+     * @param templatePatchResource The patch resource object
+     * @param testValidation If true, this will test validation but not submit the patch request
      */
-    public updateGroupTemplate(id: string, groupTemplateResource?: TemplateResource, observe?: 'body', reportProgress?: boolean): Observable<TemplateResource>;
-    public updateGroupTemplate(id: string, groupTemplateResource?: TemplateResource, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<TemplateResource>>;
-    public updateGroupTemplate(id: string, groupTemplateResource?: TemplateResource, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<TemplateResource>>;
-    public updateGroupTemplate(id: string, groupTemplateResource?: TemplateResource, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public updateGroupTemplateWithHttpInfo(id: string, templatePatchResource?: PatchResource, testValidation?: boolean, extraHttpRequestParams?: any): Observable<Response> {
+        const path = this.basePath + '/users/groups/templates/${id}'
+                    .replace('${' + 'id' + '}', String(id));
+
+        let queryParameters = new URLSearchParams();
+        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
+        // verify required parameter 'id' is not null or undefined
         if (id === null || id === undefined) {
             throw new Error('Required parameter id was null or undefined when calling updateGroupTemplate.');
         }
+        if (testValidation !== undefined) {
+            queryParameters.set('test_validation', <any>testValidation);
+        }
 
-        let headers = this.defaultHeaders;
+
+        // to determine the Accept header
+        let produces: string[] = [
+            'application/json'
+        ];
 
         // authentication (oauth2_client_credentials_grant) required
+        // oauth required
         if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
+            let accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
+            headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
         // authentication (oauth2_password_grant) required
+        // oauth required
         if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
+            let accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
+            headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-        // to determine the Accept header
-        let httpHeaderAccepts: string[] = [
-            'application/json'
-        ];
-        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
-        if (httpHeaderAcceptSelected != undefined) {
-            headers = headers.set('Accept', httpHeaderAcceptSelected);
+            
+        headers.set('Content-Type', 'application/json');
+
+        let requestOptions: RequestOptionsArgs = new RequestOptions({
+            method: RequestMethod.Patch,
+            headers: headers,
+            body: templatePatchResource == null ? '' : JSON.stringify(templatePatchResource), // https://github.com/angular/angular/issues/10612
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
+        });
+        // https://github.com/swagger-api/swagger-codegen/issues/4037
+        if (extraHttpRequestParams) {
+            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
         }
 
-        // to determine the Content-Type header
-        const consumes: string[] = [
-            'application/json'
-        ];
-        const httpContentTypeSelected: string | undefined = this.configuration.selectHeaderContentType(consumes);
-        if (httpContentTypeSelected != undefined) {
-            headers = headers.set('Content-Type', httpContentTypeSelected);
-        }
-
-        return this.httpClient.put<TemplateResource>(`${this.basePath}/users/groups/templates/${encodeURIComponent(String(id))}`,
-            groupTemplateResource,
-            {
-                withCredentials: this.configuration.withCredentials,
-                headers: headers,
-                observe: observe,
-                reportProgress: reportProgress
-            }
-        );
+        return this.http.request(path, requestOptions);
     }
 
 }

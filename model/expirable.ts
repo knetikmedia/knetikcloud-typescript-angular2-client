@@ -9,16 +9,19 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
+
 import { Behavior } from './behavior';
 
 
-export interface Expirable extends Behavior { 
+export interface Expirable extends Behavior {
     /**
      * The length of time
      */
     timeLength?: number;
+
     /**
      * The unit of time
      */
     unitOfTime?: string;
+
 }

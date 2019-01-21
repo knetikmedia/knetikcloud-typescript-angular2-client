@@ -9,17 +9,20 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
+
 /* tslint:disable:no-unused-variable member-ordering */
 
 import { Inject, Injectable, Optional }                      from '@angular/core';
-import { HttpClient, HttpHeaders, HttpParams,
-         HttpResponse, HttpEvent }                           from '@angular/common/http';
-import { CustomHttpUrlEncodingCodec }                        from '../encoder';
+import { Http, Headers, URLSearchParams }                    from '@angular/http';
+import { RequestMethod, RequestOptions, RequestOptionsArgs } from '@angular/http';
+import { Response, ResponseContentType }                     from '@angular/http';
 
 import { Observable }                                        from 'rxjs/Observable';
+import '../rxjs-operators';
 
 import { AmazonS3Activity } from '../model/amazonS3Activity';
 import { Result } from '../model/result';
+import { StringWrapper } from '../model/stringWrapper';
 
 import { BASE_PATH, COLLECTION_FORMATS }                     from '../variables';
 import { Configuration }                                     from '../configuration';
@@ -28,18 +31,33 @@ import { Configuration }                                     from '../configurat
 @Injectable()
 export class AmazonWebServicesS3Service {
 
-    protected basePath = 'https://jsapi-integration.us-east-1.elasticbeanstalk.com';
-    public defaultHeaders = new HttpHeaders();
-    public configuration = new Configuration();
+    protected basePath = 'https://devsandbox.knetikcloud.com';
+    public defaultHeaders: Headers = new Headers();
+    public configuration: Configuration = new Configuration();
 
-    constructor(protected httpClient: HttpClient, @Optional()@Inject(BASE_PATH) basePath: string, @Optional() configuration: Configuration) {
+    constructor(protected http: Http, @Optional()@Inject(BASE_PATH) basePath: string, @Optional() configuration: Configuration) {
         if (basePath) {
             this.basePath = basePath;
         }
         if (configuration) {
             this.configuration = configuration;
-            this.basePath = basePath || configuration.basePath || this.basePath;
+			this.basePath = basePath || configuration.basePath || this.basePath;
         }
+    }
+
+    /**
+     * 
+     * Extends object by coping non-existing properties.
+     * @param objA object to be extended
+     * @param objB source object
+     */
+    private extendObj<T1,T2>(objA: T1, objB: T2) {
+        for(let key in objB){
+            if(objB.hasOwnProperty(key)){
+                (objA as any)[key] = (objB as any)[key];
+            }
+        }
+        return <T1&T2>objA;
     }
 
     /**
@@ -48,7 +66,7 @@ export class AmazonWebServicesS3Service {
      */
     private canConsumeForm(consumes: string[]): boolean {
         const form = 'multipart/form-data';
-        for (const consume of consumes) {
+        for (let consume of consumes) {
             if (form === consume) {
                 return true;
             }
@@ -56,72 +74,104 @@ export class AmazonWebServicesS3Service {
         return false;
     }
 
+    /**
+     * To give access to files in your own S3 account, you will need to grant KnetikcCloud access to the file by adjusting your bucket policy accordingly. See S3 documentation for details. <br><br><b>Permissions Needed:</b> S3_ADMIN
+     * @summary Get a temporary signed S3 URL for download
+     * @param bucket S3 bucket name
+     * @param path The path to the file relative the bucket (the s3 object key)
+     * @param expiration The number of seconds this URL will be valid. Default to 60
+     */
+    public getDownloadURL(bucket?: string, path?: string, expiration?: number, extraHttpRequestParams?: any): Observable<StringWrapper> {
+        return this.getDownloadURLWithHttpInfo(bucket, path, expiration, extraHttpRequestParams)
+            .map((response: Response) => {
+                if (response.status === 204) {
+                    return undefined;
+                } else {
+                    return response.json() || {};
+                }
+            });
+    }
+
+    /**
+     * Requires the file name and file content type (i.e., 'video/mpeg'). Make a PUT to the resulting url to upload the file and use the cdn_url to retrieve it after. <br><br><b>Permissions Needed:</b> S3_USER or S3_ADMIN
+     * @summary Get a signed S3 URL for upload
+     * @param filename The file name
+     * @param contentType The content type
+     */
+    public getSignedS3URL(filename?: string, contentType?: string, extraHttpRequestParams?: any): Observable<AmazonS3Activity> {
+        return this.getSignedS3URLWithHttpInfo(filename, contentType, extraHttpRequestParams)
+            .map((response: Response) => {
+                if (response.status === 204) {
+                    return undefined;
+                } else {
+                    return response.json() || {};
+                }
+            });
+    }
+
 
     /**
      * Get a temporary signed S3 URL for download
      * To give access to files in your own S3 account, you will need to grant KnetikcCloud access to the file by adjusting your bucket policy accordingly. See S3 documentation for details. &lt;br&gt;&lt;br&gt;&lt;b&gt;Permissions Needed:&lt;/b&gt; S3_ADMIN
      * @param bucket S3 bucket name
-     * @param path The path to the file relative to the bucket (the s3 object key)
+     * @param path The path to the file relative the bucket (the s3 object key)
      * @param expiration The number of seconds this URL will be valid. Default to 60
-     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-     * @param reportProgress flag to report request and response progress.
      */
-    public getDownloadURL(bucket?: string, path?: string, expiration?: number, observe?: 'body', reportProgress?: boolean): Observable<string>;
-    public getDownloadURL(bucket?: string, path?: string, expiration?: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<string>>;
-    public getDownloadURL(bucket?: string, path?: string, expiration?: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<string>>;
-    public getDownloadURL(bucket?: string, path?: string, expiration?: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public getDownloadURLWithHttpInfo(bucket?: string, path?: string, expiration?: number, extraHttpRequestParams?: any): Observable<Response> {
+        const path = this.basePath + '/amazon/s3/download-url';
 
-        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
-        if (bucket !== undefined && bucket !== null) {
-            queryParameters = queryParameters.set('bucket', <any>bucket);
-        }
-        if (path !== undefined && path !== null) {
-            queryParameters = queryParameters.set('path', <any>path);
-        }
-        if (expiration !== undefined && expiration !== null) {
-            queryParameters = queryParameters.set('expiration', <any>expiration);
+        let queryParameters = new URLSearchParams();
+        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
+        if (bucket !== undefined) {
+            queryParameters.set('bucket', <any>bucket);
         }
 
-        let headers = this.defaultHeaders;
+        if (path !== undefined) {
+            queryParameters.set('path', <any>path);
+        }
+
+        if (expiration !== undefined) {
+            queryParameters.set('expiration', <any>expiration);
+        }
+
+
+        // to determine the Accept header
+        let produces: string[] = [
+            'application/json'
+        ];
 
         // authentication (oauth2_client_credentials_grant) required
+        // oauth required
         if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
+            let accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
+            headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
         // authentication (oauth2_password_grant) required
+        // oauth required
         if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
+            let accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
+            headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-        // to determine the Accept header
-        let httpHeaderAccepts: string[] = [
-            'application/json'
-        ];
-        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
-        if (httpHeaderAcceptSelected != undefined) {
-            headers = headers.set('Accept', httpHeaderAcceptSelected);
+            
+        let requestOptions: RequestOptionsArgs = new RequestOptions({
+            method: RequestMethod.Get,
+            headers: headers,
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
+        });
+        // https://github.com/swagger-api/swagger-codegen/issues/4037
+        if (extraHttpRequestParams) {
+            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
         }
 
-        // to determine the Content-Type header
-        const consumes: string[] = [
-        ];
-
-        return this.httpClient.get<string>(`${this.basePath}/amazon/s3/downloadurl`,
-            {
-                params: queryParameters,
-                withCredentials: this.configuration.withCredentials,
-                headers: headers,
-                observe: observe,
-                reportProgress: reportProgress
-            }
-        );
+        return this.http.request(path, requestOptions);
     }
 
     /**
@@ -129,62 +179,58 @@ export class AmazonWebServicesS3Service {
      * Requires the file name and file content type (i.e., &#39;video/mpeg&#39;). Make a PUT to the resulting url to upload the file and use the cdn_url to retrieve it after. &lt;br&gt;&lt;br&gt;&lt;b&gt;Permissions Needed:&lt;/b&gt; S3_USER or S3_ADMIN
      * @param filename The file name
      * @param contentType The content type
-     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-     * @param reportProgress flag to report request and response progress.
      */
-    public getSignedS3URL(filename?: string, contentType?: string, observe?: 'body', reportProgress?: boolean): Observable<AmazonS3Activity>;
-    public getSignedS3URL(filename?: string, contentType?: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<AmazonS3Activity>>;
-    public getSignedS3URL(filename?: string, contentType?: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<AmazonS3Activity>>;
-    public getSignedS3URL(filename?: string, contentType?: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public getSignedS3URLWithHttpInfo(filename?: string, contentType?: string, extraHttpRequestParams?: any): Observable<Response> {
+        const path = this.basePath + '/amazon/s3/signed-post-url';
 
-        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
-        if (filename !== undefined && filename !== null) {
-            queryParameters = queryParameters.set('filename', <any>filename);
-        }
-        if (contentType !== undefined && contentType !== null) {
-            queryParameters = queryParameters.set('content_type', <any>contentType);
+        let queryParameters = new URLSearchParams();
+        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
+        if (filename !== undefined) {
+            queryParameters.set('filename', <any>filename);
         }
 
-        let headers = this.defaultHeaders;
+        if (contentType !== undefined) {
+            queryParameters.set('content_type', <any>contentType);
+        }
+
+
+        // to determine the Accept header
+        let produces: string[] = [
+            'application/json'
+        ];
 
         // authentication (oauth2_client_credentials_grant) required
+        // oauth required
         if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
+            let accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
+            headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
         // authentication (oauth2_password_grant) required
+        // oauth required
         if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
+            let accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
+            headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-        // to determine the Accept header
-        let httpHeaderAccepts: string[] = [
-            'application/json'
-        ];
-        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
-        if (httpHeaderAcceptSelected != undefined) {
-            headers = headers.set('Accept', httpHeaderAcceptSelected);
+            
+        let requestOptions: RequestOptionsArgs = new RequestOptions({
+            method: RequestMethod.Get,
+            headers: headers,
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
+        });
+        // https://github.com/swagger-api/swagger-codegen/issues/4037
+        if (extraHttpRequestParams) {
+            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
         }
 
-        // to determine the Content-Type header
-        const consumes: string[] = [
-        ];
-
-        return this.httpClient.get<AmazonS3Activity>(`${this.basePath}/amazon/s3/signedposturl`,
-            {
-                params: queryParameters,
-                withCredentials: this.configuration.withCredentials,
-                headers: headers,
-                observe: observe,
-                reportProgress: reportProgress
-            }
-        );
+        return this.http.request(path, requestOptions);
     }
 
 }

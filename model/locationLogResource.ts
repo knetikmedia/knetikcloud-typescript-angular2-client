@@ -11,8 +11,12 @@
  */
 
 
-export interface LocationLogResource { 
+
+export interface LocationLogResource {
     country?: string;
+
     ip?: string;
+
     time?: number;
+
 }

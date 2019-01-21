@@ -9,10 +9,13 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
+
 import { Country } from './country';
 
 
-export interface SampleCountriesResponse { 
+export interface SampleCountriesResponse {
     vendorId1?: Array<Country>;
+
     vendorId2?: Array<Country>;
+
 }

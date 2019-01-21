@@ -11,13 +11,16 @@
  */
 
 
-export interface CartShippableResponse { 
+
+export interface CartShippableResponse {
     /**
      * The id of the cart
      */
     cartId?: number;
+
     /**
      * Whether the item is shippable
      */
     shippable?: boolean;
+
 }

@@ -11,17 +11,21 @@
  */
 
 
-export interface StripePaymentRequest { 
+
+export interface StripePaymentRequest {
     /**
      * The amount to pay, if not the full remaining balance (leave out to pay in full, but be careful no other partial payment has been started)
      */
     amount?: number;
+
     /**
      * The id of the invoice to pay
      */
     invoiceId: number;
+
     /**
      * A token from Stripe to identify payment info to be tied to the customer
      */
     token: string;
+
 }

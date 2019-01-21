@@ -9,18 +9,20 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
+
 /* tslint:disable:no-unused-variable member-ordering */
 
 import { Inject, Injectable, Optional }                      from '@angular/core';
-import { HttpClient, HttpHeaders, HttpParams,
-         HttpResponse, HttpEvent }                           from '@angular/common/http';
-import { CustomHttpUrlEncodingCodec }                        from '../encoder';
+import { Http, Headers, URLSearchParams }                    from '@angular/http';
+import { RequestMethod, RequestOptions, RequestOptionsArgs } from '@angular/http';
+import { Response, ResponseContentType }                     from '@angular/http';
 
 import { Observable }                                        from 'rxjs/Observable';
+import '../rxjs-operators';
 
-import { ChatBlacklistResource } from '../model/chatBlacklistResource';
 import { ChatMessageResource } from '../model/chatMessageResource';
 import { IntWrapper } from '../model/intWrapper';
+import { PageResourceChatBlacklistResource } from '../model/pageResourceChatBlacklistResource';
 import { PageResourceChatMessageResource } from '../model/pageResourceChatMessageResource';
 import { PageResourceChatUserThreadResource } from '../model/pageResourceChatUserThreadResource';
 import { Result } from '../model/result';
@@ -32,18 +34,33 @@ import { Configuration }                                     from '../configurat
 @Injectable()
 export class ChatService {
 
-    protected basePath = 'https://jsapi-integration.us-east-1.elasticbeanstalk.com';
-    public defaultHeaders = new HttpHeaders();
-    public configuration = new Configuration();
+    protected basePath = 'https://devsandbox.knetikcloud.com';
+    public defaultHeaders: Headers = new Headers();
+    public configuration: Configuration = new Configuration();
 
-    constructor(protected httpClient: HttpClient, @Optional()@Inject(BASE_PATH) basePath: string, @Optional() configuration: Configuration) {
+    constructor(protected http: Http, @Optional()@Inject(BASE_PATH) basePath: string, @Optional() configuration: Configuration) {
         if (basePath) {
             this.basePath = basePath;
         }
         if (configuration) {
             this.configuration = configuration;
-            this.basePath = basePath || configuration.basePath || this.basePath;
+			this.basePath = basePath || configuration.basePath || this.basePath;
         }
+    }
+
+    /**
+     * 
+     * Extends object by coping non-existing properties.
+     * @param objA object to be extended
+     * @param objB source object
+     */
+    private extendObj<T1,T2>(objA: T1, objB: T2) {
+        for(let key in objB){
+            if(objB.hasOwnProperty(key)){
+                (objA as any)[key] = (objB as any)[key];
+            }
+        }
+        return <T1&T2>objA;
     }
 
     /**
@@ -52,12 +69,221 @@ export class ChatService {
      */
     private canConsumeForm(consumes: string[]): boolean {
         const form = 'multipart/form-data';
-        for (const consume of consumes) {
+        for (let consume of consumes) {
             if (form === consume) {
                 return true;
             }
         }
         return false;
+    }
+
+    /**
+     * <b>Permissions Needed:</b> owner
+     * @summary Acknowledge number of messages in a thread
+     * @param id The thread id
+     * @param readCount The amount of messages read
+     */
+    public acknowledgeChatMessage(id: string, readCount?: IntWrapper, extraHttpRequestParams?: any): Observable<{}> {
+        return this.acknowledgeChatMessageWithHttpInfo(id, readCount, extraHttpRequestParams)
+            .map((response: Response) => {
+                if (response.status === 204) {
+                    return undefined;
+                } else {
+                    return response.json() || {};
+                }
+            });
+    }
+
+    /**
+     * <b>Permissions Needed:</b> CHAT_ADMIN or owner
+     * @summary Add a user to a chat message blacklist
+     * @param blacklistedUserId The user id to blacklist
+     * @param id The user id or &#39;me&#39;
+     */
+    public addChatMessageBlacklist(blacklistedUserId: number, id: string, extraHttpRequestParams?: any): Observable<{}> {
+        return this.addChatMessageBlacklistWithHttpInfo(blacklistedUserId, id, extraHttpRequestParams)
+            .map((response: Response) => {
+                if (response.status === 204) {
+                    return undefined;
+                } else {
+                    return response.json() || {};
+                }
+            });
+    }
+
+    /**
+     * <b>Permissions Needed:</b> CHAT_ADMIN or owner
+     * @summary Delete a message
+     * @param id The message id
+     */
+    public deleteChatMessage(id: string, extraHttpRequestParams?: any): Observable<{}> {
+        return this.deleteChatMessageWithHttpInfo(id, extraHttpRequestParams)
+            .map((response: Response) => {
+                if (response.status === 204) {
+                    return undefined;
+                } else {
+                    return response.json() || {};
+                }
+            });
+    }
+
+    /**
+     * <b>Permissions Needed:</b> owner
+     * @summary Edit your message
+     * @param id The message id
+     * @param chatMessageResource The chat message resource
+     */
+    public editChatMessage(id: string, chatMessageResource?: ChatMessageResource, extraHttpRequestParams?: any): Observable<{}> {
+        return this.editChatMessageWithHttpInfo(id, chatMessageResource, extraHttpRequestParams)
+            .map((response: Response) => {
+                if (response.status === 204) {
+                    return undefined;
+                } else {
+                    return response.json() || {};
+                }
+            });
+    }
+
+    /**
+     * <b>Permissions Needed:</b> CHAT_ADMIN or owner
+     * @summary Get a message
+     * @param id The message id
+     */
+    public getChatMessage(id: string, extraHttpRequestParams?: any): Observable<ChatMessageResource> {
+        return this.getChatMessageWithHttpInfo(id, extraHttpRequestParams)
+            .map((response: Response) => {
+                if (response.status === 204) {
+                    return undefined;
+                } else {
+                    return response.json() || {};
+                }
+            });
+    }
+
+    /**
+     * <b>Permissions Needed:</b> CHAT_ADMIN or owner
+     * @summary Get a list of blocked users for chat messaging
+     * @param id The user id or &#39;me&#39;
+     * @param size The number of objects returned per page
+     * @param page The number of the page returned, starting with 1
+     */
+    public getChatMessageBlacklist(id: string, size?: number, page?: number, extraHttpRequestParams?: any): Observable<PageResourceChatBlacklistResource> {
+        return this.getChatMessageBlacklistWithHttpInfo(id, size, page, extraHttpRequestParams)
+            .map((response: Response) => {
+                if (response.status === 204) {
+                    return undefined;
+                } else {
+                    return response.json() || {};
+                }
+            });
+    }
+
+    /**
+     * <b>Permissions Needed:</b> owner
+     * @summary List your threads
+     * @param size The number of objects returned per page
+     * @param page The number of the page returned
+     * @param order A comma separated list of sorting requirements in priority order, each entry matching PROPERTY_NAME:[ASC|DESC]
+     */
+    public getChatThreads(size?: number, page?: number, order?: string, extraHttpRequestParams?: any): Observable<PageResourceChatUserThreadResource> {
+        return this.getChatThreadsWithHttpInfo(size, page, order, extraHttpRequestParams)
+            .map((response: Response) => {
+                if (response.status === 204) {
+                    return undefined;
+                } else {
+                    return response.json() || {};
+                }
+            });
+    }
+
+    /**
+     * <b>Permissions Needed:</b> owner
+     * @summary List messages with a user
+     * @param id The user id
+     * @param size The number of objects returned per page
+     * @param page The number of the page returned
+     * @param order A comma separated list of sorting requirements in priority order, each entry matching PROPERTY_NAME:[ASC|DESC]
+     */
+    public getDirectMessages(id: number, size?: number, page?: number, order?: string, extraHttpRequestParams?: any): Observable<PageResourceChatMessageResource> {
+        return this.getDirectMessagesWithHttpInfo(id, size, page, order, extraHttpRequestParams)
+            .map((response: Response) => {
+                if (response.status === 204) {
+                    return undefined;
+                } else {
+                    return response.json() || {};
+                }
+            });
+    }
+
+    /**
+     * <b>Permissions Needed:</b> CHAT_ADMIN or owner
+     * @summary List messages in a thread
+     * @param id The thread id
+     * @param size The number of objects returned per page
+     * @param page The number of the page returned
+     * @param order A comma separated list of sorting requirements in priority order, each entry matching PROPERTY_NAME:[ASC|DESC]
+     */
+    public getThreadMessages(id: string, size?: number, page?: number, order?: string, extraHttpRequestParams?: any): Observable<PageResourceChatMessageResource> {
+        return this.getThreadMessagesWithHttpInfo(id, size, page, order, extraHttpRequestParams)
+            .map((response: Response) => {
+                if (response.status === 204) {
+                    return undefined;
+                } else {
+                    return response.json() || {};
+                }
+            });
+    }
+
+    /**
+     * <b>Permissions Needed:</b> CHAT_ADMIN or owner
+     * @summary List messages in a topic
+     * @param id The topic id
+     * @param size The number of objects returned per page
+     * @param page The number of the page returned
+     * @param order A comma separated list of sorting requirements in priority order, each entry matching PROPERTY_NAME:[ASC|DESC]
+     */
+    public getTopicMessages(id: string, size?: number, page?: number, order?: string, extraHttpRequestParams?: any): Observable<PageResourceChatMessageResource> {
+        return this.getTopicMessagesWithHttpInfo(id, size, page, order, extraHttpRequestParams)
+            .map((response: Response) => {
+                if (response.status === 204) {
+                    return undefined;
+                } else {
+                    return response.json() || {};
+                }
+            });
+    }
+
+    /**
+     * <b>Permissions Needed:</b> CHAT_ADMIN or owner
+     * @summary Remove a user from a blacklist
+     * @param blacklistedUserId The user id to blacklist
+     * @param id The user id or &#39;me&#39;
+     */
+    public removeChatBlacklist(blacklistedUserId: number, id: string, extraHttpRequestParams?: any): Observable<{}> {
+        return this.removeChatBlacklistWithHttpInfo(blacklistedUserId, id, extraHttpRequestParams)
+            .map((response: Response) => {
+                if (response.status === 204) {
+                    return undefined;
+                } else {
+                    return response.json() || {};
+                }
+            });
+    }
+
+    /**
+     * <b>Permissions Needed:</b> ANY
+     * @summary Send a message
+     * @param chatMessageResource The chat message resource
+     */
+    public sendChatMessage(chatMessageResource?: ChatMessageResource, extraHttpRequestParams?: any): Observable<ChatMessageResource> {
+        return this.sendChatMessageWithHttpInfo(chatMessageResource, extraHttpRequestParams)
+            .map((response: Response) => {
+                if (response.status === 204) {
+                    return undefined;
+                } else {
+                    return response.json() || {};
+                }
+            });
     }
 
 
@@ -66,62 +292,58 @@ export class ChatService {
      * &lt;b&gt;Permissions Needed:&lt;/b&gt; owner
      * @param id The thread id
      * @param readCount The amount of messages read
-     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-     * @param reportProgress flag to report request and response progress.
      */
-    public acknowledgeChatMessage(id: string, readCount?: IntWrapper, observe?: 'body', reportProgress?: boolean): Observable<any>;
-    public acknowledgeChatMessage(id: string, readCount?: IntWrapper, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
-    public acknowledgeChatMessage(id: string, readCount?: IntWrapper, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
-    public acknowledgeChatMessage(id: string, readCount?: IntWrapper, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public acknowledgeChatMessageWithHttpInfo(id: string, readCount?: IntWrapper, extraHttpRequestParams?: any): Observable<Response> {
+        const path = this.basePath + '/chat/threads/${id}/acknowledge'
+                    .replace('${' + 'id' + '}', String(id));
+
+        let queryParameters = new URLSearchParams();
+        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
+        // verify required parameter 'id' is not null or undefined
         if (id === null || id === undefined) {
             throw new Error('Required parameter id was null or undefined when calling acknowledgeChatMessage.');
         }
 
-        let headers = this.defaultHeaders;
+        // to determine the Accept header
+        let produces: string[] = [
+            'application/json'
+        ];
 
         // authentication (oauth2_client_credentials_grant) required
+        // oauth required
         if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
+            let accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
+            headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
         // authentication (oauth2_password_grant) required
+        // oauth required
         if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
+            let accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
+            headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-        // to determine the Accept header
-        let httpHeaderAccepts: string[] = [
-            'application/json'
-        ];
-        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
-        if (httpHeaderAcceptSelected != undefined) {
-            headers = headers.set('Accept', httpHeaderAcceptSelected);
+            
+        headers.set('Content-Type', 'application/json');
+
+        let requestOptions: RequestOptionsArgs = new RequestOptions({
+            method: RequestMethod.Put,
+            headers: headers,
+            body: readCount == null ? '' : JSON.stringify(readCount), // https://github.com/angular/angular/issues/10612
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
+        });
+        // https://github.com/swagger-api/swagger-codegen/issues/4037
+        if (extraHttpRequestParams) {
+            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
         }
 
-        // to determine the Content-Type header
-        const consumes: string[] = [
-            'application/json'
-        ];
-        const httpContentTypeSelected: string | undefined = this.configuration.selectHeaderContentType(consumes);
-        if (httpContentTypeSelected != undefined) {
-            headers = headers.set('Content-Type', httpContentTypeSelected);
-        }
-
-        return this.httpClient.put<any>(`${this.basePath}/chat/threads/${encodeURIComponent(String(id))}/acknowledge`,
-            readCount,
-            {
-                withCredentials: this.configuration.withCredentials,
-                headers: headers,
-                observe: observe,
-                reportProgress: reportProgress
-            }
-        );
+        return this.http.request(path, requestOptions);
     }
 
     /**
@@ -129,117 +351,115 @@ export class ChatService {
      * &lt;b&gt;Permissions Needed:&lt;/b&gt; CHAT_ADMIN or owner
      * @param blacklistedUserId The user id to blacklist
      * @param id The user id or &#39;me&#39;
-     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-     * @param reportProgress flag to report request and response progress.
      */
-    public addChatMessageBlacklist(blacklistedUserId: number, id: string, observe?: 'body', reportProgress?: boolean): Observable<any>;
-    public addChatMessageBlacklist(blacklistedUserId: number, id: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
-    public addChatMessageBlacklist(blacklistedUserId: number, id: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
-    public addChatMessageBlacklist(blacklistedUserId: number, id: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public addChatMessageBlacklistWithHttpInfo(blacklistedUserId: number, id: string, extraHttpRequestParams?: any): Observable<Response> {
+        const path = this.basePath + '/chat/users/${id}/blacklist/${blacklisted_user_id}'
+                    .replace('${' + 'blacklisted_user_id' + '}', String(blacklistedUserId))
+                    .replace('${' + 'id' + '}', String(id));
+
+        let queryParameters = new URLSearchParams();
+        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
+        // verify required parameter 'blacklistedUserId' is not null or undefined
         if (blacklistedUserId === null || blacklistedUserId === undefined) {
             throw new Error('Required parameter blacklistedUserId was null or undefined when calling addChatMessageBlacklist.');
         }
+        // verify required parameter 'id' is not null or undefined
         if (id === null || id === undefined) {
             throw new Error('Required parameter id was null or undefined when calling addChatMessageBlacklist.');
         }
 
-        let headers = this.defaultHeaders;
+        // to determine the Accept header
+        let produces: string[] = [
+            'application/json'
+        ];
 
         // authentication (oauth2_client_credentials_grant) required
+        // oauth required
         if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
+            let accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
+            headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
         // authentication (oauth2_password_grant) required
+        // oauth required
         if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
+            let accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
+            headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-        // to determine the Accept header
-        let httpHeaderAccepts: string[] = [
-            'application/json'
-        ];
-        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
-        if (httpHeaderAcceptSelected != undefined) {
-            headers = headers.set('Accept', httpHeaderAcceptSelected);
+            
+        let requestOptions: RequestOptionsArgs = new RequestOptions({
+            method: RequestMethod.Post,
+            headers: headers,
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
+        });
+        // https://github.com/swagger-api/swagger-codegen/issues/4037
+        if (extraHttpRequestParams) {
+            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
         }
 
-        // to determine the Content-Type header
-        const consumes: string[] = [
-            'application/json'
-        ];
-
-        return this.httpClient.post<any>(`${this.basePath}/chat/users/${encodeURIComponent(String(id))}/blacklist/${encodeURIComponent(String(blacklistedUserId))}`,
-            null,
-            {
-                withCredentials: this.configuration.withCredentials,
-                headers: headers,
-                observe: observe,
-                reportProgress: reportProgress
-            }
-        );
+        return this.http.request(path, requestOptions);
     }
 
     /**
      * Delete a message
      * &lt;b&gt;Permissions Needed:&lt;/b&gt; CHAT_ADMIN or owner
      * @param id The message id
-     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-     * @param reportProgress flag to report request and response progress.
      */
-    public deleteChatMessage(id: string, observe?: 'body', reportProgress?: boolean): Observable<any>;
-    public deleteChatMessage(id: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
-    public deleteChatMessage(id: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
-    public deleteChatMessage(id: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public deleteChatMessageWithHttpInfo(id: string, extraHttpRequestParams?: any): Observable<Response> {
+        const path = this.basePath + '/chat/messages/${id}'
+                    .replace('${' + 'id' + '}', String(id));
+
+        let queryParameters = new URLSearchParams();
+        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
+        // verify required parameter 'id' is not null or undefined
         if (id === null || id === undefined) {
             throw new Error('Required parameter id was null or undefined when calling deleteChatMessage.');
         }
 
-        let headers = this.defaultHeaders;
+        // to determine the Accept header
+        let produces: string[] = [
+            'application/json'
+        ];
 
         // authentication (oauth2_client_credentials_grant) required
+        // oauth required
         if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
+            let accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
+            headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
         // authentication (oauth2_password_grant) required
+        // oauth required
         if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
+            let accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
+            headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-        // to determine the Accept header
-        let httpHeaderAccepts: string[] = [
-            'application/json'
-        ];
-        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
-        if (httpHeaderAcceptSelected != undefined) {
-            headers = headers.set('Accept', httpHeaderAcceptSelected);
+            
+        let requestOptions: RequestOptionsArgs = new RequestOptions({
+            method: RequestMethod.Delete,
+            headers: headers,
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
+        });
+        // https://github.com/swagger-api/swagger-codegen/issues/4037
+        if (extraHttpRequestParams) {
+            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
         }
 
-        // to determine the Content-Type header
-        const consumes: string[] = [
-        ];
-
-        return this.httpClient.delete<any>(`${this.basePath}/chat/messages/${encodeURIComponent(String(id))}`,
-            {
-                withCredentials: this.configuration.withCredentials,
-                headers: headers,
-                observe: observe,
-                reportProgress: reportProgress
-            }
-        );
+        return this.http.request(path, requestOptions);
     }
 
     /**
@@ -247,174 +467,178 @@ export class ChatService {
      * &lt;b&gt;Permissions Needed:&lt;/b&gt; owner
      * @param id The message id
      * @param chatMessageResource The chat message resource
-     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-     * @param reportProgress flag to report request and response progress.
      */
-    public editChatMessage(id: string, chatMessageResource?: ChatMessageResource, observe?: 'body', reportProgress?: boolean): Observable<any>;
-    public editChatMessage(id: string, chatMessageResource?: ChatMessageResource, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
-    public editChatMessage(id: string, chatMessageResource?: ChatMessageResource, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
-    public editChatMessage(id: string, chatMessageResource?: ChatMessageResource, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public editChatMessageWithHttpInfo(id: string, chatMessageResource?: ChatMessageResource, extraHttpRequestParams?: any): Observable<Response> {
+        const path = this.basePath + '/chat/messages/${id}'
+                    .replace('${' + 'id' + '}', String(id));
+
+        let queryParameters = new URLSearchParams();
+        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
+        // verify required parameter 'id' is not null or undefined
         if (id === null || id === undefined) {
             throw new Error('Required parameter id was null or undefined when calling editChatMessage.');
         }
 
-        let headers = this.defaultHeaders;
+        // to determine the Accept header
+        let produces: string[] = [
+            'application/json'
+        ];
 
         // authentication (oauth2_client_credentials_grant) required
+        // oauth required
         if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
+            let accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
+            headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
         // authentication (oauth2_password_grant) required
+        // oauth required
         if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
+            let accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
+            headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-        // to determine the Accept header
-        let httpHeaderAccepts: string[] = [
-            'application/json'
-        ];
-        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
-        if (httpHeaderAcceptSelected != undefined) {
-            headers = headers.set('Accept', httpHeaderAcceptSelected);
+            
+        headers.set('Content-Type', 'application/json');
+
+        let requestOptions: RequestOptionsArgs = new RequestOptions({
+            method: RequestMethod.Put,
+            headers: headers,
+            body: chatMessageResource == null ? '' : JSON.stringify(chatMessageResource), // https://github.com/angular/angular/issues/10612
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
+        });
+        // https://github.com/swagger-api/swagger-codegen/issues/4037
+        if (extraHttpRequestParams) {
+            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
         }
 
-        // to determine the Content-Type header
-        const consumes: string[] = [
-            'application/json'
-        ];
-        const httpContentTypeSelected: string | undefined = this.configuration.selectHeaderContentType(consumes);
-        if (httpContentTypeSelected != undefined) {
-            headers = headers.set('Content-Type', httpContentTypeSelected);
-        }
-
-        return this.httpClient.put<any>(`${this.basePath}/chat/messages/${encodeURIComponent(String(id))}`,
-            chatMessageResource,
-            {
-                withCredentials: this.configuration.withCredentials,
-                headers: headers,
-                observe: observe,
-                reportProgress: reportProgress
-            }
-        );
+        return this.http.request(path, requestOptions);
     }
 
     /**
      * Get a message
      * &lt;b&gt;Permissions Needed:&lt;/b&gt; CHAT_ADMIN or owner
      * @param id The message id
-     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-     * @param reportProgress flag to report request and response progress.
      */
-    public getChatMessage(id: string, observe?: 'body', reportProgress?: boolean): Observable<ChatMessageResource>;
-    public getChatMessage(id: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<ChatMessageResource>>;
-    public getChatMessage(id: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<ChatMessageResource>>;
-    public getChatMessage(id: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public getChatMessageWithHttpInfo(id: string, extraHttpRequestParams?: any): Observable<Response> {
+        const path = this.basePath + '/chat/messages/${id}'
+                    .replace('${' + 'id' + '}', String(id));
+
+        let queryParameters = new URLSearchParams();
+        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
+        // verify required parameter 'id' is not null or undefined
         if (id === null || id === undefined) {
             throw new Error('Required parameter id was null or undefined when calling getChatMessage.');
         }
 
-        let headers = this.defaultHeaders;
+        // to determine the Accept header
+        let produces: string[] = [
+            'application/json'
+        ];
 
         // authentication (oauth2_client_credentials_grant) required
+        // oauth required
         if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
+            let accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
+            headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
         // authentication (oauth2_password_grant) required
+        // oauth required
         if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
+            let accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
+            headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-        // to determine the Accept header
-        let httpHeaderAccepts: string[] = [
-            'application/json'
-        ];
-        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
-        if (httpHeaderAcceptSelected != undefined) {
-            headers = headers.set('Accept', httpHeaderAcceptSelected);
+            
+        let requestOptions: RequestOptionsArgs = new RequestOptions({
+            method: RequestMethod.Get,
+            headers: headers,
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
+        });
+        // https://github.com/swagger-api/swagger-codegen/issues/4037
+        if (extraHttpRequestParams) {
+            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
         }
 
-        // to determine the Content-Type header
-        const consumes: string[] = [
-        ];
-
-        return this.httpClient.get<ChatMessageResource>(`${this.basePath}/chat/messages/${encodeURIComponent(String(id))}`,
-            {
-                withCredentials: this.configuration.withCredentials,
-                headers: headers,
-                observe: observe,
-                reportProgress: reportProgress
-            }
-        );
+        return this.http.request(path, requestOptions);
     }
 
     /**
      * Get a list of blocked users for chat messaging
      * &lt;b&gt;Permissions Needed:&lt;/b&gt; CHAT_ADMIN or owner
      * @param id The user id or &#39;me&#39;
-     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-     * @param reportProgress flag to report request and response progress.
+     * @param size The number of objects returned per page
+     * @param page The number of the page returned, starting with 1
      */
-    public getChatMessageBlacklist(id: string, observe?: 'body', reportProgress?: boolean): Observable<Array<ChatBlacklistResource>>;
-    public getChatMessageBlacklist(id: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Array<ChatBlacklistResource>>>;
-    public getChatMessageBlacklist(id: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Array<ChatBlacklistResource>>>;
-    public getChatMessageBlacklist(id: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public getChatMessageBlacklistWithHttpInfo(id: string, size?: number, page?: number, extraHttpRequestParams?: any): Observable<Response> {
+        const path = this.basePath + '/chat/users/${id}/blacklist'
+                    .replace('${' + 'id' + '}', String(id));
+
+        let queryParameters = new URLSearchParams();
+        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
+        // verify required parameter 'id' is not null or undefined
         if (id === null || id === undefined) {
             throw new Error('Required parameter id was null or undefined when calling getChatMessageBlacklist.');
         }
+        if (size !== undefined) {
+            queryParameters.set('size', <any>size);
+        }
 
-        let headers = this.defaultHeaders;
+        if (page !== undefined) {
+            queryParameters.set('page', <any>page);
+        }
+
+
+        // to determine the Accept header
+        let produces: string[] = [
+            'application/json'
+        ];
 
         // authentication (oauth2_client_credentials_grant) required
+        // oauth required
         if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
+            let accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
+            headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
         // authentication (oauth2_password_grant) required
+        // oauth required
         if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
+            let accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
+            headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-        // to determine the Accept header
-        let httpHeaderAccepts: string[] = [
-            'application/json'
-        ];
-        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
-        if (httpHeaderAcceptSelected != undefined) {
-            headers = headers.set('Accept', httpHeaderAcceptSelected);
+            
+        let requestOptions: RequestOptionsArgs = new RequestOptions({
+            method: RequestMethod.Get,
+            headers: headers,
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
+        });
+        // https://github.com/swagger-api/swagger-codegen/issues/4037
+        if (extraHttpRequestParams) {
+            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
         }
 
-        // to determine the Content-Type header
-        const consumes: string[] = [
-        ];
-
-        return this.httpClient.get<Array<ChatBlacklistResource>>(`${this.basePath}/chat/users/${encodeURIComponent(String(id))}/blacklist`,
-            {
-                withCredentials: this.configuration.withCredentials,
-                headers: headers,
-                observe: observe,
-                reportProgress: reportProgress
-            }
-        );
+        return this.http.request(path, requestOptions);
     }
 
     /**
@@ -423,65 +647,62 @@ export class ChatService {
      * @param size The number of objects returned per page
      * @param page The number of the page returned
      * @param order A comma separated list of sorting requirements in priority order, each entry matching PROPERTY_NAME:[ASC|DESC]
-     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-     * @param reportProgress flag to report request and response progress.
      */
-    public getChatThreads(size?: number, page?: number, order?: string, observe?: 'body', reportProgress?: boolean): Observable<PageResourceChatUserThreadResource>;
-    public getChatThreads(size?: number, page?: number, order?: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<PageResourceChatUserThreadResource>>;
-    public getChatThreads(size?: number, page?: number, order?: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<PageResourceChatUserThreadResource>>;
-    public getChatThreads(size?: number, page?: number, order?: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public getChatThreadsWithHttpInfo(size?: number, page?: number, order?: string, extraHttpRequestParams?: any): Observable<Response> {
+        const path = this.basePath + '/chat/threads';
 
-        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
-        if (size !== undefined && size !== null) {
-            queryParameters = queryParameters.set('size', <any>size);
-        }
-        if (page !== undefined && page !== null) {
-            queryParameters = queryParameters.set('page', <any>page);
-        }
-        if (order !== undefined && order !== null) {
-            queryParameters = queryParameters.set('order', <any>order);
+        let queryParameters = new URLSearchParams();
+        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
+        if (size !== undefined) {
+            queryParameters.set('size', <any>size);
         }
 
-        let headers = this.defaultHeaders;
+        if (page !== undefined) {
+            queryParameters.set('page', <any>page);
+        }
+
+        if (order !== undefined) {
+            queryParameters.set('order', <any>order);
+        }
+
+
+        // to determine the Accept header
+        let produces: string[] = [
+            'application/json'
+        ];
 
         // authentication (oauth2_client_credentials_grant) required
+        // oauth required
         if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
+            let accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
+            headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
         // authentication (oauth2_password_grant) required
+        // oauth required
         if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
+            let accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
+            headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-        // to determine the Accept header
-        let httpHeaderAccepts: string[] = [
-            'application/json'
-        ];
-        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
-        if (httpHeaderAcceptSelected != undefined) {
-            headers = headers.set('Accept', httpHeaderAcceptSelected);
+            
+        let requestOptions: RequestOptionsArgs = new RequestOptions({
+            method: RequestMethod.Get,
+            headers: headers,
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
+        });
+        // https://github.com/swagger-api/swagger-codegen/issues/4037
+        if (extraHttpRequestParams) {
+            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
         }
 
-        // to determine the Content-Type header
-        const consumes: string[] = [
-        ];
-
-        return this.httpClient.get<PageResourceChatUserThreadResource>(`${this.basePath}/chat/threads`,
-            {
-                params: queryParameters,
-                withCredentials: this.configuration.withCredentials,
-                headers: headers,
-                observe: observe,
-                reportProgress: reportProgress
-            }
-        );
+        return this.http.request(path, requestOptions);
     }
 
     /**
@@ -491,68 +712,67 @@ export class ChatService {
      * @param size The number of objects returned per page
      * @param page The number of the page returned
      * @param order A comma separated list of sorting requirements in priority order, each entry matching PROPERTY_NAME:[ASC|DESC]
-     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-     * @param reportProgress flag to report request and response progress.
      */
-    public getDirectMessages(id: number, size?: number, page?: number, order?: string, observe?: 'body', reportProgress?: boolean): Observable<PageResourceChatMessageResource>;
-    public getDirectMessages(id: number, size?: number, page?: number, order?: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<PageResourceChatMessageResource>>;
-    public getDirectMessages(id: number, size?: number, page?: number, order?: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<PageResourceChatMessageResource>>;
-    public getDirectMessages(id: number, size?: number, page?: number, order?: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public getDirectMessagesWithHttpInfo(id: number, size?: number, page?: number, order?: string, extraHttpRequestParams?: any): Observable<Response> {
+        const path = this.basePath + '/chat/users/${id}/messages'
+                    .replace('${' + 'id' + '}', String(id));
+
+        let queryParameters = new URLSearchParams();
+        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
+        // verify required parameter 'id' is not null or undefined
         if (id === null || id === undefined) {
             throw new Error('Required parameter id was null or undefined when calling getDirectMessages.');
         }
-
-        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
-        if (size !== undefined && size !== null) {
-            queryParameters = queryParameters.set('size', <any>size);
-        }
-        if (page !== undefined && page !== null) {
-            queryParameters = queryParameters.set('page', <any>page);
-        }
-        if (order !== undefined && order !== null) {
-            queryParameters = queryParameters.set('order', <any>order);
+        if (size !== undefined) {
+            queryParameters.set('size', <any>size);
         }
 
-        let headers = this.defaultHeaders;
+        if (page !== undefined) {
+            queryParameters.set('page', <any>page);
+        }
+
+        if (order !== undefined) {
+            queryParameters.set('order', <any>order);
+        }
+
+
+        // to determine the Accept header
+        let produces: string[] = [
+            'application/json'
+        ];
 
         // authentication (oauth2_client_credentials_grant) required
+        // oauth required
         if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
+            let accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
+            headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
         // authentication (oauth2_password_grant) required
+        // oauth required
         if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
+            let accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
+            headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-        // to determine the Accept header
-        let httpHeaderAccepts: string[] = [
-            'application/json'
-        ];
-        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
-        if (httpHeaderAcceptSelected != undefined) {
-            headers = headers.set('Accept', httpHeaderAcceptSelected);
+            
+        let requestOptions: RequestOptionsArgs = new RequestOptions({
+            method: RequestMethod.Get,
+            headers: headers,
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
+        });
+        // https://github.com/swagger-api/swagger-codegen/issues/4037
+        if (extraHttpRequestParams) {
+            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
         }
 
-        // to determine the Content-Type header
-        const consumes: string[] = [
-        ];
-
-        return this.httpClient.get<PageResourceChatMessageResource>(`${this.basePath}/chat/users/${encodeURIComponent(String(id))}/messages`,
-            {
-                params: queryParameters,
-                withCredentials: this.configuration.withCredentials,
-                headers: headers,
-                observe: observe,
-                reportProgress: reportProgress
-            }
-        );
+        return this.http.request(path, requestOptions);
     }
 
     /**
@@ -562,68 +782,67 @@ export class ChatService {
      * @param size The number of objects returned per page
      * @param page The number of the page returned
      * @param order A comma separated list of sorting requirements in priority order, each entry matching PROPERTY_NAME:[ASC|DESC]
-     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-     * @param reportProgress flag to report request and response progress.
      */
-    public getThreadMessages(id: string, size?: number, page?: number, order?: string, observe?: 'body', reportProgress?: boolean): Observable<PageResourceChatMessageResource>;
-    public getThreadMessages(id: string, size?: number, page?: number, order?: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<PageResourceChatMessageResource>>;
-    public getThreadMessages(id: string, size?: number, page?: number, order?: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<PageResourceChatMessageResource>>;
-    public getThreadMessages(id: string, size?: number, page?: number, order?: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public getThreadMessagesWithHttpInfo(id: string, size?: number, page?: number, order?: string, extraHttpRequestParams?: any): Observable<Response> {
+        const path = this.basePath + '/chat/threads/${id}/messages'
+                    .replace('${' + 'id' + '}', String(id));
+
+        let queryParameters = new URLSearchParams();
+        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
+        // verify required parameter 'id' is not null or undefined
         if (id === null || id === undefined) {
             throw new Error('Required parameter id was null or undefined when calling getThreadMessages.');
         }
-
-        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
-        if (size !== undefined && size !== null) {
-            queryParameters = queryParameters.set('size', <any>size);
-        }
-        if (page !== undefined && page !== null) {
-            queryParameters = queryParameters.set('page', <any>page);
-        }
-        if (order !== undefined && order !== null) {
-            queryParameters = queryParameters.set('order', <any>order);
+        if (size !== undefined) {
+            queryParameters.set('size', <any>size);
         }
 
-        let headers = this.defaultHeaders;
+        if (page !== undefined) {
+            queryParameters.set('page', <any>page);
+        }
+
+        if (order !== undefined) {
+            queryParameters.set('order', <any>order);
+        }
+
+
+        // to determine the Accept header
+        let produces: string[] = [
+            'application/json'
+        ];
 
         // authentication (oauth2_client_credentials_grant) required
+        // oauth required
         if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
+            let accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
+            headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
         // authentication (oauth2_password_grant) required
+        // oauth required
         if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
+            let accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
+            headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-        // to determine the Accept header
-        let httpHeaderAccepts: string[] = [
-            'application/json'
-        ];
-        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
-        if (httpHeaderAcceptSelected != undefined) {
-            headers = headers.set('Accept', httpHeaderAcceptSelected);
+            
+        let requestOptions: RequestOptionsArgs = new RequestOptions({
+            method: RequestMethod.Get,
+            headers: headers,
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
+        });
+        // https://github.com/swagger-api/swagger-codegen/issues/4037
+        if (extraHttpRequestParams) {
+            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
         }
 
-        // to determine the Content-Type header
-        const consumes: string[] = [
-        ];
-
-        return this.httpClient.get<PageResourceChatMessageResource>(`${this.basePath}/chat/threads/${encodeURIComponent(String(id))}/messages`,
-            {
-                params: queryParameters,
-                withCredentials: this.configuration.withCredentials,
-                headers: headers,
-                observe: observe,
-                reportProgress: reportProgress
-            }
-        );
+        return this.http.request(path, requestOptions);
     }
 
     /**
@@ -633,68 +852,67 @@ export class ChatService {
      * @param size The number of objects returned per page
      * @param page The number of the page returned
      * @param order A comma separated list of sorting requirements in priority order, each entry matching PROPERTY_NAME:[ASC|DESC]
-     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-     * @param reportProgress flag to report request and response progress.
      */
-    public getTopicMessages(id: string, size?: number, page?: number, order?: string, observe?: 'body', reportProgress?: boolean): Observable<PageResourceChatMessageResource>;
-    public getTopicMessages(id: string, size?: number, page?: number, order?: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<PageResourceChatMessageResource>>;
-    public getTopicMessages(id: string, size?: number, page?: number, order?: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<PageResourceChatMessageResource>>;
-    public getTopicMessages(id: string, size?: number, page?: number, order?: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public getTopicMessagesWithHttpInfo(id: string, size?: number, page?: number, order?: string, extraHttpRequestParams?: any): Observable<Response> {
+        const path = this.basePath + '/chat/topics/${id}/messages'
+                    .replace('${' + 'id' + '}', String(id));
+
+        let queryParameters = new URLSearchParams();
+        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
+        // verify required parameter 'id' is not null or undefined
         if (id === null || id === undefined) {
             throw new Error('Required parameter id was null or undefined when calling getTopicMessages.');
         }
-
-        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
-        if (size !== undefined && size !== null) {
-            queryParameters = queryParameters.set('size', <any>size);
-        }
-        if (page !== undefined && page !== null) {
-            queryParameters = queryParameters.set('page', <any>page);
-        }
-        if (order !== undefined && order !== null) {
-            queryParameters = queryParameters.set('order', <any>order);
+        if (size !== undefined) {
+            queryParameters.set('size', <any>size);
         }
 
-        let headers = this.defaultHeaders;
+        if (page !== undefined) {
+            queryParameters.set('page', <any>page);
+        }
+
+        if (order !== undefined) {
+            queryParameters.set('order', <any>order);
+        }
+
+
+        // to determine the Accept header
+        let produces: string[] = [
+            'application/json'
+        ];
 
         // authentication (oauth2_client_credentials_grant) required
+        // oauth required
         if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
+            let accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
+            headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
         // authentication (oauth2_password_grant) required
+        // oauth required
         if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
+            let accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
+            headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-        // to determine the Accept header
-        let httpHeaderAccepts: string[] = [
-            'application/json'
-        ];
-        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
-        if (httpHeaderAcceptSelected != undefined) {
-            headers = headers.set('Accept', httpHeaderAcceptSelected);
+            
+        let requestOptions: RequestOptionsArgs = new RequestOptions({
+            method: RequestMethod.Get,
+            headers: headers,
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
+        });
+        // https://github.com/swagger-api/swagger-codegen/issues/4037
+        if (extraHttpRequestParams) {
+            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
         }
 
-        // to determine the Content-Type header
-        const consumes: string[] = [
-        ];
-
-        return this.httpClient.get<PageResourceChatMessageResource>(`${this.basePath}/chat/topics/${encodeURIComponent(String(id))}/messages`,
-            {
-                params: queryParameters,
-                withCredentials: this.configuration.withCredentials,
-                headers: headers,
-                observe: observe,
-                reportProgress: reportProgress
-            }
-        );
+        return this.http.request(path, requestOptions);
     }
 
     /**
@@ -702,118 +920,113 @@ export class ChatService {
      * &lt;b&gt;Permissions Needed:&lt;/b&gt; CHAT_ADMIN or owner
      * @param blacklistedUserId The user id to blacklist
      * @param id The user id or &#39;me&#39;
-     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-     * @param reportProgress flag to report request and response progress.
      */
-    public removeChatBlacklist(blacklistedUserId: number, id: string, observe?: 'body', reportProgress?: boolean): Observable<any>;
-    public removeChatBlacklist(blacklistedUserId: number, id: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
-    public removeChatBlacklist(blacklistedUserId: number, id: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
-    public removeChatBlacklist(blacklistedUserId: number, id: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public removeChatBlacklistWithHttpInfo(blacklistedUserId: number, id: string, extraHttpRequestParams?: any): Observable<Response> {
+        const path = this.basePath + '/chat/users/${id}/blacklist/${blacklisted_user_id}'
+                    .replace('${' + 'blacklisted_user_id' + '}', String(blacklistedUserId))
+                    .replace('${' + 'id' + '}', String(id));
+
+        let queryParameters = new URLSearchParams();
+        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
+        // verify required parameter 'blacklistedUserId' is not null or undefined
         if (blacklistedUserId === null || blacklistedUserId === undefined) {
             throw new Error('Required parameter blacklistedUserId was null or undefined when calling removeChatBlacklist.');
         }
+        // verify required parameter 'id' is not null or undefined
         if (id === null || id === undefined) {
             throw new Error('Required parameter id was null or undefined when calling removeChatBlacklist.');
         }
 
-        let headers = this.defaultHeaders;
+        // to determine the Accept header
+        let produces: string[] = [
+            'application/json'
+        ];
 
         // authentication (oauth2_client_credentials_grant) required
+        // oauth required
         if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
+            let accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
+            headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
         // authentication (oauth2_password_grant) required
+        // oauth required
         if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
+            let accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
+            headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-        // to determine the Accept header
-        let httpHeaderAccepts: string[] = [
-            'application/json'
-        ];
-        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
-        if (httpHeaderAcceptSelected != undefined) {
-            headers = headers.set('Accept', httpHeaderAcceptSelected);
+            
+        let requestOptions: RequestOptionsArgs = new RequestOptions({
+            method: RequestMethod.Delete,
+            headers: headers,
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
+        });
+        // https://github.com/swagger-api/swagger-codegen/issues/4037
+        if (extraHttpRequestParams) {
+            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
         }
 
-        // to determine the Content-Type header
-        const consumes: string[] = [
-        ];
-
-        return this.httpClient.delete<any>(`${this.basePath}/chat/users/${encodeURIComponent(String(id))}/blacklist/${encodeURIComponent(String(blacklistedUserId))}`,
-            {
-                withCredentials: this.configuration.withCredentials,
-                headers: headers,
-                observe: observe,
-                reportProgress: reportProgress
-            }
-        );
+        return this.http.request(path, requestOptions);
     }
 
     /**
      * Send a message
      * &lt;b&gt;Permissions Needed:&lt;/b&gt; ANY
      * @param chatMessageResource The chat message resource
-     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-     * @param reportProgress flag to report request and response progress.
      */
-    public sendChatMessage(chatMessageResource?: ChatMessageResource, observe?: 'body', reportProgress?: boolean): Observable<ChatMessageResource>;
-    public sendChatMessage(chatMessageResource?: ChatMessageResource, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<ChatMessageResource>>;
-    public sendChatMessage(chatMessageResource?: ChatMessageResource, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<ChatMessageResource>>;
-    public sendChatMessage(chatMessageResource?: ChatMessageResource, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public sendChatMessageWithHttpInfo(chatMessageResource?: ChatMessageResource, extraHttpRequestParams?: any): Observable<Response> {
+        const path = this.basePath + '/chat/messages';
 
-        let headers = this.defaultHeaders;
+        let queryParameters = new URLSearchParams();
+        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
+
+        // to determine the Accept header
+        let produces: string[] = [
+            'application/json'
+        ];
 
         // authentication (oauth2_client_credentials_grant) required
+        // oauth required
         if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
+            let accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
+            headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
         // authentication (oauth2_password_grant) required
+        // oauth required
         if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
+            let accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
+            headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-        // to determine the Accept header
-        let httpHeaderAccepts: string[] = [
-            'application/json'
-        ];
-        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
-        if (httpHeaderAcceptSelected != undefined) {
-            headers = headers.set('Accept', httpHeaderAcceptSelected);
+            
+        headers.set('Content-Type', 'application/json');
+
+        let requestOptions: RequestOptionsArgs = new RequestOptions({
+            method: RequestMethod.Post,
+            headers: headers,
+            body: chatMessageResource == null ? '' : JSON.stringify(chatMessageResource), // https://github.com/angular/angular/issues/10612
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
+        });
+        // https://github.com/swagger-api/swagger-codegen/issues/4037
+        if (extraHttpRequestParams) {
+            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
         }
 
-        // to determine the Content-Type header
-        const consumes: string[] = [
-            'application/json'
-        ];
-        const httpContentTypeSelected: string | undefined = this.configuration.selectHeaderContentType(consumes);
-        if (httpContentTypeSelected != undefined) {
-            headers = headers.set('Content-Type', httpContentTypeSelected);
-        }
-
-        return this.httpClient.post<ChatMessageResource>(`${this.basePath}/chat/messages`,
-            chatMessageResource,
-            {
-                withCredentials: this.configuration.withCredentials,
-                headers: headers,
-                observe: observe,
-                reportProgress: reportProgress
-            }
-        );
+        return this.http.request(path, requestOptions);
     }
 
 }

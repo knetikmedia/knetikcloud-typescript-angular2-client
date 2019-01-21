@@ -9,16 +9,19 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
+
 import { Property } from './property';
 
 
-export interface BasicTemplatedResource { 
+export interface BasicTemplatedResource {
     /**
      * A map of additional properties, keyed on the property name.  Must match the names and types defined in the template for this item type
      */
     additionalProperties?: { [key: string]: Property; };
+
     /**
      * An article template this article is validated against (private). May be null and no validation of additional_properties will be done
      */
     template?: string;
+
 }

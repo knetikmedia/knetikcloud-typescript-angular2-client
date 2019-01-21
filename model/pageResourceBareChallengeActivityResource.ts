@@ -9,18 +9,25 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
+
 import { BareChallengeActivityResource } from './bareChallengeActivityResource';
-import { Order } from './order';
 
 
-export interface PageResourceBareChallengeActivityResource { 
+export interface PageResourceBareChallengeActivityResource {
     content?: Array<BareChallengeActivityResource>;
+
     first?: boolean;
+
     last?: boolean;
+
     number?: number;
+
     numberOfElements?: number;
+
     size?: number;
-    sort?: Array<Order>;
+
     totalElements?: number;
+
     totalPages?: number;
+
 }

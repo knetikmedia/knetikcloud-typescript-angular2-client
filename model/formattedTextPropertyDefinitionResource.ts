@@ -9,13 +9,14 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
+
 import { PropertyDefinitionResource } from './propertyDefinitionResource';
-import { PropertyFieldListResource } from './propertyFieldListResource';
 
 
-export interface FormattedTextPropertyDefinitionResource extends PropertyDefinitionResource { 
+export interface FormattedTextPropertyDefinitionResource extends PropertyDefinitionResource {
     /**
      * If provided, the maximum length of the text
      */
     maxLength?: number;
+
 }

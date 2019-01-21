@@ -9,18 +9,25 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
+
 import { AchievementDefinitionResource } from './achievementDefinitionResource';
-import { Order } from './order';
 
 
-export interface PageResourceAchievementDefinitionResource { 
+export interface PageResourceAchievementDefinitionResource {
     content?: Array<AchievementDefinitionResource>;
+
     first?: boolean;
+
     last?: boolean;
+
     number?: number;
+
     numberOfElements?: number;
+
     size?: number;
-    sort?: Array<Order>;
+
     totalElements?: number;
+
     totalPages?: number;
+
 }

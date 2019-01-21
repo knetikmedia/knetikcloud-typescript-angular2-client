@@ -9,61 +9,75 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
+
 import { ContributionResource } from './contributionResource';
 import { Property } from './property';
 
 
-export interface ArtistResource { 
+export interface ArtistResource {
     /**
      * A map of additional properties, keyed on the property name.  Must match the names and types defined in the template for this item type
      */
     additionalProperties?: { [key: string]: Property; };
+
     /**
      * YYYY/MM/DD when this artist was born
      */
     born?: string;
+
     /**
      * The current number of contributions the artist has made
      */
-    readonly contributionCount?: number;
+    contributionCount?: number;
+
     /**
      * The list of media this artist has contributed to as well as role(s) during contribution.  Use media endpoint to add contributions
      */
-    readonly contributions?: Array<ContributionResource>;
+    contributions?: Array<ContributionResource>;
+
     /**
      * The date/time this resource was created in seconds since unix epoch
      */
-    readonly createdDate?: number;
+    createdDate?: number;
+
     /**
      * YYYY/MM/DD when this artist died
      */
     died?: string;
+
     /**
      * The unique ID for that resource
      */
-    readonly id?: number;
+    id?: number;
+
     /**
      * The user friendly name of that resource. Defaults to blank string
      */
     longDescription?: string;
+
     /**
      * The user friendly name of that resource
      */
     name: string;
+
     /**
-     * The sort order priority ofr the artist.  Default 100
+     * The sort order priority of the artist.  Default 100
      */
     priority?: number;
+
     /**
      * The user friendly name of that resource. Defaults to blank string
      */
     shortDescription?: string;
+
     /**
      * An artist template this artist is validated against (private). May be null and no validation of additional_properties will be done
      */
     template?: string;
+
     /**
      * The date/time this resource was last updated in seconds since unix epoch
      */
-    readonly updatedDate?: number;
+    updatedDate?: number;
+
 }

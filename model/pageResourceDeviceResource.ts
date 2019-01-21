@@ -9,18 +9,25 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
+
 import { DeviceResource } from './deviceResource';
-import { Order } from './order';
 
 
-export interface PageResourceDeviceResource { 
+export interface PageResourceDeviceResource {
     content?: Array<DeviceResource>;
+
     first?: boolean;
+
     last?: boolean;
+
     number?: number;
+
     numberOfElements?: number;
+
     size?: number;
-    sort?: Array<Order>;
+
     totalElements?: number;
+
     totalPages?: number;
+
 }

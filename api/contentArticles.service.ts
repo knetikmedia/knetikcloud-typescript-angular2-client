@@ -9,19 +9,21 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
+
 /* tslint:disable:no-unused-variable member-ordering */
 
 import { Inject, Injectable, Optional }                      from '@angular/core';
-import { HttpClient, HttpHeaders, HttpParams,
-         HttpResponse, HttpEvent }                           from '@angular/common/http';
-import { CustomHttpUrlEncodingCodec }                        from '../encoder';
+import { Http, Headers, URLSearchParams }                    from '@angular/http';
+import { RequestMethod, RequestOptions, RequestOptionsArgs } from '@angular/http';
+import { Response, ResponseContentType }                     from '@angular/http';
 
 import { Observable }                                        from 'rxjs/Observable';
+import '../rxjs-operators';
 
 import { ArticleResource } from '../model/articleResource';
-import { BasicTemplatedResource } from '../model/basicTemplatedResource';
 import { PageResourceArticleResource } from '../model/pageResourceArticleResource';
 import { PageResourceTemplateResource } from '../model/pageResourceTemplateResource';
+import { PatchResource } from '../model/patchResource';
 import { Result } from '../model/result';
 import { TemplateResource } from '../model/templateResource';
 
@@ -32,18 +34,33 @@ import { Configuration }                                     from '../configurat
 @Injectable()
 export class ContentArticlesService {
 
-    protected basePath = 'https://jsapi-integration.us-east-1.elasticbeanstalk.com';
-    public defaultHeaders = new HttpHeaders();
-    public configuration = new Configuration();
+    protected basePath = 'https://devsandbox.knetikcloud.com';
+    public defaultHeaders: Headers = new Headers();
+    public configuration: Configuration = new Configuration();
 
-    constructor(protected httpClient: HttpClient, @Optional()@Inject(BASE_PATH) basePath: string, @Optional() configuration: Configuration) {
+    constructor(protected http: Http, @Optional()@Inject(BASE_PATH) basePath: string, @Optional() configuration: Configuration) {
         if (basePath) {
             this.basePath = basePath;
         }
         if (configuration) {
             this.configuration = configuration;
-            this.basePath = basePath || configuration.basePath || this.basePath;
+			this.basePath = basePath || configuration.basePath || this.basePath;
         }
+    }
+
+    /**
+     * 
+     * Extends object by coping non-existing properties.
+     * @param objA object to be extended
+     * @param objB source object
+     */
+    private extendObj<T1,T2>(objA: T1, objB: T2) {
+        for(let key in objB){
+            if(objB.hasOwnProperty(key)){
+                (objA as any)[key] = (objB as any)[key];
+            }
+        }
+        return <T1&T2>objA;
     }
 
     /**
@@ -52,7 +69,7 @@ export class ContentArticlesService {
      */
     private canConsumeForm(consumes: string[]): boolean {
         const form = 'multipart/form-data';
-        for (const consume of consumes) {
+        for (let consume of consumes) {
             if (form === consume) {
                 return true;
             }
@@ -60,554 +77,124 @@ export class ContentArticlesService {
         return false;
     }
 
-
     /**
-     * Create a new article
-     * Articles are blobs of text with titles, a category and assets. Formatting and display of the text is in the hands of the front end.&lt;br&gt;&lt;br&gt;&lt;b&gt;Permissions:&lt;/b&gt; ARTICLES_ADMIN
+     * Articles are blobs of text with titles, a category and assets. Formatting and display of the text is in the hands of the front end.<br /><b>Permissions Needed:</b> POST
+     * @summary Create a new article
      * @param articleResource The new article
-     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-     * @param reportProgress flag to report request and response progress.
      */
-    public createArticle(articleResource?: ArticleResource, observe?: 'body', reportProgress?: boolean): Observable<ArticleResource>;
-    public createArticle(articleResource?: ArticleResource, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<ArticleResource>>;
-    public createArticle(articleResource?: ArticleResource, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<ArticleResource>>;
-    public createArticle(articleResource?: ArticleResource, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
-
-        let headers = this.defaultHeaders;
-
-        // authentication (oauth2_client_credentials_grant) required
-        if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
-                ? this.configuration.accessToken()
-                : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
-        }
-
-        // authentication (oauth2_password_grant) required
-        if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
-                ? this.configuration.accessToken()
-                : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
-        }
-
-        // to determine the Accept header
-        let httpHeaderAccepts: string[] = [
-            'application/json'
-        ];
-        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
-        if (httpHeaderAcceptSelected != undefined) {
-            headers = headers.set('Accept', httpHeaderAcceptSelected);
-        }
-
-        // to determine the Content-Type header
-        const consumes: string[] = [
-            'application/json'
-        ];
-        const httpContentTypeSelected: string | undefined = this.configuration.selectHeaderContentType(consumes);
-        if (httpContentTypeSelected != undefined) {
-            headers = headers.set('Content-Type', httpContentTypeSelected);
-        }
-
-        return this.httpClient.post<ArticleResource>(`${this.basePath}/content/articles`,
-            articleResource,
-            {
-                withCredentials: this.configuration.withCredentials,
-                headers: headers,
-                observe: observe,
-                reportProgress: reportProgress
-            }
-        );
+    public createArticle(articleResource?: ArticleResource, extraHttpRequestParams?: any): Observable<ArticleResource> {
+        return this.createArticleWithHttpInfo(articleResource, extraHttpRequestParams)
+            .map((response: Response) => {
+                if (response.status === 204) {
+                    return undefined;
+                } else {
+                    return response.json() || {};
+                }
+            });
     }
 
     /**
-     * Create an article template
-     * Article Templates define a type of article and the properties they have. &lt;br&gt;&lt;br&gt;&lt;b&gt;Permissions Needed:&lt;/b&gt; TEMPLATE_ADMIN
+     * Article Templates define a type of article and the properties they have.<br /><b>Permissions Needed:</b> POST
+     * @summary Create an article template
      * @param articleTemplateResource The article template resource object
-     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-     * @param reportProgress flag to report request and response progress.
      */
-    public createArticleTemplate(articleTemplateResource?: TemplateResource, observe?: 'body', reportProgress?: boolean): Observable<TemplateResource>;
-    public createArticleTemplate(articleTemplateResource?: TemplateResource, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<TemplateResource>>;
-    public createArticleTemplate(articleTemplateResource?: TemplateResource, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<TemplateResource>>;
-    public createArticleTemplate(articleTemplateResource?: TemplateResource, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
-
-        let headers = this.defaultHeaders;
-
-        // authentication (oauth2_client_credentials_grant) required
-        if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
-                ? this.configuration.accessToken()
-                : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
-        }
-
-        // authentication (oauth2_password_grant) required
-        if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
-                ? this.configuration.accessToken()
-                : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
-        }
-
-        // to determine the Accept header
-        let httpHeaderAccepts: string[] = [
-            'application/json'
-        ];
-        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
-        if (httpHeaderAcceptSelected != undefined) {
-            headers = headers.set('Accept', httpHeaderAcceptSelected);
-        }
-
-        // to determine the Content-Type header
-        const consumes: string[] = [
-            'application/json'
-        ];
-        const httpContentTypeSelected: string | undefined = this.configuration.selectHeaderContentType(consumes);
-        if (httpContentTypeSelected != undefined) {
-            headers = headers.set('Content-Type', httpContentTypeSelected);
-        }
-
-        return this.httpClient.post<TemplateResource>(`${this.basePath}/content/articles/templates`,
-            articleTemplateResource,
-            {
-                withCredentials: this.configuration.withCredentials,
-                headers: headers,
-                observe: observe,
-                reportProgress: reportProgress
-            }
-        );
+    public createArticleTemplate(articleTemplateResource?: TemplateResource, extraHttpRequestParams?: any): Observable<TemplateResource> {
+        return this.createArticleTemplateWithHttpInfo(articleTemplateResource, extraHttpRequestParams)
+            .map((response: Response) => {
+                if (response.status === 204) {
+                    return undefined;
+                } else {
+                    return response.json() || {};
+                }
+            });
     }
 
     /**
-     * Create a template
-     * &lt;b&gt;Permissions Needed:&lt;/b&gt; TEMPLATES_ADMIN
-     * @param typeHint The type for the resource this template applies to
-     * @param template The template
-     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-     * @param reportProgress flag to report request and response progress.
-     */
-    public createTemplate(typeHint: string, template?: TemplateResource, observe?: 'body', reportProgress?: boolean): Observable<TemplateResource>;
-    public createTemplate(typeHint: string, template?: TemplateResource, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<TemplateResource>>;
-    public createTemplate(typeHint: string, template?: TemplateResource, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<TemplateResource>>;
-    public createTemplate(typeHint: string, template?: TemplateResource, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
-        if (typeHint === null || typeHint === undefined) {
-            throw new Error('Required parameter typeHint was null or undefined when calling createTemplate.');
-        }
-
-        let headers = this.defaultHeaders;
-
-        // authentication (oauth2_client_credentials_grant) required
-        if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
-                ? this.configuration.accessToken()
-                : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
-        }
-
-        // authentication (oauth2_password_grant) required
-        if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
-                ? this.configuration.accessToken()
-                : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
-        }
-
-        // to determine the Accept header
-        let httpHeaderAccepts: string[] = [
-            'application/json'
-        ];
-        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
-        if (httpHeaderAcceptSelected != undefined) {
-            headers = headers.set('Accept', httpHeaderAcceptSelected);
-        }
-
-        // to determine the Content-Type header
-        const consumes: string[] = [
-            'application/json'
-        ];
-        const httpContentTypeSelected: string | undefined = this.configuration.selectHeaderContentType(consumes);
-        if (httpContentTypeSelected != undefined) {
-            headers = headers.set('Content-Type', httpContentTypeSelected);
-        }
-
-        return this.httpClient.post<TemplateResource>(`${this.basePath}/templates/${encodeURIComponent(String(typeHint))}`,
-            template,
-            {
-                withCredentials: this.configuration.withCredentials,
-                headers: headers,
-                observe: observe,
-                reportProgress: reportProgress
-            }
-        );
-    }
-
-    /**
-     * Delete an existing article
-     * &lt;b&gt;Permissions Needed:&lt;/b&gt; ARTICLES_ADMIN
+     * <b>Permissions Needed:</b> DELETE
+     * @summary Delete an existing article
      * @param id The article id
-     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-     * @param reportProgress flag to report request and response progress.
      */
-    public deleteArticle(id: string, observe?: 'body', reportProgress?: boolean): Observable<any>;
-    public deleteArticle(id: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
-    public deleteArticle(id: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
-    public deleteArticle(id: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
-        if (id === null || id === undefined) {
-            throw new Error('Required parameter id was null or undefined when calling deleteArticle.');
-        }
-
-        let headers = this.defaultHeaders;
-
-        // authentication (oauth2_client_credentials_grant) required
-        if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
-                ? this.configuration.accessToken()
-                : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
-        }
-
-        // authentication (oauth2_password_grant) required
-        if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
-                ? this.configuration.accessToken()
-                : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
-        }
-
-        // to determine the Accept header
-        let httpHeaderAccepts: string[] = [
-            'application/json'
-        ];
-        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
-        if (httpHeaderAcceptSelected != undefined) {
-            headers = headers.set('Accept', httpHeaderAcceptSelected);
-        }
-
-        // to determine the Content-Type header
-        const consumes: string[] = [
-        ];
-
-        return this.httpClient.delete<any>(`${this.basePath}/content/articles/${encodeURIComponent(String(id))}`,
-            {
-                withCredentials: this.configuration.withCredentials,
-                headers: headers,
-                observe: observe,
-                reportProgress: reportProgress
-            }
-        );
+    public deleteArticle(id: string, extraHttpRequestParams?: any): Observable<{}> {
+        return this.deleteArticleWithHttpInfo(id, extraHttpRequestParams)
+            .map((response: Response) => {
+                if (response.status === 204) {
+                    return undefined;
+                } else {
+                    return response.json() || {};
+                }
+            });
     }
 
     /**
-     * Delete an article template
-     * If cascade &#x3D; &#39;detach&#39;, it will force delete the template even if it&#39;s attached to other objects. &lt;br&gt;&lt;br&gt;&lt;b&gt;Permissions Needed:&lt;/b&gt; TEMPLATE_ADMIN
+     * If cascade = 'detach', it will force delete the template even if it's attached to other objects.<br /><b>Permissions Needed:</b> DELETE
+     * @summary Delete an article template
      * @param id The id of the template
      * @param cascade The value needed to delete used templates
-     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-     * @param reportProgress flag to report request and response progress.
      */
-    public deleteArticleTemplate(id: string, cascade?: string, observe?: 'body', reportProgress?: boolean): Observable<any>;
-    public deleteArticleTemplate(id: string, cascade?: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
-    public deleteArticleTemplate(id: string, cascade?: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
-    public deleteArticleTemplate(id: string, cascade?: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
-        if (id === null || id === undefined) {
-            throw new Error('Required parameter id was null or undefined when calling deleteArticleTemplate.');
-        }
-
-        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
-        if (cascade !== undefined && cascade !== null) {
-            queryParameters = queryParameters.set('cascade', <any>cascade);
-        }
-
-        let headers = this.defaultHeaders;
-
-        // authentication (oauth2_client_credentials_grant) required
-        if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
-                ? this.configuration.accessToken()
-                : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
-        }
-
-        // authentication (oauth2_password_grant) required
-        if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
-                ? this.configuration.accessToken()
-                : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
-        }
-
-        // to determine the Accept header
-        let httpHeaderAccepts: string[] = [
-            'application/json'
-        ];
-        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
-        if (httpHeaderAcceptSelected != undefined) {
-            headers = headers.set('Accept', httpHeaderAcceptSelected);
-        }
-
-        // to determine the Content-Type header
-        const consumes: string[] = [
-        ];
-
-        return this.httpClient.delete<any>(`${this.basePath}/content/articles/templates/${encodeURIComponent(String(id))}`,
-            {
-                params: queryParameters,
-                withCredentials: this.configuration.withCredentials,
-                headers: headers,
-                observe: observe,
-                reportProgress: reportProgress
-            }
-        );
+    public deleteArticleTemplate(id: string, cascade?: string, extraHttpRequestParams?: any): Observable<{}> {
+        return this.deleteArticleTemplateWithHttpInfo(id, cascade, extraHttpRequestParams)
+            .map((response: Response) => {
+                if (response.status === 204) {
+                    return undefined;
+                } else {
+                    return response.json() || {};
+                }
+            });
     }
 
     /**
-     * Delete a template
-     * &lt;b&gt;Permissions Needed:&lt;/b&gt; TEMPLATES_ADMIN
-     * @param typeHint The type for the resource this template applies to
-     * @param id The id of the template
-     * @param cascade How to cascade the delete
-     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-     * @param reportProgress flag to report request and response progress.
-     */
-    public deleteTemplate(typeHint: string, id: string, cascade?: string, observe?: 'body', reportProgress?: boolean): Observable<any>;
-    public deleteTemplate(typeHint: string, id: string, cascade?: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
-    public deleteTemplate(typeHint: string, id: string, cascade?: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
-    public deleteTemplate(typeHint: string, id: string, cascade?: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
-        if (typeHint === null || typeHint === undefined) {
-            throw new Error('Required parameter typeHint was null or undefined when calling deleteTemplate.');
-        }
-        if (id === null || id === undefined) {
-            throw new Error('Required parameter id was null or undefined when calling deleteTemplate.');
-        }
-
-        let headers = this.defaultHeaders;
-
-        // authentication (oauth2_client_credentials_grant) required
-        if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
-                ? this.configuration.accessToken()
-                : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
-        }
-
-        // authentication (oauth2_password_grant) required
-        if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
-                ? this.configuration.accessToken()
-                : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
-        }
-
-        // to determine the Accept header
-        let httpHeaderAccepts: string[] = [
-            'application/json'
-        ];
-        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
-        if (httpHeaderAcceptSelected != undefined) {
-            headers = headers.set('Accept', httpHeaderAcceptSelected);
-        }
-
-        // to determine the Content-Type header
-        const consumes: string[] = [
-        ];
-        const httpContentTypeSelected: string | undefined = this.configuration.selectHeaderContentType(consumes);
-        if (httpContentTypeSelected != undefined) {
-            headers = headers.set('Content-Type', httpContentTypeSelected);
-        }
-
-        return this.httpClient.delete<any>(`${this.basePath}/templates/${encodeURIComponent(String(typeHint))}/${encodeURIComponent(String(id))}`,
-            {
-                withCredentials: this.configuration.withCredentials,
-                headers: headers,
-                observe: observe,
-                reportProgress: reportProgress
-            }
-        );
-    }
-
-    /**
-     * Get a single article
-     * &lt;b&gt;Permissions Needed:&lt;/b&gt; ANY
+     * <b>Permissions Needed:</b> GET
+     * @summary Get a single article
      * @param id The article id
-     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-     * @param reportProgress flag to report request and response progress.
      */
-    public getArticle(id: string, observe?: 'body', reportProgress?: boolean): Observable<ArticleResource>;
-    public getArticle(id: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<ArticleResource>>;
-    public getArticle(id: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<ArticleResource>>;
-    public getArticle(id: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
-        if (id === null || id === undefined) {
-            throw new Error('Required parameter id was null or undefined when calling getArticle.');
-        }
-
-        let headers = this.defaultHeaders;
-
-        // authentication (oauth2_client_credentials_grant) required
-        if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
-                ? this.configuration.accessToken()
-                : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
-        }
-
-        // authentication (oauth2_password_grant) required
-        if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
-                ? this.configuration.accessToken()
-                : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
-        }
-
-        // to determine the Accept header
-        let httpHeaderAccepts: string[] = [
-            'application/json'
-        ];
-        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
-        if (httpHeaderAcceptSelected != undefined) {
-            headers = headers.set('Accept', httpHeaderAcceptSelected);
-        }
-
-        // to determine the Content-Type header
-        const consumes: string[] = [
-        ];
-
-        return this.httpClient.get<ArticleResource>(`${this.basePath}/content/articles/${encodeURIComponent(String(id))}`,
-            {
-                withCredentials: this.configuration.withCredentials,
-                headers: headers,
-                observe: observe,
-                reportProgress: reportProgress
-            }
-        );
+    public getArticle(id: string, extraHttpRequestParams?: any): Observable<ArticleResource> {
+        return this.getArticleWithHttpInfo(id, extraHttpRequestParams)
+            .map((response: Response) => {
+                if (response.status === 204) {
+                    return undefined;
+                } else {
+                    return response.json() || {};
+                }
+            });
     }
 
     /**
-     * Get a single article template
-     * &lt;b&gt;Permissions Needed:&lt;/b&gt; TEMPLATE_ADMIN or ARTICLES_ADMIN
+     * <b>Permissions Needed:</b> GET
+     * @summary Get a single article template
      * @param id The id of the template
-     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-     * @param reportProgress flag to report request and response progress.
      */
-    public getArticleTemplate(id: string, observe?: 'body', reportProgress?: boolean): Observable<TemplateResource>;
-    public getArticleTemplate(id: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<TemplateResource>>;
-    public getArticleTemplate(id: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<TemplateResource>>;
-    public getArticleTemplate(id: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
-        if (id === null || id === undefined) {
-            throw new Error('Required parameter id was null or undefined when calling getArticleTemplate.');
-        }
-
-        let headers = this.defaultHeaders;
-
-        // authentication (oauth2_client_credentials_grant) required
-        if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
-                ? this.configuration.accessToken()
-                : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
-        }
-
-        // authentication (oauth2_password_grant) required
-        if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
-                ? this.configuration.accessToken()
-                : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
-        }
-
-        // to determine the Accept header
-        let httpHeaderAccepts: string[] = [
-            'application/json'
-        ];
-        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
-        if (httpHeaderAcceptSelected != undefined) {
-            headers = headers.set('Accept', httpHeaderAcceptSelected);
-        }
-
-        // to determine the Content-Type header
-        const consumes: string[] = [
-        ];
-
-        return this.httpClient.get<TemplateResource>(`${this.basePath}/content/articles/templates/${encodeURIComponent(String(id))}`,
-            {
-                withCredentials: this.configuration.withCredentials,
-                headers: headers,
-                observe: observe,
-                reportProgress: reportProgress
-            }
-        );
+    public getArticleTemplate(id: string, extraHttpRequestParams?: any): Observable<TemplateResource> {
+        return this.getArticleTemplateWithHttpInfo(id, extraHttpRequestParams)
+            .map((response: Response) => {
+                if (response.status === 204) {
+                    return undefined;
+                } else {
+                    return response.json() || {};
+                }
+            });
     }
 
     /**
-     * List and search article templates
-     * &lt;b&gt;Permissions Needed:&lt;/b&gt; TEMPLATE_ADMIN or ARTICLES_ADMIN
+     * <b>Permissions Needed:</b> LIST
+     * @summary List and search article templates
      * @param size The number of objects returned per page
      * @param page The number of the page returned, starting with 1
      * @param order A comma separated list of sorting requirements in priority order, each entry matching PROPERTY_NAME:[ASC|DESC]
-     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-     * @param reportProgress flag to report request and response progress.
      */
-    public getArticleTemplates(size?: number, page?: number, order?: string, observe?: 'body', reportProgress?: boolean): Observable<PageResourceTemplateResource>;
-    public getArticleTemplates(size?: number, page?: number, order?: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<PageResourceTemplateResource>>;
-    public getArticleTemplates(size?: number, page?: number, order?: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<PageResourceTemplateResource>>;
-    public getArticleTemplates(size?: number, page?: number, order?: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
-
-        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
-        if (size !== undefined && size !== null) {
-            queryParameters = queryParameters.set('size', <any>size);
-        }
-        if (page !== undefined && page !== null) {
-            queryParameters = queryParameters.set('page', <any>page);
-        }
-        if (order !== undefined && order !== null) {
-            queryParameters = queryParameters.set('order', <any>order);
-        }
-
-        let headers = this.defaultHeaders;
-
-        // authentication (oauth2_client_credentials_grant) required
-        if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
-                ? this.configuration.accessToken()
-                : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
-        }
-
-        // authentication (oauth2_password_grant) required
-        if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
-                ? this.configuration.accessToken()
-                : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
-        }
-
-        // to determine the Accept header
-        let httpHeaderAccepts: string[] = [
-            'application/json'
-        ];
-        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
-        if (httpHeaderAcceptSelected != undefined) {
-            headers = headers.set('Accept', httpHeaderAcceptSelected);
-        }
-
-        // to determine the Content-Type header
-        const consumes: string[] = [
-        ];
-
-        return this.httpClient.get<PageResourceTemplateResource>(`${this.basePath}/content/articles/templates`,
-            {
-                params: queryParameters,
-                withCredentials: this.configuration.withCredentials,
-                headers: headers,
-                observe: observe,
-                reportProgress: reportProgress
-            }
-        );
+    public getArticleTemplates(size?: number, page?: number, order?: string, extraHttpRequestParams?: any): Observable<PageResourceTemplateResource> {
+        return this.getArticleTemplatesWithHttpInfo(size, page, order, extraHttpRequestParams)
+            .map((response: Response) => {
+                if (response.status === 204) {
+                    return undefined;
+                } else {
+                    return response.json() || {};
+                }
+            });
     }
 
     /**
-     * List and search articles
-     * Get a list of articles with optional filtering. Assets will not be filled in on the resources returned. Use &#39;Get a single article&#39; to retrieve the full resource with assets for a given item as needed. &lt;br&gt;&lt;br&gt;&lt;b&gt;Permissions Needed:&lt;/b&gt; ANY
+     * Get a list of articles with optional filtering. Assets will not be filled in on the resources returned. Use 'Get a single article' to retrieve the full resource with assets for a given item as needed.<br /><b>Permissions Needed:</b> LIST
+     * @summary List and search articles
      * @param filterActiveOnly Filter for articles that are active (true) or inactive (false)
      * @param filterCategory Filter for articles from a specific category by id
      * @param filterTagset Filter for articles with at least one of a specified set of tags (separated by comma)
@@ -617,470 +204,664 @@ export class ContentArticlesService {
      * @param size The number of objects returned per page
      * @param page The number of the page returned, starting with 1
      * @param order A comma separated list of sorting requirements in priority order, each entry matching PROPERTY_NAME:[ASC|DESC]
-     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-     * @param reportProgress flag to report request and response progress.
      */
-    public getArticles(filterActiveOnly?: boolean, filterCategory?: string, filterTagset?: string, filterTagIntersection?: string, filterTagExclusion?: string, filterTitle?: string, size?: number, page?: number, order?: string, observe?: 'body', reportProgress?: boolean): Observable<PageResourceArticleResource>;
-    public getArticles(filterActiveOnly?: boolean, filterCategory?: string, filterTagset?: string, filterTagIntersection?: string, filterTagExclusion?: string, filterTitle?: string, size?: number, page?: number, order?: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<PageResourceArticleResource>>;
-    public getArticles(filterActiveOnly?: boolean, filterCategory?: string, filterTagset?: string, filterTagIntersection?: string, filterTagExclusion?: string, filterTitle?: string, size?: number, page?: number, order?: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<PageResourceArticleResource>>;
-    public getArticles(filterActiveOnly?: boolean, filterCategory?: string, filterTagset?: string, filterTagIntersection?: string, filterTagExclusion?: string, filterTitle?: string, size?: number, page?: number, order?: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
-
-        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
-        if (filterActiveOnly !== undefined && filterActiveOnly !== null) {
-            queryParameters = queryParameters.set('filter_active_only', <any>filterActiveOnly);
-        }
-        if (filterCategory !== undefined && filterCategory !== null) {
-            queryParameters = queryParameters.set('filter_category', <any>filterCategory);
-        }
-        if (filterTagset !== undefined && filterTagset !== null) {
-            queryParameters = queryParameters.set('filter_tagset', <any>filterTagset);
-        }
-        if (filterTagIntersection !== undefined && filterTagIntersection !== null) {
-            queryParameters = queryParameters.set('filter_tag_intersection', <any>filterTagIntersection);
-        }
-        if (filterTagExclusion !== undefined && filterTagExclusion !== null) {
-            queryParameters = queryParameters.set('filter_tag_exclusion', <any>filterTagExclusion);
-        }
-        if (filterTitle !== undefined && filterTitle !== null) {
-            queryParameters = queryParameters.set('filter_title', <any>filterTitle);
-        }
-        if (size !== undefined && size !== null) {
-            queryParameters = queryParameters.set('size', <any>size);
-        }
-        if (page !== undefined && page !== null) {
-            queryParameters = queryParameters.set('page', <any>page);
-        }
-        if (order !== undefined && order !== null) {
-            queryParameters = queryParameters.set('order', <any>order);
-        }
-
-        let headers = this.defaultHeaders;
-
-        // authentication (oauth2_client_credentials_grant) required
-        if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
-                ? this.configuration.accessToken()
-                : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
-        }
-
-        // authentication (oauth2_password_grant) required
-        if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
-                ? this.configuration.accessToken()
-                : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
-        }
-
-        // to determine the Accept header
-        let httpHeaderAccepts: string[] = [
-            'application/json'
-        ];
-        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
-        if (httpHeaderAcceptSelected != undefined) {
-            headers = headers.set('Accept', httpHeaderAcceptSelected);
-        }
-
-        // to determine the Content-Type header
-        const consumes: string[] = [
-        ];
-
-        return this.httpClient.get<PageResourceArticleResource>(`${this.basePath}/content/articles`,
-            {
-                params: queryParameters,
-                withCredentials: this.configuration.withCredentials,
-                headers: headers,
-                observe: observe,
-                reportProgress: reportProgress
-            }
-        );
+    public getArticles(filterActiveOnly?: boolean, filterCategory?: string, filterTagset?: string, filterTagIntersection?: string, filterTagExclusion?: string, filterTitle?: string, size?: number, page?: number, order?: string, extraHttpRequestParams?: any): Observable<PageResourceArticleResource> {
+        return this.getArticlesWithHttpInfo(filterActiveOnly, filterCategory, filterTagset, filterTagIntersection, filterTagExclusion, filterTitle, size, page, order, extraHttpRequestParams)
+            .map((response: Response) => {
+                if (response.status === 204) {
+                    return undefined;
+                } else {
+                    return response.json() || {};
+                }
+            });
     }
 
     /**
-     * Get a template
-     * &lt;b&gt;Permissions Needed:&lt;/b&gt; TEMPLATES_ADMIN
-     * @param typeHint The type for the resource this template applies to
+     * <b>Permissions Needed:</b> PUT
+     * @summary Update an existing article
+     * @param id The article id
+     * @param articleResource The article object
+     */
+    public updateArticle(id: string, articleResource?: ArticleResource, extraHttpRequestParams?: any): Observable<ArticleResource> {
+        return this.updateArticleWithHttpInfo(id, articleResource, extraHttpRequestParams)
+            .map((response: Response) => {
+                if (response.status === 204) {
+                    return undefined;
+                } else {
+                    return response.json() || {};
+                }
+            });
+    }
+
+    /**
+     * <b>Permissions Needed:</b> PUT
+     * @summary Update an article template
      * @param id The id of the template
-     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-     * @param reportProgress flag to report request and response progress.
+     * @param templatePatchResource The patch resource object
+     * @param testValidation If true, this will test validation but not submit the patch request
      */
-    public getTemplate(typeHint: string, id: string, observe?: 'body', reportProgress?: boolean): Observable<TemplateResource>;
-    public getTemplate(typeHint: string, id: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<TemplateResource>>;
-    public getTemplate(typeHint: string, id: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<TemplateResource>>;
-    public getTemplate(typeHint: string, id: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
-        if (typeHint === null || typeHint === undefined) {
-            throw new Error('Required parameter typeHint was null or undefined when calling getTemplate.');
-        }
-        if (id === null || id === undefined) {
-            throw new Error('Required parameter id was null or undefined when calling getTemplate.');
-        }
+    public updateArticleTemplate(id: string, templatePatchResource?: PatchResource, testValidation?: boolean, extraHttpRequestParams?: any): Observable<TemplateResource> {
+        return this.updateArticleTemplateWithHttpInfo(id, templatePatchResource, testValidation, extraHttpRequestParams)
+            .map((response: Response) => {
+                if (response.status === 204) {
+                    return undefined;
+                } else {
+                    return response.json() || {};
+                }
+            });
+    }
 
-        let headers = this.defaultHeaders;
+
+    /**
+     * Create a new article
+     * Articles are blobs of text with titles, a category and assets. Formatting and display of the text is in the hands of the front end.&lt;br /&gt;&lt;b&gt;Permissions Needed:&lt;/b&gt; POST
+     * @param articleResource The new article
+     */
+    public createArticleWithHttpInfo(articleResource?: ArticleResource, extraHttpRequestParams?: any): Observable<Response> {
+        const path = this.basePath + '/content/articles';
+
+        let queryParameters = new URLSearchParams();
+        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
+
+        // to determine the Accept header
+        let produces: string[] = [
+            'application/json'
+        ];
 
         // authentication (oauth2_client_credentials_grant) required
+        // oauth required
         if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
+            let accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
+            headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
         // authentication (oauth2_password_grant) required
+        // oauth required
         if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
+            let accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
+            headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-        // to determine the Accept header
-        let httpHeaderAccepts: string[] = [
-            'application/json'
-        ];
-        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
-        if (httpHeaderAcceptSelected != undefined) {
-            headers = headers.set('Accept', httpHeaderAcceptSelected);
+            
+        headers.set('Content-Type', 'application/json');
+
+        let requestOptions: RequestOptionsArgs = new RequestOptions({
+            method: RequestMethod.Post,
+            headers: headers,
+            body: articleResource == null ? '' : JSON.stringify(articleResource), // https://github.com/angular/angular/issues/10612
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
+        });
+        // https://github.com/swagger-api/swagger-codegen/issues/4037
+        if (extraHttpRequestParams) {
+            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
         }
 
-        // to determine the Content-Type header
-        const consumes: string[] = [
-        ];
-
-        return this.httpClient.get<TemplateResource>(`${this.basePath}/templates/${encodeURIComponent(String(typeHint))}/${encodeURIComponent(String(id))}`,
-            {
-                withCredentials: this.configuration.withCredentials,
-                headers: headers,
-                observe: observe,
-                reportProgress: reportProgress
-            }
-        );
+        return this.http.request(path, requestOptions);
     }
 
     /**
-     * List and search templates
-     * &lt;b&gt;Permissions Needed:&lt;/b&gt; TEMPLATES_ADMIN
-     * @param typeHint The type for the resource this template applies to
+     * Create an article template
+     * Article Templates define a type of article and the properties they have.&lt;br /&gt;&lt;b&gt;Permissions Needed:&lt;/b&gt; POST
+     * @param articleTemplateResource The article template resource object
+     */
+    public createArticleTemplateWithHttpInfo(articleTemplateResource?: TemplateResource, extraHttpRequestParams?: any): Observable<Response> {
+        const path = this.basePath + '/content/articles/templates';
+
+        let queryParameters = new URLSearchParams();
+        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
+
+        // to determine the Accept header
+        let produces: string[] = [
+            'application/json'
+        ];
+
+        // authentication (oauth2_client_credentials_grant) required
+        // oauth required
+        if (this.configuration.accessToken) {
+            let accessToken = typeof this.configuration.accessToken === 'function'
+                ? this.configuration.accessToken()
+                : this.configuration.accessToken;
+            headers.set('Authorization', 'Bearer ' + accessToken);
+        }
+
+        // authentication (oauth2_password_grant) required
+        // oauth required
+        if (this.configuration.accessToken) {
+            let accessToken = typeof this.configuration.accessToken === 'function'
+                ? this.configuration.accessToken()
+                : this.configuration.accessToken;
+            headers.set('Authorization', 'Bearer ' + accessToken);
+        }
+
+            
+        headers.set('Content-Type', 'application/json');
+
+        let requestOptions: RequestOptionsArgs = new RequestOptions({
+            method: RequestMethod.Post,
+            headers: headers,
+            body: articleTemplateResource == null ? '' : JSON.stringify(articleTemplateResource), // https://github.com/angular/angular/issues/10612
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
+        });
+        // https://github.com/swagger-api/swagger-codegen/issues/4037
+        if (extraHttpRequestParams) {
+            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
+        }
+
+        return this.http.request(path, requestOptions);
+    }
+
+    /**
+     * Delete an existing article
+     * &lt;b&gt;Permissions Needed:&lt;/b&gt; DELETE
+     * @param id The article id
+     */
+    public deleteArticleWithHttpInfo(id: string, extraHttpRequestParams?: any): Observable<Response> {
+        const path = this.basePath + '/content/articles/${id}'
+                    .replace('${' + 'id' + '}', String(id));
+
+        let queryParameters = new URLSearchParams();
+        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
+        // verify required parameter 'id' is not null or undefined
+        if (id === null || id === undefined) {
+            throw new Error('Required parameter id was null or undefined when calling deleteArticle.');
+        }
+
+        // to determine the Accept header
+        let produces: string[] = [
+            'application/json'
+        ];
+
+        // authentication (oauth2_client_credentials_grant) required
+        // oauth required
+        if (this.configuration.accessToken) {
+            let accessToken = typeof this.configuration.accessToken === 'function'
+                ? this.configuration.accessToken()
+                : this.configuration.accessToken;
+            headers.set('Authorization', 'Bearer ' + accessToken);
+        }
+
+        // authentication (oauth2_password_grant) required
+        // oauth required
+        if (this.configuration.accessToken) {
+            let accessToken = typeof this.configuration.accessToken === 'function'
+                ? this.configuration.accessToken()
+                : this.configuration.accessToken;
+            headers.set('Authorization', 'Bearer ' + accessToken);
+        }
+
+            
+        let requestOptions: RequestOptionsArgs = new RequestOptions({
+            method: RequestMethod.Delete,
+            headers: headers,
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
+        });
+        // https://github.com/swagger-api/swagger-codegen/issues/4037
+        if (extraHttpRequestParams) {
+            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
+        }
+
+        return this.http.request(path, requestOptions);
+    }
+
+    /**
+     * Delete an article template
+     * If cascade &#x3D; &#39;detach&#39;, it will force delete the template even if it&#39;s attached to other objects.&lt;br /&gt;&lt;b&gt;Permissions Needed:&lt;/b&gt; DELETE
+     * @param id The id of the template
+     * @param cascade The value needed to delete used templates
+     */
+    public deleteArticleTemplateWithHttpInfo(id: string, cascade?: string, extraHttpRequestParams?: any): Observable<Response> {
+        const path = this.basePath + '/content/articles/templates/${id}'
+                    .replace('${' + 'id' + '}', String(id));
+
+        let queryParameters = new URLSearchParams();
+        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
+        // verify required parameter 'id' is not null or undefined
+        if (id === null || id === undefined) {
+            throw new Error('Required parameter id was null or undefined when calling deleteArticleTemplate.');
+        }
+        if (cascade !== undefined) {
+            queryParameters.set('cascade', <any>cascade);
+        }
+
+
+        // to determine the Accept header
+        let produces: string[] = [
+            'application/json'
+        ];
+
+        // authentication (oauth2_client_credentials_grant) required
+        // oauth required
+        if (this.configuration.accessToken) {
+            let accessToken = typeof this.configuration.accessToken === 'function'
+                ? this.configuration.accessToken()
+                : this.configuration.accessToken;
+            headers.set('Authorization', 'Bearer ' + accessToken);
+        }
+
+        // authentication (oauth2_password_grant) required
+        // oauth required
+        if (this.configuration.accessToken) {
+            let accessToken = typeof this.configuration.accessToken === 'function'
+                ? this.configuration.accessToken()
+                : this.configuration.accessToken;
+            headers.set('Authorization', 'Bearer ' + accessToken);
+        }
+
+            
+        let requestOptions: RequestOptionsArgs = new RequestOptions({
+            method: RequestMethod.Delete,
+            headers: headers,
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
+        });
+        // https://github.com/swagger-api/swagger-codegen/issues/4037
+        if (extraHttpRequestParams) {
+            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
+        }
+
+        return this.http.request(path, requestOptions);
+    }
+
+    /**
+     * Get a single article
+     * &lt;b&gt;Permissions Needed:&lt;/b&gt; GET
+     * @param id The article id
+     */
+    public getArticleWithHttpInfo(id: string, extraHttpRequestParams?: any): Observable<Response> {
+        const path = this.basePath + '/content/articles/${id}'
+                    .replace('${' + 'id' + '}', String(id));
+
+        let queryParameters = new URLSearchParams();
+        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
+        // verify required parameter 'id' is not null or undefined
+        if (id === null || id === undefined) {
+            throw new Error('Required parameter id was null or undefined when calling getArticle.');
+        }
+
+        // to determine the Accept header
+        let produces: string[] = [
+            'application/json'
+        ];
+
+        // authentication (oauth2_client_credentials_grant) required
+        // oauth required
+        if (this.configuration.accessToken) {
+            let accessToken = typeof this.configuration.accessToken === 'function'
+                ? this.configuration.accessToken()
+                : this.configuration.accessToken;
+            headers.set('Authorization', 'Bearer ' + accessToken);
+        }
+
+        // authentication (oauth2_password_grant) required
+        // oauth required
+        if (this.configuration.accessToken) {
+            let accessToken = typeof this.configuration.accessToken === 'function'
+                ? this.configuration.accessToken()
+                : this.configuration.accessToken;
+            headers.set('Authorization', 'Bearer ' + accessToken);
+        }
+
+            
+        let requestOptions: RequestOptionsArgs = new RequestOptions({
+            method: RequestMethod.Get,
+            headers: headers,
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
+        });
+        // https://github.com/swagger-api/swagger-codegen/issues/4037
+        if (extraHttpRequestParams) {
+            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
+        }
+
+        return this.http.request(path, requestOptions);
+    }
+
+    /**
+     * Get a single article template
+     * &lt;b&gt;Permissions Needed:&lt;/b&gt; GET
+     * @param id The id of the template
+     */
+    public getArticleTemplateWithHttpInfo(id: string, extraHttpRequestParams?: any): Observable<Response> {
+        const path = this.basePath + '/content/articles/templates/${id}'
+                    .replace('${' + 'id' + '}', String(id));
+
+        let queryParameters = new URLSearchParams();
+        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
+        // verify required parameter 'id' is not null or undefined
+        if (id === null || id === undefined) {
+            throw new Error('Required parameter id was null or undefined when calling getArticleTemplate.');
+        }
+
+        // to determine the Accept header
+        let produces: string[] = [
+            'application/json'
+        ];
+
+        // authentication (oauth2_client_credentials_grant) required
+        // oauth required
+        if (this.configuration.accessToken) {
+            let accessToken = typeof this.configuration.accessToken === 'function'
+                ? this.configuration.accessToken()
+                : this.configuration.accessToken;
+            headers.set('Authorization', 'Bearer ' + accessToken);
+        }
+
+        // authentication (oauth2_password_grant) required
+        // oauth required
+        if (this.configuration.accessToken) {
+            let accessToken = typeof this.configuration.accessToken === 'function'
+                ? this.configuration.accessToken()
+                : this.configuration.accessToken;
+            headers.set('Authorization', 'Bearer ' + accessToken);
+        }
+
+            
+        let requestOptions: RequestOptionsArgs = new RequestOptions({
+            method: RequestMethod.Get,
+            headers: headers,
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
+        });
+        // https://github.com/swagger-api/swagger-codegen/issues/4037
+        if (extraHttpRequestParams) {
+            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
+        }
+
+        return this.http.request(path, requestOptions);
+    }
+
+    /**
+     * List and search article templates
+     * &lt;b&gt;Permissions Needed:&lt;/b&gt; LIST
      * @param size The number of objects returned per page
      * @param page The number of the page returned, starting with 1
      * @param order A comma separated list of sorting requirements in priority order, each entry matching PROPERTY_NAME:[ASC|DESC]
-     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-     * @param reportProgress flag to report request and response progress.
      */
-    public getTemplates(typeHint: string, size?: number, page?: number, order?: string, observe?: 'body', reportProgress?: boolean): Observable<PageResourceTemplateResource>;
-    public getTemplates(typeHint: string, size?: number, page?: number, order?: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<PageResourceTemplateResource>>;
-    public getTemplates(typeHint: string, size?: number, page?: number, order?: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<PageResourceTemplateResource>>;
-    public getTemplates(typeHint: string, size?: number, page?: number, order?: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
-        if (typeHint === null || typeHint === undefined) {
-            throw new Error('Required parameter typeHint was null or undefined when calling getTemplates.');
+    public getArticleTemplatesWithHttpInfo(size?: number, page?: number, order?: string, extraHttpRequestParams?: any): Observable<Response> {
+        const path = this.basePath + '/content/articles/templates';
+
+        let queryParameters = new URLSearchParams();
+        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
+        if (size !== undefined) {
+            queryParameters.set('size', <any>size);
         }
 
-        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
-        if (size !== undefined && size !== null) {
-            queryParameters = queryParameters.set('size', <any>size);
-        }
-        if (page !== undefined && page !== null) {
-            queryParameters = queryParameters.set('page', <any>page);
-        }
-        if (order !== undefined && order !== null) {
-            queryParameters = queryParameters.set('order', <any>order);
+        if (page !== undefined) {
+            queryParameters.set('page', <any>page);
         }
 
-        let headers = this.defaultHeaders;
+        if (order !== undefined) {
+            queryParameters.set('order', <any>order);
+        }
+
+
+        // to determine the Accept header
+        let produces: string[] = [
+            'application/json'
+        ];
 
         // authentication (oauth2_client_credentials_grant) required
+        // oauth required
         if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
+            let accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
+            headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
         // authentication (oauth2_password_grant) required
+        // oauth required
         if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
+            let accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
+            headers.set('Authorization', 'Bearer ' + accessToken);
         }
+
+            
+        let requestOptions: RequestOptionsArgs = new RequestOptions({
+            method: RequestMethod.Get,
+            headers: headers,
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
+        });
+        // https://github.com/swagger-api/swagger-codegen/issues/4037
+        if (extraHttpRequestParams) {
+            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
+        }
+
+        return this.http.request(path, requestOptions);
+    }
+
+    /**
+     * List and search articles
+     * Get a list of articles with optional filtering. Assets will not be filled in on the resources returned. Use &#39;Get a single article&#39; to retrieve the full resource with assets for a given item as needed.&lt;br /&gt;&lt;b&gt;Permissions Needed:&lt;/b&gt; LIST
+     * @param filterActiveOnly Filter for articles that are active (true) or inactive (false)
+     * @param filterCategory Filter for articles from a specific category by id
+     * @param filterTagset Filter for articles with at least one of a specified set of tags (separated by comma)
+     * @param filterTagIntersection Filter for articles with all of a specified set of tags (separated by comma)
+     * @param filterTagExclusion Filter for articles with none of a specified set of tags (separated by comma)
+     * @param filterTitle Filter for articles whose title contains a string
+     * @param size The number of objects returned per page
+     * @param page The number of the page returned, starting with 1
+     * @param order A comma separated list of sorting requirements in priority order, each entry matching PROPERTY_NAME:[ASC|DESC]
+     */
+    public getArticlesWithHttpInfo(filterActiveOnly?: boolean, filterCategory?: string, filterTagset?: string, filterTagIntersection?: string, filterTagExclusion?: string, filterTitle?: string, size?: number, page?: number, order?: string, extraHttpRequestParams?: any): Observable<Response> {
+        const path = this.basePath + '/content/articles';
+
+        let queryParameters = new URLSearchParams();
+        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
+        if (filterActiveOnly !== undefined) {
+            queryParameters.set('filter_active_only', <any>filterActiveOnly);
+        }
+
+        if (filterCategory !== undefined) {
+            queryParameters.set('filter_category', <any>filterCategory);
+        }
+
+        if (filterTagset !== undefined) {
+            queryParameters.set('filter_tagset', <any>filterTagset);
+        }
+
+        if (filterTagIntersection !== undefined) {
+            queryParameters.set('filter_tag_intersection', <any>filterTagIntersection);
+        }
+
+        if (filterTagExclusion !== undefined) {
+            queryParameters.set('filter_tag_exclusion', <any>filterTagExclusion);
+        }
+
+        if (filterTitle !== undefined) {
+            queryParameters.set('filter_title', <any>filterTitle);
+        }
+
+        if (size !== undefined) {
+            queryParameters.set('size', <any>size);
+        }
+
+        if (page !== undefined) {
+            queryParameters.set('page', <any>page);
+        }
+
+        if (order !== undefined) {
+            queryParameters.set('order', <any>order);
+        }
+
 
         // to determine the Accept header
-        let httpHeaderAccepts: string[] = [
+        let produces: string[] = [
             'application/json'
         ];
-        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
-        if (httpHeaderAcceptSelected != undefined) {
-            headers = headers.set('Accept', httpHeaderAcceptSelected);
+
+        // authentication (oauth2_client_credentials_grant) required
+        // oauth required
+        if (this.configuration.accessToken) {
+            let accessToken = typeof this.configuration.accessToken === 'function'
+                ? this.configuration.accessToken()
+                : this.configuration.accessToken;
+            headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-        // to determine the Content-Type header
-        const consumes: string[] = [
-        ];
+        // authentication (oauth2_password_grant) required
+        // oauth required
+        if (this.configuration.accessToken) {
+            let accessToken = typeof this.configuration.accessToken === 'function'
+                ? this.configuration.accessToken()
+                : this.configuration.accessToken;
+            headers.set('Authorization', 'Bearer ' + accessToken);
+        }
 
-        return this.httpClient.get<PageResourceTemplateResource>(`${this.basePath}/templates/${encodeURIComponent(String(typeHint))}`,
-            {
-                params: queryParameters,
-                withCredentials: this.configuration.withCredentials,
-                headers: headers,
-                observe: observe,
-                reportProgress: reportProgress
-            }
-        );
+            
+        let requestOptions: RequestOptionsArgs = new RequestOptions({
+            method: RequestMethod.Get,
+            headers: headers,
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
+        });
+        // https://github.com/swagger-api/swagger-codegen/issues/4037
+        if (extraHttpRequestParams) {
+            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
+        }
+
+        return this.http.request(path, requestOptions);
     }
 
     /**
      * Update an existing article
-     * &lt;b&gt;Permissions Needed:&lt;/b&gt; ARTICLES_ADMIN
+     * &lt;b&gt;Permissions Needed:&lt;/b&gt; PUT
      * @param id The article id
      * @param articleResource The article object
-     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-     * @param reportProgress flag to report request and response progress.
      */
-    public updateArticle(id: string, articleResource?: ArticleResource, observe?: 'body', reportProgress?: boolean): Observable<ArticleResource>;
-    public updateArticle(id: string, articleResource?: ArticleResource, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<ArticleResource>>;
-    public updateArticle(id: string, articleResource?: ArticleResource, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<ArticleResource>>;
-    public updateArticle(id: string, articleResource?: ArticleResource, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public updateArticleWithHttpInfo(id: string, articleResource?: ArticleResource, extraHttpRequestParams?: any): Observable<Response> {
+        const path = this.basePath + '/content/articles/${id}'
+                    .replace('${' + 'id' + '}', String(id));
+
+        let queryParameters = new URLSearchParams();
+        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
+        // verify required parameter 'id' is not null or undefined
         if (id === null || id === undefined) {
             throw new Error('Required parameter id was null or undefined when calling updateArticle.');
         }
 
-        let headers = this.defaultHeaders;
+        // to determine the Accept header
+        let produces: string[] = [
+            'application/json'
+        ];
 
         // authentication (oauth2_client_credentials_grant) required
+        // oauth required
         if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
+            let accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
+            headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
         // authentication (oauth2_password_grant) required
+        // oauth required
         if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
+            let accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
+            headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-        // to determine the Accept header
-        let httpHeaderAccepts: string[] = [
-            'application/json'
-        ];
-        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
-        if (httpHeaderAcceptSelected != undefined) {
-            headers = headers.set('Accept', httpHeaderAcceptSelected);
+            
+        headers.set('Content-Type', 'application/json');
+
+        let requestOptions: RequestOptionsArgs = new RequestOptions({
+            method: RequestMethod.Put,
+            headers: headers,
+            body: articleResource == null ? '' : JSON.stringify(articleResource), // https://github.com/angular/angular/issues/10612
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
+        });
+        // https://github.com/swagger-api/swagger-codegen/issues/4037
+        if (extraHttpRequestParams) {
+            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
         }
 
-        // to determine the Content-Type header
-        const consumes: string[] = [
-            'application/json'
-        ];
-        const httpContentTypeSelected: string | undefined = this.configuration.selectHeaderContentType(consumes);
-        if (httpContentTypeSelected != undefined) {
-            headers = headers.set('Content-Type', httpContentTypeSelected);
-        }
-
-        return this.httpClient.put<ArticleResource>(`${this.basePath}/content/articles/${encodeURIComponent(String(id))}`,
-            articleResource,
-            {
-                withCredentials: this.configuration.withCredentials,
-                headers: headers,
-                observe: observe,
-                reportProgress: reportProgress
-            }
-        );
+        return this.http.request(path, requestOptions);
     }
 
     /**
      * Update an article template
-     * &lt;b&gt;Permissions Needed:&lt;/b&gt; TEMPLATE_ADMIN
+     * &lt;b&gt;Permissions Needed:&lt;/b&gt; PUT
      * @param id The id of the template
-     * @param articleTemplateResource The article template resource object
-     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-     * @param reportProgress flag to report request and response progress.
+     * @param templatePatchResource The patch resource object
+     * @param testValidation If true, this will test validation but not submit the patch request
      */
-    public updateArticleTemplate(id: string, articleTemplateResource?: TemplateResource, observe?: 'body', reportProgress?: boolean): Observable<TemplateResource>;
-    public updateArticleTemplate(id: string, articleTemplateResource?: TemplateResource, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<TemplateResource>>;
-    public updateArticleTemplate(id: string, articleTemplateResource?: TemplateResource, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<TemplateResource>>;
-    public updateArticleTemplate(id: string, articleTemplateResource?: TemplateResource, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public updateArticleTemplateWithHttpInfo(id: string, templatePatchResource?: PatchResource, testValidation?: boolean, extraHttpRequestParams?: any): Observable<Response> {
+        const path = this.basePath + '/content/articles/templates/${id}'
+                    .replace('${' + 'id' + '}', String(id));
+
+        let queryParameters = new URLSearchParams();
+        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
+        // verify required parameter 'id' is not null or undefined
         if (id === null || id === undefined) {
             throw new Error('Required parameter id was null or undefined when calling updateArticleTemplate.');
         }
+        if (testValidation !== undefined) {
+            queryParameters.set('test_validation', <any>testValidation);
+        }
 
-        let headers = this.defaultHeaders;
+
+        // to determine the Accept header
+        let produces: string[] = [
+            'application/json'
+        ];
 
         // authentication (oauth2_client_credentials_grant) required
+        // oauth required
         if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
+            let accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
+            headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
         // authentication (oauth2_password_grant) required
+        // oauth required
         if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
+            let accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
+            headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-        // to determine the Accept header
-        let httpHeaderAccepts: string[] = [
-            'application/json'
-        ];
-        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
-        if (httpHeaderAcceptSelected != undefined) {
-            headers = headers.set('Accept', httpHeaderAcceptSelected);
+            
+        headers.set('Content-Type', 'application/json');
+
+        let requestOptions: RequestOptionsArgs = new RequestOptions({
+            method: RequestMethod.Patch,
+            headers: headers,
+            body: templatePatchResource == null ? '' : JSON.stringify(templatePatchResource), // https://github.com/angular/angular/issues/10612
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
+        });
+        // https://github.com/swagger-api/swagger-codegen/issues/4037
+        if (extraHttpRequestParams) {
+            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
         }
 
-        // to determine the Content-Type header
-        const consumes: string[] = [
-            'application/json'
-        ];
-        const httpContentTypeSelected: string | undefined = this.configuration.selectHeaderContentType(consumes);
-        if (httpContentTypeSelected != undefined) {
-            headers = headers.set('Content-Type', httpContentTypeSelected);
-        }
-
-        return this.httpClient.put<TemplateResource>(`${this.basePath}/content/articles/templates/${encodeURIComponent(String(id))}`,
-            articleTemplateResource,
-            {
-                withCredentials: this.configuration.withCredentials,
-                headers: headers,
-                observe: observe,
-                reportProgress: reportProgress
-            }
-        );
-    }
-
-    /**
-     * Update a template
-     * &lt;b&gt;Permissions Needed:&lt;/b&gt; TEMPLATES_ADMIN
-     * @param typeHint The type for the resource this template applies to
-     * @param id The id of the template
-     * @param template The template
-     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-     * @param reportProgress flag to report request and response progress.
-     */
-    public updateTemplate(typeHint: string, id: string, template?: TemplateResource, observe?: 'body', reportProgress?: boolean): Observable<TemplateResource>;
-    public updateTemplate(typeHint: string, id: string, template?: TemplateResource, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<TemplateResource>>;
-    public updateTemplate(typeHint: string, id: string, template?: TemplateResource, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<TemplateResource>>;
-    public updateTemplate(typeHint: string, id: string, template?: TemplateResource, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
-        if (typeHint === null || typeHint === undefined) {
-            throw new Error('Required parameter typeHint was null or undefined when calling updateTemplate.');
-        }
-        if (id === null || id === undefined) {
-            throw new Error('Required parameter id was null or undefined when calling updateTemplate.');
-        }
-
-        let headers = this.defaultHeaders;
-
-        // authentication (oauth2_client_credentials_grant) required
-        if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
-                ? this.configuration.accessToken()
-                : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
-        }
-
-        // authentication (oauth2_password_grant) required
-        if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
-                ? this.configuration.accessToken()
-                : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
-        }
-
-        // to determine the Accept header
-        let httpHeaderAccepts: string[] = [
-            'application/json'
-        ];
-        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
-        if (httpHeaderAcceptSelected != undefined) {
-            headers = headers.set('Accept', httpHeaderAcceptSelected);
-        }
-
-        // to determine the Content-Type header
-        const consumes: string[] = [
-            'application/json'
-        ];
-        const httpContentTypeSelected: string | undefined = this.configuration.selectHeaderContentType(consumes);
-        if (httpContentTypeSelected != undefined) {
-            headers = headers.set('Content-Type', httpContentTypeSelected);
-        }
-
-        return this.httpClient.put<TemplateResource>(`${this.basePath}/templates/${encodeURIComponent(String(typeHint))}/${encodeURIComponent(String(id))}`,
-            template,
-            {
-                withCredentials: this.configuration.withCredentials,
-                headers: headers,
-                observe: observe,
-                reportProgress: reportProgress
-            }
-        );
-    }
-
-    /**
-     * Validate a templated resource
-     * Error code thrown if invalid.&lt;br&gt;&lt;br&gt;&lt;b&gt;Permissions Needed:&lt;/b&gt; TEMPLATES_ADMIN
-     * @param typeHint The type for the resource this template applies to
-     * @param resource The resource to validate
-     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-     * @param reportProgress flag to report request and response progress.
-     */
-    public validate(typeHint: string, resource?: BasicTemplatedResource, observe?: 'body', reportProgress?: boolean): Observable<any>;
-    public validate(typeHint: string, resource?: BasicTemplatedResource, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
-    public validate(typeHint: string, resource?: BasicTemplatedResource, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
-    public validate(typeHint: string, resource?: BasicTemplatedResource, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
-        if (typeHint === null || typeHint === undefined) {
-            throw new Error('Required parameter typeHint was null or undefined when calling validate.');
-        }
-
-        let headers = this.defaultHeaders;
-
-        // authentication (oauth2_client_credentials_grant) required
-        if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
-                ? this.configuration.accessToken()
-                : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
-        }
-
-        // authentication (oauth2_password_grant) required
-        if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
-                ? this.configuration.accessToken()
-                : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
-        }
-
-        // to determine the Accept header
-        let httpHeaderAccepts: string[] = [
-            'application/json'
-        ];
-        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
-        if (httpHeaderAcceptSelected != undefined) {
-            headers = headers.set('Accept', httpHeaderAcceptSelected);
-        }
-
-        // to determine the Content-Type header
-        const consumes: string[] = [
-            'application/json'
-        ];
-        const httpContentTypeSelected: string | undefined = this.configuration.selectHeaderContentType(consumes);
-        if (httpContentTypeSelected != undefined) {
-            headers = headers.set('Content-Type', httpContentTypeSelected);
-        }
-
-        return this.httpClient.post<any>(`${this.basePath}/templates/${encodeURIComponent(String(typeHint))}/validate`,
-            resource,
-            {
-                withCredentials: this.configuration.withCredentials,
-                headers: headers,
-                observe: observe,
-                reportProgress: reportProgress
-            }
-        );
+        return this.http.request(path, requestOptions);
     }
 
 }

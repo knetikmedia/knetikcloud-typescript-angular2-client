@@ -11,16 +11,17 @@
  */
 
 
-export interface ActivityUserStatusWrapper { 
+
+export interface ActivityUserStatusWrapper {
     value?: ActivityUserStatusWrapper.ValueEnum;
+
 }
 export namespace ActivityUserStatusWrapper {
-    export type ValueEnum = 'present' | 'ready' | 'left' | 'surrendered' | 'disconnected';
-    export const ValueEnum = {
-        Present: 'present' as ValueEnum,
-        Ready: 'ready' as ValueEnum,
-        Left: 'left' as ValueEnum,
-        Surrendered: 'surrendered' as ValueEnum,
-        Disconnected: 'disconnected' as ValueEnum
-    };
+    export enum ValueEnum {
+        Present = <any> 'present',
+        Ready = <any> 'ready',
+        Left = <any> 'left',
+        Surrendered = <any> 'surrendered',
+        Disconnected = <any> 'disconnected'
+    }
 }

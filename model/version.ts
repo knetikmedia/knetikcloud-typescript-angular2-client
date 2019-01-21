@@ -11,6 +11,8 @@
  */
 
 
-export interface Version { 
+
+export interface Version {
     version?: string;
+
 }

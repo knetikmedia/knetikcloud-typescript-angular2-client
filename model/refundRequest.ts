@@ -11,21 +11,26 @@
  */
 
 
-export interface RefundRequest { 
+
+export interface RefundRequest {
     /**
      * The amount to refund. If left off, will refund the remaining balance of the transaction or specific item balance (if SKU provided), whichever is less.
      */
     amount?: number;
+
     /**
      * The SKU of a bundle item from the invoice that the target item is within.
      */
     bundleSku?: string;
+
     /**
      * Notes about or reason for the refund
      */
     notes: string;
+
     /**
      * The SKU of a specific item from the invoice to refund. Affects the maximum refund amount (not to exceed the price of this item times quantity on invoice). Transaction must be tied to an invoice if used.
      */
     sku?: string;
+
 }

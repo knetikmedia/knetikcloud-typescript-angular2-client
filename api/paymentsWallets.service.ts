@@ -9,14 +9,16 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
+
 /* tslint:disable:no-unused-variable member-ordering */
 
 import { Inject, Injectable, Optional }                      from '@angular/core';
-import { HttpClient, HttpHeaders, HttpParams,
-         HttpResponse, HttpEvent }                           from '@angular/common/http';
-import { CustomHttpUrlEncodingCodec }                        from '../encoder';
+import { Http, Headers, URLSearchParams }                    from '@angular/http';
+import { RequestMethod, RequestOptions, RequestOptionsArgs } from '@angular/http';
+import { Response, ResponseContentType }                     from '@angular/http';
 
 import { Observable }                                        from 'rxjs/Observable';
+import '../rxjs-operators';
 
 import { PageResourceSimpleWallet } from '../model/pageResourceSimpleWallet';
 import { PageResourceWalletTotalResponse } from '../model/pageResourceWalletTotalResponse';
@@ -33,18 +35,33 @@ import { Configuration }                                     from '../configurat
 @Injectable()
 export class PaymentsWalletsService {
 
-    protected basePath = 'https://jsapi-integration.us-east-1.elasticbeanstalk.com';
-    public defaultHeaders = new HttpHeaders();
-    public configuration = new Configuration();
+    protected basePath = 'https://devsandbox.knetikcloud.com';
+    public defaultHeaders: Headers = new Headers();
+    public configuration: Configuration = new Configuration();
 
-    constructor(protected httpClient: HttpClient, @Optional()@Inject(BASE_PATH) basePath: string, @Optional() configuration: Configuration) {
+    constructor(protected http: Http, @Optional()@Inject(BASE_PATH) basePath: string, @Optional() configuration: Configuration) {
         if (basePath) {
             this.basePath = basePath;
         }
         if (configuration) {
             this.configuration = configuration;
-            this.basePath = basePath || configuration.basePath || this.basePath;
+			this.basePath = basePath || configuration.basePath || this.basePath;
         }
+    }
+
+    /**
+     * 
+     * Extends object by coping non-existing properties.
+     * @param objA object to be extended
+     * @param objB source object
+     */
+    private extendObj<T1,T2>(objA: T1, objB: T2) {
+        for(let key in objB){
+            if(objB.hasOwnProperty(key)){
+                (objA as any)[key] = (objB as any)[key];
+            }
+        }
+        return <T1&T2>objA;
     }
 
     /**
@@ -53,12 +70,148 @@ export class PaymentsWalletsService {
      */
     private canConsumeForm(consumes: string[]): boolean {
         const form = 'multipart/form-data';
-        for (const consume of consumes) {
+        for (let consume of consumes) {
             if (form === consume) {
                 return true;
             }
         }
         return false;
+    }
+
+    /**
+     * <b>Permissions Needed:</b> WALLETS_ADMIN or owner
+     * @summary Returns the user's wallet for the given currency code
+     * @param userId The ID of the user for whom wallet is being retrieved
+     * @param currencyCode Currency code of the user&#39;s wallet
+     */
+    public getUserWallet(userId: number, currencyCode: string, extraHttpRequestParams?: any): Observable<SimpleWallet> {
+        return this.getUserWalletWithHttpInfo(userId, currencyCode, extraHttpRequestParams)
+            .map((response: Response) => {
+                if (response.status === 204) {
+                    return undefined;
+                } else {
+                    return response.json() || {};
+                }
+            });
+    }
+
+    /**
+     * <b>Permissions Needed:</b> WALLETS_ADMIN or owner
+     * @summary Retrieve a user's wallet transactions
+     * @param userId The ID of the user for whom wallet transactions are being retrieved
+     * @param currencyCode Currency code of the user&#39;s wallet
+     * @param filterType Filter for transactions with specified type
+     * @param filterMaxDate Filter for transactions from no earlier than the specified date as a unix timestamp in seconds
+     * @param filterMinDate Filter for transactions from no later than the specified date as a unix timestamp in seconds
+     * @param filterSign Filter for transactions with amount with the given sign.  Allowable values: (&#39;positive&#39;, &#39;negative&#39;)
+     * @param size The number of objects returned per page
+     * @param page The number of the page returned, starting with 1
+     * @param order A comma separated list of sorting requirements in priority order, each entry matching PROPERTY_NAME:[ASC|DESC]
+     */
+    public getUserWalletTransactions(userId: number, currencyCode: string, filterType?: string, filterMaxDate?: number, filterMinDate?: number, filterSign?: string, size?: number, page?: number, order?: string, extraHttpRequestParams?: any): Observable<PageResourceWalletTransactionResource> {
+        return this.getUserWalletTransactionsWithHttpInfo(userId, currencyCode, filterType, filterMaxDate, filterMinDate, filterSign, size, page, order, extraHttpRequestParams)
+            .map((response: Response) => {
+                if (response.status === 204) {
+                    return undefined;
+                } else {
+                    return response.json() || {};
+                }
+            });
+    }
+
+    /**
+     * <b>Permissions Needed:</b> WALLETS_ADMIN or owner
+     * @summary List all of a user's wallets
+     * @param userId The ID of the user for whom wallets are being retrieved
+     * @param size The number of objects returned per page
+     * @param page The number of the page returned, starting with 1
+     */
+    public getUserWallets(userId: number, size?: number, page?: number, extraHttpRequestParams?: any): Observable<PageResourceSimpleWallet> {
+        return this.getUserWalletsWithHttpInfo(userId, size, page, extraHttpRequestParams)
+            .map((response: Response) => {
+                if (response.status === 204) {
+                    return undefined;
+                } else {
+                    return response.json() || {};
+                }
+            });
+    }
+
+    /**
+     * <b>Permissions Needed:</b> WALLETS_ADMIN
+     * @summary Retrieves a summation of wallet balances by currency code
+     */
+    public getWalletBalances(extraHttpRequestParams?: any): Observable<PageResourceWalletTotalResponse> {
+        return this.getWalletBalancesWithHttpInfo(extraHttpRequestParams)
+            .map((response: Response) => {
+                if (response.status === 204) {
+                    return undefined;
+                } else {
+                    return response.json() || {};
+                }
+            });
+    }
+
+    /**
+     * <b>Permissions Needed:</b> WALLETS_ADMIN
+     * @summary Retrieve wallet transactions across the system
+     * @param filterInvoice Filter for transactions from a specific invoice
+     * @param filterType Filter for transactions with specified type
+     * @param filterDate A comma separated string without spaces.  First value is the operator to search on, second value is the log start date, a unix timestamp in seconds. Can be repeated for a range, eg: GT,123,LT,456  Allowed operators: (GT, LT, EQ, GOE, LOE).
+     * @param filterSign Filter for transactions with amount with the given sign
+     * @param filterUserId Filter for transactions for specific userId
+     * @param filterUsername Filter for transactions for specific username that start with the given string
+     * @param filterDetails Filter for transactions for specific details that start with the given string
+     * @param filterCurrencyCode Filter for transactions for specific currency code
+     * @param size The number of objects returned per page
+     * @param page The number of the page returned, starting with 1
+     * @param order A comma separated list of sorting requirements in priority order, each entry matching PROPERTY_NAME:[ASC|DESC]
+     */
+    public getWalletTransactions(filterInvoice?: number, filterType?: string, filterDate?: string, filterSign?: string, filterUserId?: number, filterUsername?: string, filterDetails?: string, filterCurrencyCode?: string, size?: number, page?: number, order?: string, extraHttpRequestParams?: any): Observable<PageResourceWalletTransactionResource> {
+        return this.getWalletTransactionsWithHttpInfo(filterInvoice, filterType, filterDate, filterSign, filterUserId, filterUsername, filterDetails, filterCurrencyCode, size, page, order, extraHttpRequestParams)
+            .map((response: Response) => {
+                if (response.status === 204) {
+                    return undefined;
+                } else {
+                    return response.json() || {};
+                }
+            });
+    }
+
+    /**
+     * <b>Permissions Needed:</b> WALLETS_ADMIN
+     * @summary Retrieve a list of wallets across the system
+     * @param size The number of objects returned per page
+     * @param page The number of the page returned, starting with 1
+     * @param order A comma separated list of sorting requirements in priority order, each entry matching PROPERTY_NAME:[ASC|DESC]
+     */
+    public getWallets(size?: number, page?: number, order?: string, extraHttpRequestParams?: any): Observable<PageResourceSimpleWallet> {
+        return this.getWalletsWithHttpInfo(size, page, order, extraHttpRequestParams)
+            .map((response: Response) => {
+                if (response.status === 204) {
+                    return undefined;
+                } else {
+                    return response.json() || {};
+                }
+            });
+    }
+
+    /**
+     * <b>Permissions Needed:</b> WALLETS_ADMIN
+     * @summary Updates the balance for a user's wallet
+     * @param userId The ID of the user for whom wallet is being modified
+     * @param currencyCode Currency code of the user&#39;s wallet
+     * @param request The requested balance modification to be made to the user&#39;s wallet
+     */
+    public updateWalletBalance(userId: number, currencyCode: string, request?: WalletAlterRequest, extraHttpRequestParams?: any): Observable<WalletTransactionResource> {
+        return this.updateWalletBalanceWithHttpInfo(userId, currencyCode, request, extraHttpRequestParams)
+            .map((response: Response) => {
+                if (response.status === 204) {
+                    return undefined;
+                } else {
+                    return response.json() || {};
+                }
+            });
     }
 
 
@@ -67,59 +220,60 @@ export class PaymentsWalletsService {
      * &lt;b&gt;Permissions Needed:&lt;/b&gt; WALLETS_ADMIN or owner
      * @param userId The ID of the user for whom wallet is being retrieved
      * @param currencyCode Currency code of the user&#39;s wallet
-     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-     * @param reportProgress flag to report request and response progress.
      */
-    public getUserWallet(userId: number, currencyCode: string, observe?: 'body', reportProgress?: boolean): Observable<SimpleWallet>;
-    public getUserWallet(userId: number, currencyCode: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<SimpleWallet>>;
-    public getUserWallet(userId: number, currencyCode: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<SimpleWallet>>;
-    public getUserWallet(userId: number, currencyCode: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public getUserWalletWithHttpInfo(userId: number, currencyCode: string, extraHttpRequestParams?: any): Observable<Response> {
+        const path = this.basePath + '/users/${user_id}/wallets/${currency_code}'
+                    .replace('${' + 'user_id' + '}', String(userId))
+                    .replace('${' + 'currency_code' + '}', String(currencyCode));
+
+        let queryParameters = new URLSearchParams();
+        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
+        // verify required parameter 'userId' is not null or undefined
         if (userId === null || userId === undefined) {
             throw new Error('Required parameter userId was null or undefined when calling getUserWallet.');
         }
+        // verify required parameter 'currencyCode' is not null or undefined
         if (currencyCode === null || currencyCode === undefined) {
             throw new Error('Required parameter currencyCode was null or undefined when calling getUserWallet.');
         }
 
-        let headers = this.defaultHeaders;
+        // to determine the Accept header
+        let produces: string[] = [
+            'application/json'
+        ];
 
         // authentication (oauth2_client_credentials_grant) required
+        // oauth required
         if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
+            let accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
+            headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
         // authentication (oauth2_password_grant) required
+        // oauth required
         if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
+            let accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
+            headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-        // to determine the Accept header
-        let httpHeaderAccepts: string[] = [
-            'application/json'
-        ];
-        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
-        if (httpHeaderAcceptSelected != undefined) {
-            headers = headers.set('Accept', httpHeaderAcceptSelected);
+            
+        let requestOptions: RequestOptionsArgs = new RequestOptions({
+            method: RequestMethod.Get,
+            headers: headers,
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
+        });
+        // https://github.com/swagger-api/swagger-codegen/issues/4037
+        if (extraHttpRequestParams) {
+            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
         }
 
-        // to determine the Content-Type header
-        const consumes: string[] = [
-        ];
-
-        return this.httpClient.get<SimpleWallet>(`${this.basePath}/users/${encodeURIComponent(String(userId))}/wallets/${encodeURIComponent(String(currencyCode))}`,
-            {
-                withCredentials: this.configuration.withCredentials,
-                headers: headers,
-                observe: observe,
-                reportProgress: reportProgress
-            }
-        );
+        return this.http.request(path, requestOptions);
     }
 
     /**
@@ -134,191 +288,202 @@ export class PaymentsWalletsService {
      * @param size The number of objects returned per page
      * @param page The number of the page returned, starting with 1
      * @param order A comma separated list of sorting requirements in priority order, each entry matching PROPERTY_NAME:[ASC|DESC]
-     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-     * @param reportProgress flag to report request and response progress.
      */
-    public getUserWalletTransactions(userId: number, currencyCode: string, filterType?: string, filterMaxDate?: number, filterMinDate?: number, filterSign?: string, size?: number, page?: number, order?: string, observe?: 'body', reportProgress?: boolean): Observable<PageResourceWalletTransactionResource>;
-    public getUserWalletTransactions(userId: number, currencyCode: string, filterType?: string, filterMaxDate?: number, filterMinDate?: number, filterSign?: string, size?: number, page?: number, order?: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<PageResourceWalletTransactionResource>>;
-    public getUserWalletTransactions(userId: number, currencyCode: string, filterType?: string, filterMaxDate?: number, filterMinDate?: number, filterSign?: string, size?: number, page?: number, order?: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<PageResourceWalletTransactionResource>>;
-    public getUserWalletTransactions(userId: number, currencyCode: string, filterType?: string, filterMaxDate?: number, filterMinDate?: number, filterSign?: string, size?: number, page?: number, order?: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public getUserWalletTransactionsWithHttpInfo(userId: number, currencyCode: string, filterType?: string, filterMaxDate?: number, filterMinDate?: number, filterSign?: string, size?: number, page?: number, order?: string, extraHttpRequestParams?: any): Observable<Response> {
+        const path = this.basePath + '/users/${user_id}/wallets/${currency_code}/transactions'
+                    .replace('${' + 'user_id' + '}', String(userId))
+                    .replace('${' + 'currency_code' + '}', String(currencyCode));
+
+        let queryParameters = new URLSearchParams();
+        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
+        // verify required parameter 'userId' is not null or undefined
         if (userId === null || userId === undefined) {
             throw new Error('Required parameter userId was null or undefined when calling getUserWalletTransactions.');
         }
+        // verify required parameter 'currencyCode' is not null or undefined
         if (currencyCode === null || currencyCode === undefined) {
             throw new Error('Required parameter currencyCode was null or undefined when calling getUserWalletTransactions.');
         }
-
-        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
-        if (filterType !== undefined && filterType !== null) {
-            queryParameters = queryParameters.set('filter_type', <any>filterType);
-        }
-        if (filterMaxDate !== undefined && filterMaxDate !== null) {
-            queryParameters = queryParameters.set('filter_max_date', <any>filterMaxDate);
-        }
-        if (filterMinDate !== undefined && filterMinDate !== null) {
-            queryParameters = queryParameters.set('filter_min_date', <any>filterMinDate);
-        }
-        if (filterSign !== undefined && filterSign !== null) {
-            queryParameters = queryParameters.set('filter_sign', <any>filterSign);
-        }
-        if (size !== undefined && size !== null) {
-            queryParameters = queryParameters.set('size', <any>size);
-        }
-        if (page !== undefined && page !== null) {
-            queryParameters = queryParameters.set('page', <any>page);
-        }
-        if (order !== undefined && order !== null) {
-            queryParameters = queryParameters.set('order', <any>order);
+        if (filterType !== undefined) {
+            queryParameters.set('filter_type', <any>filterType);
         }
 
-        let headers = this.defaultHeaders;
+        if (filterMaxDate !== undefined) {
+            queryParameters.set('filter_max_date', <any>filterMaxDate);
+        }
+
+        if (filterMinDate !== undefined) {
+            queryParameters.set('filter_min_date', <any>filterMinDate);
+        }
+
+        if (filterSign !== undefined) {
+            queryParameters.set('filter_sign', <any>filterSign);
+        }
+
+        if (size !== undefined) {
+            queryParameters.set('size', <any>size);
+        }
+
+        if (page !== undefined) {
+            queryParameters.set('page', <any>page);
+        }
+
+        if (order !== undefined) {
+            queryParameters.set('order', <any>order);
+        }
+
+
+        // to determine the Accept header
+        let produces: string[] = [
+            'application/json'
+        ];
 
         // authentication (oauth2_client_credentials_grant) required
+        // oauth required
         if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
+            let accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
+            headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
         // authentication (oauth2_password_grant) required
+        // oauth required
         if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
+            let accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
+            headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-        // to determine the Accept header
-        let httpHeaderAccepts: string[] = [
-            'application/json'
-        ];
-        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
-        if (httpHeaderAcceptSelected != undefined) {
-            headers = headers.set('Accept', httpHeaderAcceptSelected);
+            
+        let requestOptions: RequestOptionsArgs = new RequestOptions({
+            method: RequestMethod.Get,
+            headers: headers,
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
+        });
+        // https://github.com/swagger-api/swagger-codegen/issues/4037
+        if (extraHttpRequestParams) {
+            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
         }
 
-        // to determine the Content-Type header
-        const consumes: string[] = [
-        ];
-
-        return this.httpClient.get<PageResourceWalletTransactionResource>(`${this.basePath}/users/${encodeURIComponent(String(userId))}/wallets/${encodeURIComponent(String(currencyCode))}/transactions`,
-            {
-                params: queryParameters,
-                withCredentials: this.configuration.withCredentials,
-                headers: headers,
-                observe: observe,
-                reportProgress: reportProgress
-            }
-        );
+        return this.http.request(path, requestOptions);
     }
 
     /**
      * List all of a user&#39;s wallets
      * &lt;b&gt;Permissions Needed:&lt;/b&gt; WALLETS_ADMIN or owner
      * @param userId The ID of the user for whom wallets are being retrieved
-     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-     * @param reportProgress flag to report request and response progress.
+     * @param size The number of objects returned per page
+     * @param page The number of the page returned, starting with 1
      */
-    public getUserWallets(userId: number, observe?: 'body', reportProgress?: boolean): Observable<Array<SimpleWallet>>;
-    public getUserWallets(userId: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Array<SimpleWallet>>>;
-    public getUserWallets(userId: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Array<SimpleWallet>>>;
-    public getUserWallets(userId: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public getUserWalletsWithHttpInfo(userId: number, size?: number, page?: number, extraHttpRequestParams?: any): Observable<Response> {
+        const path = this.basePath + '/users/${user_id}/wallets'
+                    .replace('${' + 'user_id' + '}', String(userId));
+
+        let queryParameters = new URLSearchParams();
+        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
+        // verify required parameter 'userId' is not null or undefined
         if (userId === null || userId === undefined) {
             throw new Error('Required parameter userId was null or undefined when calling getUserWallets.');
         }
+        if (size !== undefined) {
+            queryParameters.set('size', <any>size);
+        }
 
-        let headers = this.defaultHeaders;
+        if (page !== undefined) {
+            queryParameters.set('page', <any>page);
+        }
+
+
+        // to determine the Accept header
+        let produces: string[] = [
+            'application/json'
+        ];
 
         // authentication (oauth2_client_credentials_grant) required
+        // oauth required
         if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
+            let accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
+            headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
         // authentication (oauth2_password_grant) required
+        // oauth required
         if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
+            let accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
+            headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-        // to determine the Accept header
-        let httpHeaderAccepts: string[] = [
-            'application/json'
-        ];
-        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
-        if (httpHeaderAcceptSelected != undefined) {
-            headers = headers.set('Accept', httpHeaderAcceptSelected);
+            
+        let requestOptions: RequestOptionsArgs = new RequestOptions({
+            method: RequestMethod.Get,
+            headers: headers,
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
+        });
+        // https://github.com/swagger-api/swagger-codegen/issues/4037
+        if (extraHttpRequestParams) {
+            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
         }
 
-        // to determine the Content-Type header
-        const consumes: string[] = [
-        ];
-
-        return this.httpClient.get<Array<SimpleWallet>>(`${this.basePath}/users/${encodeURIComponent(String(userId))}/wallets`,
-            {
-                withCredentials: this.configuration.withCredentials,
-                headers: headers,
-                observe: observe,
-                reportProgress: reportProgress
-            }
-        );
+        return this.http.request(path, requestOptions);
     }
 
     /**
      * Retrieves a summation of wallet balances by currency code
      * &lt;b&gt;Permissions Needed:&lt;/b&gt; WALLETS_ADMIN
-     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-     * @param reportProgress flag to report request and response progress.
      */
-    public getWalletBalances(observe?: 'body', reportProgress?: boolean): Observable<PageResourceWalletTotalResponse>;
-    public getWalletBalances(observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<PageResourceWalletTotalResponse>>;
-    public getWalletBalances(observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<PageResourceWalletTotalResponse>>;
-    public getWalletBalances(observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public getWalletBalancesWithHttpInfo(extraHttpRequestParams?: any): Observable<Response> {
+        const path = this.basePath + '/wallets/totals';
 
-        let headers = this.defaultHeaders;
+        let queryParameters = new URLSearchParams();
+        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
+
+        // to determine the Accept header
+        let produces: string[] = [
+            'application/json'
+        ];
 
         // authentication (oauth2_client_credentials_grant) required
+        // oauth required
         if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
+            let accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
+            headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
         // authentication (oauth2_password_grant) required
+        // oauth required
         if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
+            let accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
+            headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-        // to determine the Accept header
-        let httpHeaderAccepts: string[] = [
-            'application/json'
-        ];
-        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
-        if (httpHeaderAcceptSelected != undefined) {
-            headers = headers.set('Accept', httpHeaderAcceptSelected);
+            
+        let requestOptions: RequestOptionsArgs = new RequestOptions({
+            method: RequestMethod.Get,
+            headers: headers,
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
+        });
+        // https://github.com/swagger-api/swagger-codegen/issues/4037
+        if (extraHttpRequestParams) {
+            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
         }
 
-        // to determine the Content-Type header
-        const consumes: string[] = [
-        ];
-
-        return this.httpClient.get<PageResourceWalletTotalResponse>(`${this.basePath}/wallets/totals`,
-            {
-                withCredentials: this.configuration.withCredentials,
-                headers: headers,
-                observe: observe,
-                reportProgress: reportProgress
-            }
-        );
+        return this.http.request(path, requestOptions);
     }
 
     /**
@@ -335,89 +500,94 @@ export class PaymentsWalletsService {
      * @param size The number of objects returned per page
      * @param page The number of the page returned, starting with 1
      * @param order A comma separated list of sorting requirements in priority order, each entry matching PROPERTY_NAME:[ASC|DESC]
-     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-     * @param reportProgress flag to report request and response progress.
      */
-    public getWalletTransactions(filterInvoice?: number, filterType?: string, filterDate?: string, filterSign?: 'positive' | 'negative', filterUserId?: number, filterUsername?: string, filterDetails?: string, filterCurrencyCode?: string, size?: number, page?: number, order?: string, observe?: 'body', reportProgress?: boolean): Observable<PageResourceWalletTransactionResource>;
-    public getWalletTransactions(filterInvoice?: number, filterType?: string, filterDate?: string, filterSign?: 'positive' | 'negative', filterUserId?: number, filterUsername?: string, filterDetails?: string, filterCurrencyCode?: string, size?: number, page?: number, order?: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<PageResourceWalletTransactionResource>>;
-    public getWalletTransactions(filterInvoice?: number, filterType?: string, filterDate?: string, filterSign?: 'positive' | 'negative', filterUserId?: number, filterUsername?: string, filterDetails?: string, filterCurrencyCode?: string, size?: number, page?: number, order?: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<PageResourceWalletTransactionResource>>;
-    public getWalletTransactions(filterInvoice?: number, filterType?: string, filterDate?: string, filterSign?: 'positive' | 'negative', filterUserId?: number, filterUsername?: string, filterDetails?: string, filterCurrencyCode?: string, size?: number, page?: number, order?: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public getWalletTransactionsWithHttpInfo(filterInvoice?: number, filterType?: string, filterDate?: string, filterSign?: string, filterUserId?: number, filterUsername?: string, filterDetails?: string, filterCurrencyCode?: string, size?: number, page?: number, order?: string, extraHttpRequestParams?: any): Observable<Response> {
+        const path = this.basePath + '/wallets/transactions';
 
-        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
-        if (filterInvoice !== undefined && filterInvoice !== null) {
-            queryParameters = queryParameters.set('filter_invoice', <any>filterInvoice);
-        }
-        if (filterType !== undefined && filterType !== null) {
-            queryParameters = queryParameters.set('filter_type', <any>filterType);
-        }
-        if (filterDate !== undefined && filterDate !== null) {
-            queryParameters = queryParameters.set('filter_date', <any>filterDate);
-        }
-        if (filterSign !== undefined && filterSign !== null) {
-            queryParameters = queryParameters.set('filter_sign', <any>filterSign);
-        }
-        if (filterUserId !== undefined && filterUserId !== null) {
-            queryParameters = queryParameters.set('filter_user_id', <any>filterUserId);
-        }
-        if (filterUsername !== undefined && filterUsername !== null) {
-            queryParameters = queryParameters.set('filter_username', <any>filterUsername);
-        }
-        if (filterDetails !== undefined && filterDetails !== null) {
-            queryParameters = queryParameters.set('filter_details', <any>filterDetails);
-        }
-        if (filterCurrencyCode !== undefined && filterCurrencyCode !== null) {
-            queryParameters = queryParameters.set('filter_currency_code', <any>filterCurrencyCode);
-        }
-        if (size !== undefined && size !== null) {
-            queryParameters = queryParameters.set('size', <any>size);
-        }
-        if (page !== undefined && page !== null) {
-            queryParameters = queryParameters.set('page', <any>page);
-        }
-        if (order !== undefined && order !== null) {
-            queryParameters = queryParameters.set('order', <any>order);
+        let queryParameters = new URLSearchParams();
+        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
+        if (filterInvoice !== undefined) {
+            queryParameters.set('filter_invoice', <any>filterInvoice);
         }
 
-        let headers = this.defaultHeaders;
+        if (filterType !== undefined) {
+            queryParameters.set('filter_type', <any>filterType);
+        }
+
+        if (filterDate !== undefined) {
+            queryParameters.set('filter_date', <any>filterDate);
+        }
+
+        if (filterSign !== undefined) {
+            queryParameters.set('filter_sign', <any>filterSign);
+        }
+
+        if (filterUserId !== undefined) {
+            queryParameters.set('filter_user_id', <any>filterUserId);
+        }
+
+        if (filterUsername !== undefined) {
+            queryParameters.set('filter_username', <any>filterUsername);
+        }
+
+        if (filterDetails !== undefined) {
+            queryParameters.set('filter_details', <any>filterDetails);
+        }
+
+        if (filterCurrencyCode !== undefined) {
+            queryParameters.set('filter_currency_code', <any>filterCurrencyCode);
+        }
+
+        if (size !== undefined) {
+            queryParameters.set('size', <any>size);
+        }
+
+        if (page !== undefined) {
+            queryParameters.set('page', <any>page);
+        }
+
+        if (order !== undefined) {
+            queryParameters.set('order', <any>order);
+        }
+
+
+        // to determine the Accept header
+        let produces: string[] = [
+            'application/json'
+        ];
 
         // authentication (oauth2_client_credentials_grant) required
+        // oauth required
         if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
+            let accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
+            headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
         // authentication (oauth2_password_grant) required
+        // oauth required
         if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
+            let accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
+            headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-        // to determine the Accept header
-        let httpHeaderAccepts: string[] = [
-            'application/json'
-        ];
-        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
-        if (httpHeaderAcceptSelected != undefined) {
-            headers = headers.set('Accept', httpHeaderAcceptSelected);
+            
+        let requestOptions: RequestOptionsArgs = new RequestOptions({
+            method: RequestMethod.Get,
+            headers: headers,
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
+        });
+        // https://github.com/swagger-api/swagger-codegen/issues/4037
+        if (extraHttpRequestParams) {
+            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
         }
 
-        // to determine the Content-Type header
-        const consumes: string[] = [
-        ];
-
-        return this.httpClient.get<PageResourceWalletTransactionResource>(`${this.basePath}/wallets/transactions`,
-            {
-                params: queryParameters,
-                withCredentials: this.configuration.withCredentials,
-                headers: headers,
-                observe: observe,
-                reportProgress: reportProgress
-            }
-        );
+        return this.http.request(path, requestOptions);
     }
 
     /**
@@ -426,65 +596,62 @@ export class PaymentsWalletsService {
      * @param size The number of objects returned per page
      * @param page The number of the page returned, starting with 1
      * @param order A comma separated list of sorting requirements in priority order, each entry matching PROPERTY_NAME:[ASC|DESC]
-     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-     * @param reportProgress flag to report request and response progress.
      */
-    public getWallets(size?: number, page?: number, order?: string, observe?: 'body', reportProgress?: boolean): Observable<PageResourceSimpleWallet>;
-    public getWallets(size?: number, page?: number, order?: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<PageResourceSimpleWallet>>;
-    public getWallets(size?: number, page?: number, order?: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<PageResourceSimpleWallet>>;
-    public getWallets(size?: number, page?: number, order?: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public getWalletsWithHttpInfo(size?: number, page?: number, order?: string, extraHttpRequestParams?: any): Observable<Response> {
+        const path = this.basePath + '/wallets';
 
-        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
-        if (size !== undefined && size !== null) {
-            queryParameters = queryParameters.set('size', <any>size);
-        }
-        if (page !== undefined && page !== null) {
-            queryParameters = queryParameters.set('page', <any>page);
-        }
-        if (order !== undefined && order !== null) {
-            queryParameters = queryParameters.set('order', <any>order);
+        let queryParameters = new URLSearchParams();
+        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
+        if (size !== undefined) {
+            queryParameters.set('size', <any>size);
         }
 
-        let headers = this.defaultHeaders;
+        if (page !== undefined) {
+            queryParameters.set('page', <any>page);
+        }
+
+        if (order !== undefined) {
+            queryParameters.set('order', <any>order);
+        }
+
+
+        // to determine the Accept header
+        let produces: string[] = [
+            'application/json'
+        ];
 
         // authentication (oauth2_client_credentials_grant) required
+        // oauth required
         if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
+            let accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
+            headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
         // authentication (oauth2_password_grant) required
+        // oauth required
         if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
+            let accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
+            headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-        // to determine the Accept header
-        let httpHeaderAccepts: string[] = [
-            'application/json'
-        ];
-        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
-        if (httpHeaderAcceptSelected != undefined) {
-            headers = headers.set('Accept', httpHeaderAcceptSelected);
+            
+        let requestOptions: RequestOptionsArgs = new RequestOptions({
+            method: RequestMethod.Get,
+            headers: headers,
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
+        });
+        // https://github.com/swagger-api/swagger-codegen/issues/4037
+        if (extraHttpRequestParams) {
+            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
         }
 
-        // to determine the Content-Type header
-        const consumes: string[] = [
-        ];
-
-        return this.httpClient.get<PageResourceSimpleWallet>(`${this.basePath}/wallets`,
-            {
-                params: queryParameters,
-                withCredentials: this.configuration.withCredentials,
-                headers: headers,
-                observe: observe,
-                reportProgress: reportProgress
-            }
-        );
+        return this.http.request(path, requestOptions);
     }
 
     /**
@@ -493,65 +660,63 @@ export class PaymentsWalletsService {
      * @param userId The ID of the user for whom wallet is being modified
      * @param currencyCode Currency code of the user&#39;s wallet
      * @param request The requested balance modification to be made to the user&#39;s wallet
-     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-     * @param reportProgress flag to report request and response progress.
      */
-    public updateWalletBalance(userId: number, currencyCode: string, request?: WalletAlterRequest, observe?: 'body', reportProgress?: boolean): Observable<WalletTransactionResource>;
-    public updateWalletBalance(userId: number, currencyCode: string, request?: WalletAlterRequest, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<WalletTransactionResource>>;
-    public updateWalletBalance(userId: number, currencyCode: string, request?: WalletAlterRequest, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<WalletTransactionResource>>;
-    public updateWalletBalance(userId: number, currencyCode: string, request?: WalletAlterRequest, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public updateWalletBalanceWithHttpInfo(userId: number, currencyCode: string, request?: WalletAlterRequest, extraHttpRequestParams?: any): Observable<Response> {
+        const path = this.basePath + '/users/${user_id}/wallets/${currency_code}/balance'
+                    .replace('${' + 'user_id' + '}', String(userId))
+                    .replace('${' + 'currency_code' + '}', String(currencyCode));
+
+        let queryParameters = new URLSearchParams();
+        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
+        // verify required parameter 'userId' is not null or undefined
         if (userId === null || userId === undefined) {
             throw new Error('Required parameter userId was null or undefined when calling updateWalletBalance.');
         }
+        // verify required parameter 'currencyCode' is not null or undefined
         if (currencyCode === null || currencyCode === undefined) {
             throw new Error('Required parameter currencyCode was null or undefined when calling updateWalletBalance.');
         }
 
-        let headers = this.defaultHeaders;
+        // to determine the Accept header
+        let produces: string[] = [
+            'application/json'
+        ];
 
         // authentication (oauth2_client_credentials_grant) required
+        // oauth required
         if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
+            let accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
+            headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
         // authentication (oauth2_password_grant) required
+        // oauth required
         if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
+            let accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
+            headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-        // to determine the Accept header
-        let httpHeaderAccepts: string[] = [
-            'application/json'
-        ];
-        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
-        if (httpHeaderAcceptSelected != undefined) {
-            headers = headers.set('Accept', httpHeaderAcceptSelected);
+            
+        headers.set('Content-Type', 'application/json');
+
+        let requestOptions: RequestOptionsArgs = new RequestOptions({
+            method: RequestMethod.Put,
+            headers: headers,
+            body: request == null ? '' : JSON.stringify(request), // https://github.com/angular/angular/issues/10612
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
+        });
+        // https://github.com/swagger-api/swagger-codegen/issues/4037
+        if (extraHttpRequestParams) {
+            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
         }
 
-        // to determine the Content-Type header
-        const consumes: string[] = [
-            'application/json'
-        ];
-        const httpContentTypeSelected: string | undefined = this.configuration.selectHeaderContentType(consumes);
-        if (httpContentTypeSelected != undefined) {
-            headers = headers.set('Content-Type', httpContentTypeSelected);
-        }
-
-        return this.httpClient.put<WalletTransactionResource>(`${this.basePath}/users/${encodeURIComponent(String(userId))}/wallets/${encodeURIComponent(String(currencyCode))}/balance`,
-            request,
-            {
-                withCredentials: this.configuration.withCredentials,
-                headers: headers,
-                observe: observe,
-                reportProgress: reportProgress
-            }
-        );
+        return this.http.request(path, requestOptions);
     }
 
 }

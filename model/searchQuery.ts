@@ -10,26 +10,33 @@
  * Do not edit the class manually.
  */
 
+import { InnerQuery } from './innerQuery';
 
-export interface SearchReferenceMapping { 
+
+export interface SearchQuery {
     /**
-     * Unique identifier for the mapping to protect against duplicates
+     * Index of the first result to be returned for pagination
      */
-    id: string;
+    from?: number;
+
     /**
-     * The field that will be replaced with the refType
+     * The query body
      */
-    newFieldName: string;
+    query: InnerQuery;
+
     /**
-     * The path to the id of the referenced resource (can be a field name, or dot notation for sub-fields)
+     * The maximum number of results to be returned for pagination
      */
-    refIdField: string;
+    size?: number;
+
     /**
-     * The index type that the mapping pulls data from
+     * Elasticsearch sort
      */
-    refType: string;
+    sort?: any;
+
     /**
-     * The index type that the mapping is for
+     * Elasticsearch source
      */
-    type: string;
+    source?: any;
+
 }

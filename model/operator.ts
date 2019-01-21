@@ -11,5 +11,6 @@
  */
 
 
-export interface Operator { 
+
+export interface Operator {
 }

@@ -9,26 +9,45 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
+
 import { Discount } from './discount';
 
 
-export interface CartLineItem { 
+export interface CartLineItem {
     currencyCode?: string;
+
     description?: string;
+
     discount?: Discount;
+
     lineTotal?: number;
+
     name?: string;
+
     originalLineTotal?: number;
+
     originalUnitPrice?: number;
+
     qty?: number;
+
     saleName?: string;
+
     sku?: string;
+
     skuDescription?: string;
+
     storeItemId?: number;
+
     tags?: Array<string>;
+
     thumbUrl?: string;
+
     uniqueKey?: string;
+
     unitPrice?: number;
+
     vendorId?: number;
+
     vendorName?: string;
+
 }

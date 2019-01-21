@@ -11,13 +11,16 @@
  */
 
 
-export interface SubscriptionPriceOverrideRequest { 
+
+export interface SubscriptionPriceOverrideRequest {
     /**
      * The recurring price that has been set to override the base price. Null if not overriding
      */
     newPrice?: number;
+
     /**
      * An explanation for the reason the price is being overridden
      */
     reason?: string;
+
 }

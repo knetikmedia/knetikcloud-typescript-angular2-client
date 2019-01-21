@@ -9,21 +9,24 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
+
 /* tslint:disable:no-unused-variable member-ordering */
 
 import { Inject, Injectable, Optional }                      from '@angular/core';
-import { HttpClient, HttpHeaders, HttpParams,
-         HttpResponse, HttpEvent }                           from '@angular/common/http';
-import { CustomHttpUrlEncodingCodec }                        from '../encoder';
+import { Http, Headers, URLSearchParams }                    from '@angular/http';
+import { RequestMethod, RequestOptions, RequestOptionsArgs } from '@angular/http';
+import { Response, ResponseContentType }                     from '@angular/http';
 
 import { Observable }                                        from 'rxjs/Observable';
+import '../rxjs-operators';
 
 import { AchievementDefinitionResource } from '../model/achievementDefinitionResource';
-import { BreTriggerResource } from '../model/breTriggerResource';
 import { IntWrapper } from '../model/intWrapper';
 import { PageResourceAchievementDefinitionResource } from '../model/pageResourceAchievementDefinitionResource';
+import { PageResourceBreTriggerResource } from '../model/pageResourceBreTriggerResource';
 import { PageResourceTemplateResource } from '../model/pageResourceTemplateResource';
 import { PageResourceUserAchievementGroupResource } from '../model/pageResourceUserAchievementGroupResource';
+import { PatchResource } from '../model/patchResource';
 import { Result } from '../model/result';
 import { TemplateResource } from '../model/templateResource';
 import { UserAchievementGroupResource } from '../model/userAchievementGroupResource';
@@ -35,18 +38,33 @@ import { Configuration }                                     from '../configurat
 @Injectable()
 export class GamificationAchievementsService {
 
-    protected basePath = 'https://jsapi-integration.us-east-1.elasticbeanstalk.com';
-    public defaultHeaders = new HttpHeaders();
-    public configuration = new Configuration();
+    protected basePath = 'https://devsandbox.knetikcloud.com';
+    public defaultHeaders: Headers = new Headers();
+    public configuration: Configuration = new Configuration();
 
-    constructor(protected httpClient: HttpClient, @Optional()@Inject(BASE_PATH) basePath: string, @Optional() configuration: Configuration) {
+    constructor(protected http: Http, @Optional()@Inject(BASE_PATH) basePath: string, @Optional() configuration: Configuration) {
         if (basePath) {
             this.basePath = basePath;
         }
         if (configuration) {
             this.configuration = configuration;
-            this.basePath = basePath || configuration.basePath || this.basePath;
+			this.basePath = basePath || configuration.basePath || this.basePath;
         }
+    }
+
+    /**
+     * 
+     * Extends object by coping non-existing properties.
+     * @param objA object to be extended
+     * @param objB source object
+     */
+    private extendObj<T1,T2>(objA: T1, objB: T2) {
+        for(let key in objB){
+            if(objB.hasOwnProperty(key)){
+                (objA as any)[key] = (objB as any)[key];
+            }
+        }
+        return <T1&T2>objA;
     }
 
     /**
@@ -55,7 +73,7 @@ export class GamificationAchievementsService {
      */
     private canConsumeForm(consumes: string[]): boolean {
         const form = 'multipart/form-data';
-        for (const consume of consumes) {
+        for (let consume of consumes) {
             if (form === consume) {
                 return true;
             }
@@ -63,473 +81,781 @@ export class GamificationAchievementsService {
         return false;
     }
 
+    /**
+     * If the definition contains a trigger event name, a BRE rule is created, so that tracking logic is executed when the triggering event occurs. If no trigger event name is specified, the user's achievement status must manually be updated via the API. <br><br><b>Permissions Needed:</b> ACHIEVEMENTS_ADMIN
+     * @summary Create a new achievement definition
+     * @param achievement The achievement definition
+     */
+    public createAchievement(achievement?: AchievementDefinitionResource, extraHttpRequestParams?: any): Observable<AchievementDefinitionResource> {
+        return this.createAchievementWithHttpInfo(achievement, extraHttpRequestParams)
+            .map((response: Response) => {
+                if (response.status === 204) {
+                    return undefined;
+                } else {
+                    return response.json() || {};
+                }
+            });
+    }
+
+    /**
+     * Achievement templates define a type of achievement and the properties they have.<br /><b>Permissions Needed:</b> POST
+     * @summary Create an achievement template
+     * @param template The achievement template to be created
+     */
+    public createAchievementTemplate(template?: TemplateResource, extraHttpRequestParams?: any): Observable<TemplateResource> {
+        return this.createAchievementTemplateWithHttpInfo(template, extraHttpRequestParams)
+            .map((response: Response) => {
+                if (response.status === 204) {
+                    return undefined;
+                } else {
+                    return response.json() || {};
+                }
+            });
+    }
+
+    /**
+     * Will also disable the associated generated rule, if any. <br><br><b>Permissions Needed:</b> ACHIEVEMENTS_ADMIN
+     * @summary Delete an achievement definition
+     * @param name The name of the achievement
+     */
+    public deleteAchievement(name: string, extraHttpRequestParams?: any): Observable<{}> {
+        return this.deleteAchievementWithHttpInfo(name, extraHttpRequestParams)
+            .map((response: Response) => {
+                if (response.status === 204) {
+                    return undefined;
+                } else {
+                    return response.json() || {};
+                }
+            });
+    }
+
+    /**
+     * If cascade = 'detach', it will force delete the template even if it's attached to other objects.<br /><b>Permissions Needed:</b> DELETE
+     * @summary Delete an achievement template
+     * @param id The id of the template
+     * @param cascade The value needed to delete used templates
+     */
+    public deleteAchievementTemplate(id: string, cascade?: string, extraHttpRequestParams?: any): Observable<{}> {
+        return this.deleteAchievementTemplateWithHttpInfo(id, cascade, extraHttpRequestParams)
+            .map((response: Response) => {
+                if (response.status === 204) {
+                    return undefined;
+                } else {
+                    return response.json() || {};
+                }
+            });
+    }
+
+    /**
+     * <b>Permissions Needed:</b> ACHIEVEMENTS_ADMIN or ACHIEVEMENTS_USER
+     * @summary Get a single achievement definition
+     * @param name The name of the achievement
+     */
+    public getAchievement(name: string, extraHttpRequestParams?: any): Observable<AchievementDefinitionResource> {
+        return this.getAchievementWithHttpInfo(name, extraHttpRequestParams)
+            .map((response: Response) => {
+                if (response.status === 204) {
+                    return undefined;
+                } else {
+                    return response.json() || {};
+                }
+            });
+    }
+
+    /**
+     * <b>Permissions Needed:</b> GET
+     * @summary Get a single achievement template
+     * @param id The id of the template
+     */
+    public getAchievementTemplate(id: string, extraHttpRequestParams?: any): Observable<TemplateResource> {
+        return this.getAchievementTemplateWithHttpInfo(id, extraHttpRequestParams)
+            .map((response: Response) => {
+                if (response.status === 204) {
+                    return undefined;
+                } else {
+                    return response.json() || {};
+                }
+            });
+    }
+
+    /**
+     * <b>Permissions Needed:</b> LIST
+     * @summary List and search achievement templates
+     * @param size The number of objects returned per page
+     * @param page The number of the page returned, starting with 1
+     * @param order A comma separated list of sorting requirements in priority order, each entry matching PROPERTY_NAME:[ASC|DESC]
+     */
+    public getAchievementTemplates(size?: number, page?: number, order?: string, extraHttpRequestParams?: any): Observable<PageResourceTemplateResource> {
+        return this.getAchievementTemplatesWithHttpInfo(size, page, order, extraHttpRequestParams)
+            .map((response: Response) => {
+                if (response.status === 204) {
+                    return undefined;
+                } else {
+                    return response.json() || {};
+                }
+            });
+    }
+
+    /**
+     * <b>Permissions Needed:</b> ACHIEVEMENTS_ADMIN
+     * @summary Get the list of triggers that can be used to trigger an achievement progress update
+     * @param size The number of objects returned per page
+     * @param page The number of the page returned, starting with 1
+     */
+    public getAchievementTriggers(size?: number, page?: number, extraHttpRequestParams?: any): Observable<PageResourceBreTriggerResource> {
+        return this.getAchievementTriggersWithHttpInfo(size, page, extraHttpRequestParams)
+            .map((response: Response) => {
+                if (response.status === 204) {
+                    return undefined;
+                } else {
+                    return response.json() || {};
+                }
+            });
+    }
+
+    /**
+     * <b>Permissions Needed:</b> ACHIEVEMENTS_ADMIN or ACHIEVEMENTS_USER
+     * @summary Get all achievement definitions in the system
+     * @param filterTagset Filter for achievements with specified tags (separated by comma)
+     * @param filterName Filter for achievements whose name contains a string
+     * @param filterHidden Filter for achievements that are hidden or not
+     * @param size The number of objects returned per page
+     * @param page The number of the page returned, starting with 1
+     * @param order A comma separated list of sorting requirements in priority order, each entry matching PROPERTY_NAME:[ASC|DESC]
+     * @param filterDerived Filter for achievements that are derived from other services
+     */
+    public getAchievements(filterTagset?: string, filterName?: string, filterHidden?: boolean, size?: number, page?: number, order?: string, filterDerived?: boolean, extraHttpRequestParams?: any): Observable<PageResourceAchievementDefinitionResource> {
+        return this.getAchievementsWithHttpInfo(filterTagset, filterName, filterHidden, size, page, order, filterDerived, extraHttpRequestParams)
+            .map((response: Response) => {
+                if (response.status === 204) {
+                    return undefined;
+                } else {
+                    return response.json() || {};
+                }
+            });
+    }
+
+    /**
+     * Used by other services that depend on achievements.  <br><br><b>Permissions Needed:</b> ACHIEVEMENTS_ADMIN
+     * @summary Get a list of derived achievements
+     * @param name The name of the derived achievement
+     * @param size The number of objects returned per page
+     * @param page The number of the page returned, starting with 1
+     */
+    public getDerivedAchievements(name: string, size?: number, page?: number, extraHttpRequestParams?: any): Observable<PageResourceAchievementDefinitionResource> {
+        return this.getDerivedAchievementsWithHttpInfo(name, size, page, extraHttpRequestParams)
+            .map((response: Response) => {
+                if (response.status === 204) {
+                    return undefined;
+                } else {
+                    return response.json() || {};
+                }
+            });
+    }
+
+    /**
+     * Assets will not be filled in on the resources returned. Use 'Get a single poll' to retrieve the full resource with assets for a given item as needed. <br><br><b>Permissions Needed:</b> ACHIEVEMENTS_ADMIN
+     * @summary Retrieve progress on a given achievement for a given user
+     * @param userId The user&#39;s id
+     * @param achievementName The achievement&#39;s name
+     */
+    public getUserAchievementProgress(userId: number, achievementName: string, extraHttpRequestParams?: any): Observable<UserAchievementGroupResource> {
+        return this.getUserAchievementProgressWithHttpInfo(userId, achievementName, extraHttpRequestParams)
+            .map((response: Response) => {
+                if (response.status === 204) {
+                    return undefined;
+                } else {
+                    return response.json() || {};
+                }
+            });
+    }
+
+    /**
+     * Assets will not be filled in on the resources returned. Use 'Get a single poll' to retrieve the full resource with assets for a given item as needed. <br><br><b>Permissions Needed:</b> ACHIEVEMENTS_ADMIN
+     * @summary Retrieve progress on achievements for a given user
+     * @param userId The user&#39;s id
+     * @param filterAchievementDerived Filter for achievements that are derived from other services
+     * @param filterAchievementTagset Filter for achievements with specified tags (separated by comma)
+     * @param filterGroupName Filter for achievements whose group/level name contains a string
+     * @param size The number of objects returned per page
+     * @param page The number of the page returned, starting with 1
+     */
+    public getUserAchievementsProgress(userId: number, filterAchievementDerived?: boolean, filterAchievementTagset?: string, filterGroupName?: string, size?: number, page?: number, extraHttpRequestParams?: any): Observable<PageResourceUserAchievementGroupResource> {
+        return this.getUserAchievementsProgressWithHttpInfo(userId, filterAchievementDerived, filterAchievementTagset, filterGroupName, size, page, extraHttpRequestParams)
+            .map((response: Response) => {
+                if (response.status === 204) {
+                    return undefined;
+                } else {
+                    return response.json() || {};
+                }
+            });
+    }
+
+    /**
+     * Assets will not be filled in on the resources returned. Use 'Get single achievement progress for user' to retrieve the full resource with assets for a given user as needed. <br><br><b>Permissions Needed:</b> ACHIEVEMENTS_ADMIN<br /><b>Permissions Needed:</b> NONE
+     * @summary Retrieve progress on a given achievement for all users
+     * @param achievementName The achievement&#39;s name
+     * @param filterAchievementDerived Filter for achievements that are derived from other services
+     * @param filterAchievementTagset Filter for achievements with specified tags (separated by comma)
+     * @param filterGroupName Filter for achievements whose group/level name contains a string
+     * @param size The number of objects returned per page
+     * @param page The number of the page returned, starting with 1
+     */
+    public getUsersAchievementProgress(achievementName: string, filterAchievementDerived?: boolean, filterAchievementTagset?: string, filterGroupName?: string, size?: number, page?: number, extraHttpRequestParams?: any): Observable<PageResourceUserAchievementGroupResource> {
+        return this.getUsersAchievementProgressWithHttpInfo(achievementName, filterAchievementDerived, filterAchievementTagset, filterGroupName, size, page, extraHttpRequestParams)
+            .map((response: Response) => {
+                if (response.status === 204) {
+                    return undefined;
+                } else {
+                    return response.json() || {};
+                }
+            });
+    }
+
+    /**
+     * Assets will not be filled in on the resources returned. Use 'Get single achievement progress for user' to retrieve the full resource with assets for a given user as needed. <br><br><b>Permissions Needed:</b> ACHIEVEMENTS_ADMIN<br /><b>Permissions Needed:</b> LIST
+     * @summary Retrieve progress on achievements for all users
+     * @param filterAchievementDerived Filter for achievements that are derived from other services
+     * @param filterAchievementTagset Filter for achievements with specified tags (separated by comma)
+     * @param filterGroupName Filter for achievements whose group/level name contains a string
+     * @param size The number of objects returned per page
+     * @param page The number of the page returned, starting with 1
+     */
+    public getUsersAchievementsProgress(filterAchievementDerived?: boolean, filterAchievementTagset?: string, filterGroupName?: string, size?: number, page?: number, extraHttpRequestParams?: any): Observable<PageResourceUserAchievementGroupResource> {
+        return this.getUsersAchievementsProgressWithHttpInfo(filterAchievementDerived, filterAchievementTagset, filterGroupName, size, page, extraHttpRequestParams)
+            .map((response: Response) => {
+                if (response.status === 204) {
+                    return undefined;
+                } else {
+                    return response.json() || {};
+                }
+            });
+    }
+
+    /**
+     * If no progress record yet exists for the user, it will be created. Otherwise it will be updated and the provided value added to the existing progress. May be negative. If progress meets or exceeds the achievement's max_value it will be marked as earned and a BRE event will be triggered for the <code>BreAchievementEarnedTrigger</code>. <br><br><b>Permissions Needed:</b> ACHIEVEMENTS_ADMIN
+     * @summary Increment an achievement progress record for a user
+     * @param userId The user&#39;s id
+     * @param achievementName The achievement&#39;s name
+     * @param progress The amount to add to the progress value
+     */
+    public incrementAchievementProgress(userId: number, achievementName: string, progress?: IntWrapper, extraHttpRequestParams?: any): Observable<UserAchievementGroupResource> {
+        return this.incrementAchievementProgressWithHttpInfo(userId, achievementName, progress, extraHttpRequestParams)
+            .map((response: Response) => {
+                if (response.status === 204) {
+                    return undefined;
+                } else {
+                    return response.json() || {};
+                }
+            });
+    }
+
+    /**
+     * If no progress record yet exists for the user, it will be created. Otherwise it will be updated and progress set to the provided value. If progress meets or exceeds the achievement's max_value it will be marked as earned and a BRE event will be triggered for the <code>BreAchievementEarnedTrigger</code>. <br><br><b>Permissions Needed:</b> ACHIEVEMENTS_ADMIN
+     * @summary Set an achievement progress record for a user
+     * @param userId The user&#39;s id
+     * @param achievementName The achievement&#39;s name
+     * @param progress The new progress value
+     */
+    public setAchievementProgress(userId: number, achievementName: string, progress?: IntWrapper, extraHttpRequestParams?: any): Observable<UserAchievementGroupResource> {
+        return this.setAchievementProgressWithHttpInfo(userId, achievementName, progress, extraHttpRequestParams)
+            .map((response: Response) => {
+                if (response.status === 204) {
+                    return undefined;
+                } else {
+                    return response.json() || {};
+                }
+            });
+    }
+
+    /**
+     * The existing generated rule, if any, will be deleted. A new rule will be created if a trigger event name is specified in the new version. <br><br><b>Permissions Needed:</b> ACHIEVEMENTS_ADMIN
+     * @summary Update an achievement definition
+     * @param name The name of the achievement
+     * @param achievement The achievement definition
+     */
+    public updateAchievement(name: string, achievement?: AchievementDefinitionResource, extraHttpRequestParams?: any): Observable<AchievementDefinitionResource> {
+        return this.updateAchievementWithHttpInfo(name, achievement, extraHttpRequestParams)
+            .map((response: Response) => {
+                if (response.status === 204) {
+                    return undefined;
+                } else {
+                    return response.json() || {};
+                }
+            });
+    }
+
+    /**
+     * <b>Permissions Needed:</b> PUT
+     * @summary Update an achievement template
+     * @param id The id of the template
+     * @param templatePatchResource The patch resource object
+     * @param testValidation If true, this will test validation but not submit the patch request
+     */
+    public updateAchievementTemplate(id: string, templatePatchResource?: PatchResource, testValidation?: boolean, extraHttpRequestParams?: any): Observable<TemplateResource> {
+        return this.updateAchievementTemplateWithHttpInfo(id, templatePatchResource, testValidation, extraHttpRequestParams)
+            .map((response: Response) => {
+                if (response.status === 204) {
+                    return undefined;
+                } else {
+                    return response.json() || {};
+                }
+            });
+    }
+
 
     /**
      * Create a new achievement definition
      * If the definition contains a trigger event name, a BRE rule is created, so that tracking logic is executed when the triggering event occurs. If no trigger event name is specified, the user&#39;s achievement status must manually be updated via the API. &lt;br&gt;&lt;br&gt;&lt;b&gt;Permissions Needed:&lt;/b&gt; ACHIEVEMENTS_ADMIN
      * @param achievement The achievement definition
-     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-     * @param reportProgress flag to report request and response progress.
      */
-    public createAchievement(achievement?: AchievementDefinitionResource, observe?: 'body', reportProgress?: boolean): Observable<AchievementDefinitionResource>;
-    public createAchievement(achievement?: AchievementDefinitionResource, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<AchievementDefinitionResource>>;
-    public createAchievement(achievement?: AchievementDefinitionResource, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<AchievementDefinitionResource>>;
-    public createAchievement(achievement?: AchievementDefinitionResource, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public createAchievementWithHttpInfo(achievement?: AchievementDefinitionResource, extraHttpRequestParams?: any): Observable<Response> {
+        const path = this.basePath + '/achievements';
 
-        let headers = this.defaultHeaders;
+        let queryParameters = new URLSearchParams();
+        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
+
+        // to determine the Accept header
+        let produces: string[] = [
+            'application/json'
+        ];
 
         // authentication (oauth2_client_credentials_grant) required
+        // oauth required
         if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
+            let accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
+            headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
         // authentication (oauth2_password_grant) required
+        // oauth required
         if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
+            let accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
+            headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-        // to determine the Accept header
-        let httpHeaderAccepts: string[] = [
-            'application/json'
-        ];
-        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
-        if (httpHeaderAcceptSelected != undefined) {
-            headers = headers.set('Accept', httpHeaderAcceptSelected);
+            
+        headers.set('Content-Type', 'application/json');
+
+        let requestOptions: RequestOptionsArgs = new RequestOptions({
+            method: RequestMethod.Post,
+            headers: headers,
+            body: achievement == null ? '' : JSON.stringify(achievement), // https://github.com/angular/angular/issues/10612
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
+        });
+        // https://github.com/swagger-api/swagger-codegen/issues/4037
+        if (extraHttpRequestParams) {
+            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
         }
 
-        // to determine the Content-Type header
-        const consumes: string[] = [
-            'application/json'
-        ];
-        const httpContentTypeSelected: string | undefined = this.configuration.selectHeaderContentType(consumes);
-        if (httpContentTypeSelected != undefined) {
-            headers = headers.set('Content-Type', httpContentTypeSelected);
-        }
-
-        return this.httpClient.post<AchievementDefinitionResource>(`${this.basePath}/achievements`,
-            achievement,
-            {
-                withCredentials: this.configuration.withCredentials,
-                headers: headers,
-                observe: observe,
-                reportProgress: reportProgress
-            }
-        );
+        return this.http.request(path, requestOptions);
     }
 
     /**
      * Create an achievement template
-     * Achievement templates define a type of achievement and the properties they have. &lt;br&gt;&lt;br&gt;&lt;b&gt;Permissions Needed:&lt;/b&gt; TEMPLATE_ADMIN
+     * Achievement templates define a type of achievement and the properties they have.&lt;br /&gt;&lt;b&gt;Permissions Needed:&lt;/b&gt; POST
      * @param template The achievement template to be created
-     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-     * @param reportProgress flag to report request and response progress.
      */
-    public createAchievementTemplate(template?: TemplateResource, observe?: 'body', reportProgress?: boolean): Observable<TemplateResource>;
-    public createAchievementTemplate(template?: TemplateResource, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<TemplateResource>>;
-    public createAchievementTemplate(template?: TemplateResource, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<TemplateResource>>;
-    public createAchievementTemplate(template?: TemplateResource, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public createAchievementTemplateWithHttpInfo(template?: TemplateResource, extraHttpRequestParams?: any): Observable<Response> {
+        const path = this.basePath + '/achievements/templates';
 
-        let headers = this.defaultHeaders;
+        let queryParameters = new URLSearchParams();
+        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
+
+        // to determine the Accept header
+        let produces: string[] = [
+            'application/json'
+        ];
 
         // authentication (oauth2_client_credentials_grant) required
+        // oauth required
         if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
+            let accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
+            headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
         // authentication (oauth2_password_grant) required
+        // oauth required
         if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
+            let accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
+            headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-        // to determine the Accept header
-        let httpHeaderAccepts: string[] = [
-            'application/json'
-        ];
-        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
-        if (httpHeaderAcceptSelected != undefined) {
-            headers = headers.set('Accept', httpHeaderAcceptSelected);
+            
+        headers.set('Content-Type', 'application/json');
+
+        let requestOptions: RequestOptionsArgs = new RequestOptions({
+            method: RequestMethod.Post,
+            headers: headers,
+            body: template == null ? '' : JSON.stringify(template), // https://github.com/angular/angular/issues/10612
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
+        });
+        // https://github.com/swagger-api/swagger-codegen/issues/4037
+        if (extraHttpRequestParams) {
+            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
         }
 
-        // to determine the Content-Type header
-        const consumes: string[] = [
-            'application/json'
-        ];
-        const httpContentTypeSelected: string | undefined = this.configuration.selectHeaderContentType(consumes);
-        if (httpContentTypeSelected != undefined) {
-            headers = headers.set('Content-Type', httpContentTypeSelected);
-        }
-
-        return this.httpClient.post<TemplateResource>(`${this.basePath}/achievements/templates`,
-            template,
-            {
-                withCredentials: this.configuration.withCredentials,
-                headers: headers,
-                observe: observe,
-                reportProgress: reportProgress
-            }
-        );
+        return this.http.request(path, requestOptions);
     }
 
     /**
      * Delete an achievement definition
      * Will also disable the associated generated rule, if any. &lt;br&gt;&lt;br&gt;&lt;b&gt;Permissions Needed:&lt;/b&gt; ACHIEVEMENTS_ADMIN
      * @param name The name of the achievement
-     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-     * @param reportProgress flag to report request and response progress.
      */
-    public deleteAchievement(name: string, observe?: 'body', reportProgress?: boolean): Observable<any>;
-    public deleteAchievement(name: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
-    public deleteAchievement(name: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
-    public deleteAchievement(name: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public deleteAchievementWithHttpInfo(name: string, extraHttpRequestParams?: any): Observable<Response> {
+        const path = this.basePath + '/achievements/${name}'
+                    .replace('${' + 'name' + '}', String(name));
+
+        let queryParameters = new URLSearchParams();
+        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
+        // verify required parameter 'name' is not null or undefined
         if (name === null || name === undefined) {
             throw new Error('Required parameter name was null or undefined when calling deleteAchievement.');
         }
 
-        let headers = this.defaultHeaders;
+        // to determine the Accept header
+        let produces: string[] = [
+            'application/json'
+        ];
 
         // authentication (oauth2_client_credentials_grant) required
+        // oauth required
         if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
+            let accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
+            headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
         // authentication (oauth2_password_grant) required
+        // oauth required
         if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
+            let accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
+            headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-        // to determine the Accept header
-        let httpHeaderAccepts: string[] = [
-            'application/json'
-        ];
-        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
-        if (httpHeaderAcceptSelected != undefined) {
-            headers = headers.set('Accept', httpHeaderAcceptSelected);
+            
+        let requestOptions: RequestOptionsArgs = new RequestOptions({
+            method: RequestMethod.Delete,
+            headers: headers,
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
+        });
+        // https://github.com/swagger-api/swagger-codegen/issues/4037
+        if (extraHttpRequestParams) {
+            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
         }
 
-        // to determine the Content-Type header
-        const consumes: string[] = [
-        ];
-
-        return this.httpClient.delete<any>(`${this.basePath}/achievements/${encodeURIComponent(String(name))}`,
-            {
-                withCredentials: this.configuration.withCredentials,
-                headers: headers,
-                observe: observe,
-                reportProgress: reportProgress
-            }
-        );
+        return this.http.request(path, requestOptions);
     }
 
     /**
      * Delete an achievement template
-     * If cascade &#x3D; &#39;detach&#39;, it will force delete the template even if it&#39;s attached to other objects. &lt;br&gt;&lt;br&gt;&lt;b&gt;Permissions Needed:&lt;/b&gt; TEMPLATE_ADMIN
+     * If cascade &#x3D; &#39;detach&#39;, it will force delete the template even if it&#39;s attached to other objects.&lt;br /&gt;&lt;b&gt;Permissions Needed:&lt;/b&gt; DELETE
      * @param id The id of the template
      * @param cascade The value needed to delete used templates
-     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-     * @param reportProgress flag to report request and response progress.
      */
-    public deleteAchievementTemplate(id: string, cascade?: string, observe?: 'body', reportProgress?: boolean): Observable<any>;
-    public deleteAchievementTemplate(id: string, cascade?: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
-    public deleteAchievementTemplate(id: string, cascade?: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
-    public deleteAchievementTemplate(id: string, cascade?: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public deleteAchievementTemplateWithHttpInfo(id: string, cascade?: string, extraHttpRequestParams?: any): Observable<Response> {
+        const path = this.basePath + '/achievements/templates/${id}'
+                    .replace('${' + 'id' + '}', String(id));
+
+        let queryParameters = new URLSearchParams();
+        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
+        // verify required parameter 'id' is not null or undefined
         if (id === null || id === undefined) {
             throw new Error('Required parameter id was null or undefined when calling deleteAchievementTemplate.');
         }
-
-        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
-        if (cascade !== undefined && cascade !== null) {
-            queryParameters = queryParameters.set('cascade', <any>cascade);
+        if (cascade !== undefined) {
+            queryParameters.set('cascade', <any>cascade);
         }
 
-        let headers = this.defaultHeaders;
+
+        // to determine the Accept header
+        let produces: string[] = [
+            'application/json'
+        ];
 
         // authentication (oauth2_client_credentials_grant) required
+        // oauth required
         if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
+            let accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
+            headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
         // authentication (oauth2_password_grant) required
+        // oauth required
         if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
+            let accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
+            headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-        // to determine the Accept header
-        let httpHeaderAccepts: string[] = [
-            'application/json'
-        ];
-        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
-        if (httpHeaderAcceptSelected != undefined) {
-            headers = headers.set('Accept', httpHeaderAcceptSelected);
+            
+        let requestOptions: RequestOptionsArgs = new RequestOptions({
+            method: RequestMethod.Delete,
+            headers: headers,
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
+        });
+        // https://github.com/swagger-api/swagger-codegen/issues/4037
+        if (extraHttpRequestParams) {
+            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
         }
 
-        // to determine the Content-Type header
-        const consumes: string[] = [
-        ];
-
-        return this.httpClient.delete<any>(`${this.basePath}/achievements/templates/${encodeURIComponent(String(id))}`,
-            {
-                params: queryParameters,
-                withCredentials: this.configuration.withCredentials,
-                headers: headers,
-                observe: observe,
-                reportProgress: reportProgress
-            }
-        );
+        return this.http.request(path, requestOptions);
     }
 
     /**
      * Get a single achievement definition
      * &lt;b&gt;Permissions Needed:&lt;/b&gt; ACHIEVEMENTS_ADMIN or ACHIEVEMENTS_USER
      * @param name The name of the achievement
-     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-     * @param reportProgress flag to report request and response progress.
      */
-    public getAchievement(name: string, observe?: 'body', reportProgress?: boolean): Observable<AchievementDefinitionResource>;
-    public getAchievement(name: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<AchievementDefinitionResource>>;
-    public getAchievement(name: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<AchievementDefinitionResource>>;
-    public getAchievement(name: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public getAchievementWithHttpInfo(name: string, extraHttpRequestParams?: any): Observable<Response> {
+        const path = this.basePath + '/achievements/${name}'
+                    .replace('${' + 'name' + '}', String(name));
+
+        let queryParameters = new URLSearchParams();
+        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
+        // verify required parameter 'name' is not null or undefined
         if (name === null || name === undefined) {
             throw new Error('Required parameter name was null or undefined when calling getAchievement.');
         }
 
-        let headers = this.defaultHeaders;
+        // to determine the Accept header
+        let produces: string[] = [
+            'application/json'
+        ];
 
         // authentication (oauth2_client_credentials_grant) required
+        // oauth required
         if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
+            let accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
+            headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
         // authentication (oauth2_password_grant) required
+        // oauth required
         if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
+            let accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
+            headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-        // to determine the Accept header
-        let httpHeaderAccepts: string[] = [
-            'application/json'
-        ];
-        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
-        if (httpHeaderAcceptSelected != undefined) {
-            headers = headers.set('Accept', httpHeaderAcceptSelected);
+            
+        let requestOptions: RequestOptionsArgs = new RequestOptions({
+            method: RequestMethod.Get,
+            headers: headers,
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
+        });
+        // https://github.com/swagger-api/swagger-codegen/issues/4037
+        if (extraHttpRequestParams) {
+            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
         }
 
-        // to determine the Content-Type header
-        const consumes: string[] = [
-        ];
-
-        return this.httpClient.get<AchievementDefinitionResource>(`${this.basePath}/achievements/${encodeURIComponent(String(name))}`,
-            {
-                withCredentials: this.configuration.withCredentials,
-                headers: headers,
-                observe: observe,
-                reportProgress: reportProgress
-            }
-        );
+        return this.http.request(path, requestOptions);
     }
 
     /**
      * Get a single achievement template
-     * &lt;b&gt;Permissions Needed:&lt;/b&gt; TEMPLATE_ADMIN or ACHIEVEMENTS_ADMIN
+     * &lt;b&gt;Permissions Needed:&lt;/b&gt; GET
      * @param id The id of the template
-     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-     * @param reportProgress flag to report request and response progress.
      */
-    public getAchievementTemplate(id: string, observe?: 'body', reportProgress?: boolean): Observable<TemplateResource>;
-    public getAchievementTemplate(id: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<TemplateResource>>;
-    public getAchievementTemplate(id: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<TemplateResource>>;
-    public getAchievementTemplate(id: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public getAchievementTemplateWithHttpInfo(id: string, extraHttpRequestParams?: any): Observable<Response> {
+        const path = this.basePath + '/achievements/templates/${id}'
+                    .replace('${' + 'id' + '}', String(id));
+
+        let queryParameters = new URLSearchParams();
+        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
+        // verify required parameter 'id' is not null or undefined
         if (id === null || id === undefined) {
             throw new Error('Required parameter id was null or undefined when calling getAchievementTemplate.');
         }
 
-        let headers = this.defaultHeaders;
+        // to determine the Accept header
+        let produces: string[] = [
+            'application/json'
+        ];
 
         // authentication (oauth2_client_credentials_grant) required
+        // oauth required
         if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
+            let accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
+            headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
         // authentication (oauth2_password_grant) required
+        // oauth required
         if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
+            let accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
+            headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-        // to determine the Accept header
-        let httpHeaderAccepts: string[] = [
-            'application/json'
-        ];
-        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
-        if (httpHeaderAcceptSelected != undefined) {
-            headers = headers.set('Accept', httpHeaderAcceptSelected);
+            
+        let requestOptions: RequestOptionsArgs = new RequestOptions({
+            method: RequestMethod.Get,
+            headers: headers,
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
+        });
+        // https://github.com/swagger-api/swagger-codegen/issues/4037
+        if (extraHttpRequestParams) {
+            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
         }
 
-        // to determine the Content-Type header
-        const consumes: string[] = [
-        ];
-
-        return this.httpClient.get<TemplateResource>(`${this.basePath}/achievements/templates/${encodeURIComponent(String(id))}`,
-            {
-                withCredentials: this.configuration.withCredentials,
-                headers: headers,
-                observe: observe,
-                reportProgress: reportProgress
-            }
-        );
+        return this.http.request(path, requestOptions);
     }
 
     /**
      * List and search achievement templates
-     * &lt;b&gt;Permissions Needed:&lt;/b&gt; TEMPLATE_ADMIN or ACHIEVEMENTS_ADMIN
+     * &lt;b&gt;Permissions Needed:&lt;/b&gt; LIST
      * @param size The number of objects returned per page
      * @param page The number of the page returned, starting with 1
      * @param order A comma separated list of sorting requirements in priority order, each entry matching PROPERTY_NAME:[ASC|DESC]
-     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-     * @param reportProgress flag to report request and response progress.
      */
-    public getAchievementTemplates(size?: number, page?: number, order?: string, observe?: 'body', reportProgress?: boolean): Observable<PageResourceTemplateResource>;
-    public getAchievementTemplates(size?: number, page?: number, order?: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<PageResourceTemplateResource>>;
-    public getAchievementTemplates(size?: number, page?: number, order?: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<PageResourceTemplateResource>>;
-    public getAchievementTemplates(size?: number, page?: number, order?: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public getAchievementTemplatesWithHttpInfo(size?: number, page?: number, order?: string, extraHttpRequestParams?: any): Observable<Response> {
+        const path = this.basePath + '/achievements/templates';
 
-        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
-        if (size !== undefined && size !== null) {
-            queryParameters = queryParameters.set('size', <any>size);
-        }
-        if (page !== undefined && page !== null) {
-            queryParameters = queryParameters.set('page', <any>page);
-        }
-        if (order !== undefined && order !== null) {
-            queryParameters = queryParameters.set('order', <any>order);
+        let queryParameters = new URLSearchParams();
+        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
+        if (size !== undefined) {
+            queryParameters.set('size', <any>size);
         }
 
-        let headers = this.defaultHeaders;
+        if (page !== undefined) {
+            queryParameters.set('page', <any>page);
+        }
+
+        if (order !== undefined) {
+            queryParameters.set('order', <any>order);
+        }
+
+
+        // to determine the Accept header
+        let produces: string[] = [
+            'application/json'
+        ];
 
         // authentication (oauth2_client_credentials_grant) required
+        // oauth required
         if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
+            let accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
+            headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
         // authentication (oauth2_password_grant) required
+        // oauth required
         if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
+            let accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
+            headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-        // to determine the Accept header
-        let httpHeaderAccepts: string[] = [
-            'application/json'
-        ];
-        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
-        if (httpHeaderAcceptSelected != undefined) {
-            headers = headers.set('Accept', httpHeaderAcceptSelected);
+            
+        let requestOptions: RequestOptionsArgs = new RequestOptions({
+            method: RequestMethod.Get,
+            headers: headers,
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
+        });
+        // https://github.com/swagger-api/swagger-codegen/issues/4037
+        if (extraHttpRequestParams) {
+            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
         }
 
-        // to determine the Content-Type header
-        const consumes: string[] = [
-        ];
-
-        return this.httpClient.get<PageResourceTemplateResource>(`${this.basePath}/achievements/templates`,
-            {
-                params: queryParameters,
-                withCredentials: this.configuration.withCredentials,
-                headers: headers,
-                observe: observe,
-                reportProgress: reportProgress
-            }
-        );
+        return this.http.request(path, requestOptions);
     }
 
     /**
      * Get the list of triggers that can be used to trigger an achievement progress update
      * &lt;b&gt;Permissions Needed:&lt;/b&gt; ACHIEVEMENTS_ADMIN
-     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-     * @param reportProgress flag to report request and response progress.
+     * @param size The number of objects returned per page
+     * @param page The number of the page returned, starting with 1
      */
-    public getAchievementTriggers(observe?: 'body', reportProgress?: boolean): Observable<Array<BreTriggerResource>>;
-    public getAchievementTriggers(observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Array<BreTriggerResource>>>;
-    public getAchievementTriggers(observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Array<BreTriggerResource>>>;
-    public getAchievementTriggers(observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public getAchievementTriggersWithHttpInfo(size?: number, page?: number, extraHttpRequestParams?: any): Observable<Response> {
+        const path = this.basePath + '/achievements/triggers';
 
-        let headers = this.defaultHeaders;
+        let queryParameters = new URLSearchParams();
+        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
+        if (size !== undefined) {
+            queryParameters.set('size', <any>size);
+        }
+
+        if (page !== undefined) {
+            queryParameters.set('page', <any>page);
+        }
+
+
+        // to determine the Accept header
+        let produces: string[] = [
+            'application/json'
+        ];
 
         // authentication (oauth2_client_credentials_grant) required
+        // oauth required
         if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
+            let accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
+            headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
         // authentication (oauth2_password_grant) required
+        // oauth required
         if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
+            let accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
+            headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-        // to determine the Accept header
-        let httpHeaderAccepts: string[] = [
-            'application/json'
-        ];
-        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
-        if (httpHeaderAcceptSelected != undefined) {
-            headers = headers.set('Accept', httpHeaderAcceptSelected);
+            
+        let requestOptions: RequestOptionsArgs = new RequestOptions({
+            method: RequestMethod.Get,
+            headers: headers,
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
+        });
+        // https://github.com/swagger-api/swagger-codegen/issues/4037
+        if (extraHttpRequestParams) {
+            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
         }
 
-        // to determine the Content-Type header
-        const consumes: string[] = [
-        ];
-
-        return this.httpClient.get<Array<BreTriggerResource>>(`${this.basePath}/achievements/triggers`,
-            {
-                withCredentials: this.configuration.withCredentials,
-                headers: headers,
-                observe: observe,
-                reportProgress: reportProgress
-            }
-        );
+        return this.http.request(path, requestOptions);
     }
 
     /**
@@ -542,133 +868,143 @@ export class GamificationAchievementsService {
      * @param page The number of the page returned, starting with 1
      * @param order A comma separated list of sorting requirements in priority order, each entry matching PROPERTY_NAME:[ASC|DESC]
      * @param filterDerived Filter for achievements that are derived from other services
-     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-     * @param reportProgress flag to report request and response progress.
      */
-    public getAchievements(filterTagset?: string, filterName?: string, filterHidden?: boolean, size?: number, page?: number, order?: string, filterDerived?: boolean, observe?: 'body', reportProgress?: boolean): Observable<PageResourceAchievementDefinitionResource>;
-    public getAchievements(filterTagset?: string, filterName?: string, filterHidden?: boolean, size?: number, page?: number, order?: string, filterDerived?: boolean, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<PageResourceAchievementDefinitionResource>>;
-    public getAchievements(filterTagset?: string, filterName?: string, filterHidden?: boolean, size?: number, page?: number, order?: string, filterDerived?: boolean, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<PageResourceAchievementDefinitionResource>>;
-    public getAchievements(filterTagset?: string, filterName?: string, filterHidden?: boolean, size?: number, page?: number, order?: string, filterDerived?: boolean, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public getAchievementsWithHttpInfo(filterTagset?: string, filterName?: string, filterHidden?: boolean, size?: number, page?: number, order?: string, filterDerived?: boolean, extraHttpRequestParams?: any): Observable<Response> {
+        const path = this.basePath + '/achievements';
 
-        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
-        if (filterTagset !== undefined && filterTagset !== null) {
-            queryParameters = queryParameters.set('filter_tagset', <any>filterTagset);
-        }
-        if (filterName !== undefined && filterName !== null) {
-            queryParameters = queryParameters.set('filter_name', <any>filterName);
-        }
-        if (filterHidden !== undefined && filterHidden !== null) {
-            queryParameters = queryParameters.set('filter_hidden', <any>filterHidden);
-        }
-        if (size !== undefined && size !== null) {
-            queryParameters = queryParameters.set('size', <any>size);
-        }
-        if (page !== undefined && page !== null) {
-            queryParameters = queryParameters.set('page', <any>page);
-        }
-        if (order !== undefined && order !== null) {
-            queryParameters = queryParameters.set('order', <any>order);
-        }
-        if (filterDerived !== undefined && filterDerived !== null) {
-            queryParameters = queryParameters.set('filter_derived', <any>filterDerived);
+        let queryParameters = new URLSearchParams();
+        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
+        if (filterTagset !== undefined) {
+            queryParameters.set('filter_tagset', <any>filterTagset);
         }
 
-        let headers = this.defaultHeaders;
+        if (filterName !== undefined) {
+            queryParameters.set('filter_name', <any>filterName);
+        }
+
+        if (filterHidden !== undefined) {
+            queryParameters.set('filter_hidden', <any>filterHidden);
+        }
+
+        if (size !== undefined) {
+            queryParameters.set('size', <any>size);
+        }
+
+        if (page !== undefined) {
+            queryParameters.set('page', <any>page);
+        }
+
+        if (order !== undefined) {
+            queryParameters.set('order', <any>order);
+        }
+
+        if (filterDerived !== undefined) {
+            queryParameters.set('filter_derived', <any>filterDerived);
+        }
+
+
+        // to determine the Accept header
+        let produces: string[] = [
+            'application/json'
+        ];
 
         // authentication (oauth2_client_credentials_grant) required
+        // oauth required
         if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
+            let accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
+            headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
         // authentication (oauth2_password_grant) required
+        // oauth required
         if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
+            let accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
+            headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-        // to determine the Accept header
-        let httpHeaderAccepts: string[] = [
-            'application/json'
-        ];
-        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
-        if (httpHeaderAcceptSelected != undefined) {
-            headers = headers.set('Accept', httpHeaderAcceptSelected);
+            
+        let requestOptions: RequestOptionsArgs = new RequestOptions({
+            method: RequestMethod.Get,
+            headers: headers,
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
+        });
+        // https://github.com/swagger-api/swagger-codegen/issues/4037
+        if (extraHttpRequestParams) {
+            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
         }
 
-        // to determine the Content-Type header
-        const consumes: string[] = [
-        ];
-
-        return this.httpClient.get<PageResourceAchievementDefinitionResource>(`${this.basePath}/achievements`,
-            {
-                params: queryParameters,
-                withCredentials: this.configuration.withCredentials,
-                headers: headers,
-                observe: observe,
-                reportProgress: reportProgress
-            }
-        );
+        return this.http.request(path, requestOptions);
     }
 
     /**
      * Get a list of derived achievements
      * Used by other services that depend on achievements.  &lt;br&gt;&lt;br&gt;&lt;b&gt;Permissions Needed:&lt;/b&gt; ACHIEVEMENTS_ADMIN
      * @param name The name of the derived achievement
-     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-     * @param reportProgress flag to report request and response progress.
+     * @param size The number of objects returned per page
+     * @param page The number of the page returned, starting with 1
      */
-    public getDerivedAchievements(name: string, observe?: 'body', reportProgress?: boolean): Observable<Array<AchievementDefinitionResource>>;
-    public getDerivedAchievements(name: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Array<AchievementDefinitionResource>>>;
-    public getDerivedAchievements(name: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Array<AchievementDefinitionResource>>>;
-    public getDerivedAchievements(name: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public getDerivedAchievementsWithHttpInfo(name: string, size?: number, page?: number, extraHttpRequestParams?: any): Observable<Response> {
+        const path = this.basePath + '/achievements/derived/${name}'
+                    .replace('${' + 'name' + '}', String(name));
+
+        let queryParameters = new URLSearchParams();
+        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
+        // verify required parameter 'name' is not null or undefined
         if (name === null || name === undefined) {
             throw new Error('Required parameter name was null or undefined when calling getDerivedAchievements.');
         }
+        if (size !== undefined) {
+            queryParameters.set('size', <any>size);
+        }
 
-        let headers = this.defaultHeaders;
+        if (page !== undefined) {
+            queryParameters.set('page', <any>page);
+        }
+
+
+        // to determine the Accept header
+        let produces: string[] = [
+            'application/json'
+        ];
 
         // authentication (oauth2_client_credentials_grant) required
+        // oauth required
         if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
+            let accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
+            headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
         // authentication (oauth2_password_grant) required
+        // oauth required
         if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
+            let accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
+            headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-        // to determine the Accept header
-        let httpHeaderAccepts: string[] = [
-            'application/json'
-        ];
-        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
-        if (httpHeaderAcceptSelected != undefined) {
-            headers = headers.set('Accept', httpHeaderAcceptSelected);
+            
+        let requestOptions: RequestOptionsArgs = new RequestOptions({
+            method: RequestMethod.Get,
+            headers: headers,
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
+        });
+        // https://github.com/swagger-api/swagger-codegen/issues/4037
+        if (extraHttpRequestParams) {
+            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
         }
 
-        // to determine the Content-Type header
-        const consumes: string[] = [
-        ];
-
-        return this.httpClient.get<Array<AchievementDefinitionResource>>(`${this.basePath}/achievements/derived/${encodeURIComponent(String(name))}`,
-            {
-                withCredentials: this.configuration.withCredentials,
-                headers: headers,
-                observe: observe,
-                reportProgress: reportProgress
-            }
-        );
+        return this.http.request(path, requestOptions);
     }
 
     /**
@@ -676,59 +1012,60 @@ export class GamificationAchievementsService {
      * Assets will not be filled in on the resources returned. Use &#39;Get a single poll&#39; to retrieve the full resource with assets for a given item as needed. &lt;br&gt;&lt;br&gt;&lt;b&gt;Permissions Needed:&lt;/b&gt; ACHIEVEMENTS_ADMIN
      * @param userId The user&#39;s id
      * @param achievementName The achievement&#39;s name
-     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-     * @param reportProgress flag to report request and response progress.
      */
-    public getUserAchievementProgress(userId: number, achievementName: string, observe?: 'body', reportProgress?: boolean): Observable<UserAchievementGroupResource>;
-    public getUserAchievementProgress(userId: number, achievementName: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<UserAchievementGroupResource>>;
-    public getUserAchievementProgress(userId: number, achievementName: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<UserAchievementGroupResource>>;
-    public getUserAchievementProgress(userId: number, achievementName: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public getUserAchievementProgressWithHttpInfo(userId: number, achievementName: string, extraHttpRequestParams?: any): Observable<Response> {
+        const path = this.basePath + '/users/${user_id}/achievements/${achievement_name}'
+                    .replace('${' + 'user_id' + '}', String(userId))
+                    .replace('${' + 'achievement_name' + '}', String(achievementName));
+
+        let queryParameters = new URLSearchParams();
+        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
+        // verify required parameter 'userId' is not null or undefined
         if (userId === null || userId === undefined) {
             throw new Error('Required parameter userId was null or undefined when calling getUserAchievementProgress.');
         }
+        // verify required parameter 'achievementName' is not null or undefined
         if (achievementName === null || achievementName === undefined) {
             throw new Error('Required parameter achievementName was null or undefined when calling getUserAchievementProgress.');
         }
 
-        let headers = this.defaultHeaders;
+        // to determine the Accept header
+        let produces: string[] = [
+            'application/json'
+        ];
 
         // authentication (oauth2_client_credentials_grant) required
+        // oauth required
         if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
+            let accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
+            headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
         // authentication (oauth2_password_grant) required
+        // oauth required
         if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
+            let accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
+            headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-        // to determine the Accept header
-        let httpHeaderAccepts: string[] = [
-            'application/json'
-        ];
-        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
-        if (httpHeaderAcceptSelected != undefined) {
-            headers = headers.set('Accept', httpHeaderAcceptSelected);
+            
+        let requestOptions: RequestOptionsArgs = new RequestOptions({
+            method: RequestMethod.Get,
+            headers: headers,
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
+        });
+        // https://github.com/swagger-api/swagger-codegen/issues/4037
+        if (extraHttpRequestParams) {
+            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
         }
 
-        // to determine the Content-Type header
-        const consumes: string[] = [
-        ];
-
-        return this.httpClient.get<UserAchievementGroupResource>(`${this.basePath}/users/${encodeURIComponent(String(userId))}/achievements/${encodeURIComponent(String(achievementName))}`,
-            {
-                withCredentials: this.configuration.withCredentials,
-                headers: headers,
-                observe: observe,
-                reportProgress: reportProgress
-            }
-        );
+        return this.http.request(path, requestOptions);
     }
 
     /**
@@ -737,231 +1074,232 @@ export class GamificationAchievementsService {
      * @param userId The user&#39;s id
      * @param filterAchievementDerived Filter for achievements that are derived from other services
      * @param filterAchievementTagset Filter for achievements with specified tags (separated by comma)
-     * @param filterAchievementName Filter for achievements whose name contains a string
+     * @param filterGroupName Filter for achievements whose group/level name contains a string
      * @param size The number of objects returned per page
      * @param page The number of the page returned, starting with 1
-     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-     * @param reportProgress flag to report request and response progress.
      */
-    public getUserAchievementsProgress(userId: number, filterAchievementDerived?: boolean, filterAchievementTagset?: string, filterAchievementName?: string, size?: number, page?: number, observe?: 'body', reportProgress?: boolean): Observable<PageResourceUserAchievementGroupResource>;
-    public getUserAchievementsProgress(userId: number, filterAchievementDerived?: boolean, filterAchievementTagset?: string, filterAchievementName?: string, size?: number, page?: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<PageResourceUserAchievementGroupResource>>;
-    public getUserAchievementsProgress(userId: number, filterAchievementDerived?: boolean, filterAchievementTagset?: string, filterAchievementName?: string, size?: number, page?: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<PageResourceUserAchievementGroupResource>>;
-    public getUserAchievementsProgress(userId: number, filterAchievementDerived?: boolean, filterAchievementTagset?: string, filterAchievementName?: string, size?: number, page?: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public getUserAchievementsProgressWithHttpInfo(userId: number, filterAchievementDerived?: boolean, filterAchievementTagset?: string, filterGroupName?: string, size?: number, page?: number, extraHttpRequestParams?: any): Observable<Response> {
+        const path = this.basePath + '/users/${user_id}/achievements'
+                    .replace('${' + 'user_id' + '}', String(userId));
+
+        let queryParameters = new URLSearchParams();
+        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
+        // verify required parameter 'userId' is not null or undefined
         if (userId === null || userId === undefined) {
             throw new Error('Required parameter userId was null or undefined when calling getUserAchievementsProgress.');
         }
-
-        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
-        if (filterAchievementDerived !== undefined && filterAchievementDerived !== null) {
-            queryParameters = queryParameters.set('filter_achievement_derived', <any>filterAchievementDerived);
-        }
-        if (filterAchievementTagset !== undefined && filterAchievementTagset !== null) {
-            queryParameters = queryParameters.set('filter_achievement_tagset', <any>filterAchievementTagset);
-        }
-        if (filterAchievementName !== undefined && filterAchievementName !== null) {
-            queryParameters = queryParameters.set('filter_achievement_name', <any>filterAchievementName);
-        }
-        if (size !== undefined && size !== null) {
-            queryParameters = queryParameters.set('size', <any>size);
-        }
-        if (page !== undefined && page !== null) {
-            queryParameters = queryParameters.set('page', <any>page);
+        if (filterAchievementDerived !== undefined) {
+            queryParameters.set('filter_achievement_derived', <any>filterAchievementDerived);
         }
 
-        let headers = this.defaultHeaders;
+        if (filterAchievementTagset !== undefined) {
+            queryParameters.set('filter_achievement_tagset', <any>filterAchievementTagset);
+        }
+
+        if (filterGroupName !== undefined) {
+            queryParameters.set('filter_group_name', <any>filterGroupName);
+        }
+
+        if (size !== undefined) {
+            queryParameters.set('size', <any>size);
+        }
+
+        if (page !== undefined) {
+            queryParameters.set('page', <any>page);
+        }
+
+
+        // to determine the Accept header
+        let produces: string[] = [
+            'application/json'
+        ];
 
         // authentication (oauth2_client_credentials_grant) required
+        // oauth required
         if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
+            let accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
+            headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
         // authentication (oauth2_password_grant) required
+        // oauth required
         if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
+            let accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
+            headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-        // to determine the Accept header
-        let httpHeaderAccepts: string[] = [
-            'application/json'
-        ];
-        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
-        if (httpHeaderAcceptSelected != undefined) {
-            headers = headers.set('Accept', httpHeaderAcceptSelected);
+            
+        let requestOptions: RequestOptionsArgs = new RequestOptions({
+            method: RequestMethod.Get,
+            headers: headers,
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
+        });
+        // https://github.com/swagger-api/swagger-codegen/issues/4037
+        if (extraHttpRequestParams) {
+            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
         }
 
-        // to determine the Content-Type header
-        const consumes: string[] = [
-        ];
-
-        return this.httpClient.get<PageResourceUserAchievementGroupResource>(`${this.basePath}/users/${encodeURIComponent(String(userId))}/achievements`,
-            {
-                params: queryParameters,
-                withCredentials: this.configuration.withCredentials,
-                headers: headers,
-                observe: observe,
-                reportProgress: reportProgress
-            }
-        );
+        return this.http.request(path, requestOptions);
     }
 
     /**
      * Retrieve progress on a given achievement for all users
-     * Assets will not be filled in on the resources returned. Use &#39;Get single achievement progress for user&#39; to retrieve the full resource with assets for a given user as needed. &lt;br&gt;&lt;br&gt;&lt;b&gt;Permissions Needed:&lt;/b&gt; ACHIEVEMENTS_ADMIN
+     * Assets will not be filled in on the resources returned. Use &#39;Get single achievement progress for user&#39; to retrieve the full resource with assets for a given user as needed. &lt;br&gt;&lt;br&gt;&lt;b&gt;Permissions Needed:&lt;/b&gt; ACHIEVEMENTS_ADMIN&lt;br /&gt;&lt;b&gt;Permissions Needed:&lt;/b&gt; NONE
      * @param achievementName The achievement&#39;s name
      * @param filterAchievementDerived Filter for achievements that are derived from other services
      * @param filterAchievementTagset Filter for achievements with specified tags (separated by comma)
-     * @param filterAchievementName Filter for achievements whose name contains a string
+     * @param filterGroupName Filter for achievements whose group/level name contains a string
      * @param size The number of objects returned per page
      * @param page The number of the page returned, starting with 1
-     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-     * @param reportProgress flag to report request and response progress.
      */
-    public getUsersAchievementProgress(achievementName: string, filterAchievementDerived?: boolean, filterAchievementTagset?: string, filterAchievementName?: string, size?: number, page?: number, observe?: 'body', reportProgress?: boolean): Observable<PageResourceUserAchievementGroupResource>;
-    public getUsersAchievementProgress(achievementName: string, filterAchievementDerived?: boolean, filterAchievementTagset?: string, filterAchievementName?: string, size?: number, page?: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<PageResourceUserAchievementGroupResource>>;
-    public getUsersAchievementProgress(achievementName: string, filterAchievementDerived?: boolean, filterAchievementTagset?: string, filterAchievementName?: string, size?: number, page?: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<PageResourceUserAchievementGroupResource>>;
-    public getUsersAchievementProgress(achievementName: string, filterAchievementDerived?: boolean, filterAchievementTagset?: string, filterAchievementName?: string, size?: number, page?: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public getUsersAchievementProgressWithHttpInfo(achievementName: string, filterAchievementDerived?: boolean, filterAchievementTagset?: string, filterGroupName?: string, size?: number, page?: number, extraHttpRequestParams?: any): Observable<Response> {
+        const path = this.basePath + '/users/achievements/${achievement_name}'
+                    .replace('${' + 'achievement_name' + '}', String(achievementName));
+
+        let queryParameters = new URLSearchParams();
+        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
+        // verify required parameter 'achievementName' is not null or undefined
         if (achievementName === null || achievementName === undefined) {
             throw new Error('Required parameter achievementName was null or undefined when calling getUsersAchievementProgress.');
         }
-
-        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
-        if (filterAchievementDerived !== undefined && filterAchievementDerived !== null) {
-            queryParameters = queryParameters.set('filter_achievement_derived', <any>filterAchievementDerived);
-        }
-        if (filterAchievementTagset !== undefined && filterAchievementTagset !== null) {
-            queryParameters = queryParameters.set('filter_achievement_tagset', <any>filterAchievementTagset);
-        }
-        if (filterAchievementName !== undefined && filterAchievementName !== null) {
-            queryParameters = queryParameters.set('filter_achievement_name', <any>filterAchievementName);
-        }
-        if (size !== undefined && size !== null) {
-            queryParameters = queryParameters.set('size', <any>size);
-        }
-        if (page !== undefined && page !== null) {
-            queryParameters = queryParameters.set('page', <any>page);
+        if (filterAchievementDerived !== undefined) {
+            queryParameters.set('filter_achievement_derived', <any>filterAchievementDerived);
         }
 
-        let headers = this.defaultHeaders;
+        if (filterAchievementTagset !== undefined) {
+            queryParameters.set('filter_achievement_tagset', <any>filterAchievementTagset);
+        }
+
+        if (filterGroupName !== undefined) {
+            queryParameters.set('filter_group_name', <any>filterGroupName);
+        }
+
+        if (size !== undefined) {
+            queryParameters.set('size', <any>size);
+        }
+
+        if (page !== undefined) {
+            queryParameters.set('page', <any>page);
+        }
+
+
+        // to determine the Accept header
+        let produces: string[] = [
+            'application/json'
+        ];
 
         // authentication (oauth2_client_credentials_grant) required
+        // oauth required
         if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
+            let accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
+            headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
         // authentication (oauth2_password_grant) required
+        // oauth required
         if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
+            let accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
+            headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-        // to determine the Accept header
-        let httpHeaderAccepts: string[] = [
-            'application/json'
-        ];
-        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
-        if (httpHeaderAcceptSelected != undefined) {
-            headers = headers.set('Accept', httpHeaderAcceptSelected);
+            
+        let requestOptions: RequestOptionsArgs = new RequestOptions({
+            method: RequestMethod.Get,
+            headers: headers,
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
+        });
+        // https://github.com/swagger-api/swagger-codegen/issues/4037
+        if (extraHttpRequestParams) {
+            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
         }
 
-        // to determine the Content-Type header
-        const consumes: string[] = [
-        ];
-
-        return this.httpClient.get<PageResourceUserAchievementGroupResource>(`${this.basePath}/users/achievements/${encodeURIComponent(String(achievementName))}`,
-            {
-                params: queryParameters,
-                withCredentials: this.configuration.withCredentials,
-                headers: headers,
-                observe: observe,
-                reportProgress: reportProgress
-            }
-        );
+        return this.http.request(path, requestOptions);
     }
 
     /**
      * Retrieve progress on achievements for all users
-     * Assets will not be filled in on the resources returned. Use &#39;Get single achievement progress for user&#39; to retrieve the full resource with assets for a given user as needed. &lt;br&gt;&lt;br&gt;&lt;b&gt;Permissions Needed:&lt;/b&gt; ACHIEVEMENTS_ADMIN
+     * Assets will not be filled in on the resources returned. Use &#39;Get single achievement progress for user&#39; to retrieve the full resource with assets for a given user as needed. &lt;br&gt;&lt;br&gt;&lt;b&gt;Permissions Needed:&lt;/b&gt; ACHIEVEMENTS_ADMIN&lt;br /&gt;&lt;b&gt;Permissions Needed:&lt;/b&gt; LIST
      * @param filterAchievementDerived Filter for achievements that are derived from other services
      * @param filterAchievementTagset Filter for achievements with specified tags (separated by comma)
-     * @param filterAchievementName Filter for achievements whose name contains a string
+     * @param filterGroupName Filter for achievements whose group/level name contains a string
      * @param size The number of objects returned per page
      * @param page The number of the page returned, starting with 1
-     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-     * @param reportProgress flag to report request and response progress.
      */
-    public getUsersAchievementsProgress(filterAchievementDerived?: boolean, filterAchievementTagset?: string, filterAchievementName?: string, size?: number, page?: number, observe?: 'body', reportProgress?: boolean): Observable<PageResourceUserAchievementGroupResource>;
-    public getUsersAchievementsProgress(filterAchievementDerived?: boolean, filterAchievementTagset?: string, filterAchievementName?: string, size?: number, page?: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<PageResourceUserAchievementGroupResource>>;
-    public getUsersAchievementsProgress(filterAchievementDerived?: boolean, filterAchievementTagset?: string, filterAchievementName?: string, size?: number, page?: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<PageResourceUserAchievementGroupResource>>;
-    public getUsersAchievementsProgress(filterAchievementDerived?: boolean, filterAchievementTagset?: string, filterAchievementName?: string, size?: number, page?: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public getUsersAchievementsProgressWithHttpInfo(filterAchievementDerived?: boolean, filterAchievementTagset?: string, filterGroupName?: string, size?: number, page?: number, extraHttpRequestParams?: any): Observable<Response> {
+        const path = this.basePath + '/users/achievements';
 
-        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
-        if (filterAchievementDerived !== undefined && filterAchievementDerived !== null) {
-            queryParameters = queryParameters.set('filter_achievement_derived', <any>filterAchievementDerived);
-        }
-        if (filterAchievementTagset !== undefined && filterAchievementTagset !== null) {
-            queryParameters = queryParameters.set('filter_achievement_tagset', <any>filterAchievementTagset);
-        }
-        if (filterAchievementName !== undefined && filterAchievementName !== null) {
-            queryParameters = queryParameters.set('filter_achievement_name', <any>filterAchievementName);
-        }
-        if (size !== undefined && size !== null) {
-            queryParameters = queryParameters.set('size', <any>size);
-        }
-        if (page !== undefined && page !== null) {
-            queryParameters = queryParameters.set('page', <any>page);
+        let queryParameters = new URLSearchParams();
+        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
+        if (filterAchievementDerived !== undefined) {
+            queryParameters.set('filter_achievement_derived', <any>filterAchievementDerived);
         }
 
-        let headers = this.defaultHeaders;
+        if (filterAchievementTagset !== undefined) {
+            queryParameters.set('filter_achievement_tagset', <any>filterAchievementTagset);
+        }
+
+        if (filterGroupName !== undefined) {
+            queryParameters.set('filter_group_name', <any>filterGroupName);
+        }
+
+        if (size !== undefined) {
+            queryParameters.set('size', <any>size);
+        }
+
+        if (page !== undefined) {
+            queryParameters.set('page', <any>page);
+        }
+
+
+        // to determine the Accept header
+        let produces: string[] = [
+            'application/json'
+        ];
 
         // authentication (oauth2_client_credentials_grant) required
+        // oauth required
         if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
+            let accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
+            headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
         // authentication (oauth2_password_grant) required
+        // oauth required
         if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
+            let accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
+            headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-        // to determine the Accept header
-        let httpHeaderAccepts: string[] = [
-            'application/json'
-        ];
-        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
-        if (httpHeaderAcceptSelected != undefined) {
-            headers = headers.set('Accept', httpHeaderAcceptSelected);
+            
+        let requestOptions: RequestOptionsArgs = new RequestOptions({
+            method: RequestMethod.Get,
+            headers: headers,
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
+        });
+        // https://github.com/swagger-api/swagger-codegen/issues/4037
+        if (extraHttpRequestParams) {
+            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
         }
 
-        // to determine the Content-Type header
-        const consumes: string[] = [
-        ];
-
-        return this.httpClient.get<PageResourceUserAchievementGroupResource>(`${this.basePath}/users/achievements`,
-            {
-                params: queryParameters,
-                withCredentials: this.configuration.withCredentials,
-                headers: headers,
-                observe: observe,
-                reportProgress: reportProgress
-            }
-        );
+        return this.http.request(path, requestOptions);
     }
 
     /**
@@ -970,65 +1308,63 @@ export class GamificationAchievementsService {
      * @param userId The user&#39;s id
      * @param achievementName The achievement&#39;s name
      * @param progress The amount to add to the progress value
-     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-     * @param reportProgress flag to report request and response progress.
      */
-    public incrementAchievementProgress(userId: number, achievementName: string, progress?: IntWrapper, observe?: 'body', reportProgress?: boolean): Observable<UserAchievementGroupResource>;
-    public incrementAchievementProgress(userId: number, achievementName: string, progress?: IntWrapper, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<UserAchievementGroupResource>>;
-    public incrementAchievementProgress(userId: number, achievementName: string, progress?: IntWrapper, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<UserAchievementGroupResource>>;
-    public incrementAchievementProgress(userId: number, achievementName: string, progress?: IntWrapper, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public incrementAchievementProgressWithHttpInfo(userId: number, achievementName: string, progress?: IntWrapper, extraHttpRequestParams?: any): Observable<Response> {
+        const path = this.basePath + '/users/${user_id}/achievements/${achievement_name}/progress'
+                    .replace('${' + 'user_id' + '}', String(userId))
+                    .replace('${' + 'achievement_name' + '}', String(achievementName));
+
+        let queryParameters = new URLSearchParams();
+        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
+        // verify required parameter 'userId' is not null or undefined
         if (userId === null || userId === undefined) {
             throw new Error('Required parameter userId was null or undefined when calling incrementAchievementProgress.');
         }
+        // verify required parameter 'achievementName' is not null or undefined
         if (achievementName === null || achievementName === undefined) {
             throw new Error('Required parameter achievementName was null or undefined when calling incrementAchievementProgress.');
         }
 
-        let headers = this.defaultHeaders;
+        // to determine the Accept header
+        let produces: string[] = [
+            'application/json'
+        ];
 
         // authentication (oauth2_client_credentials_grant) required
+        // oauth required
         if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
+            let accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
+            headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
         // authentication (oauth2_password_grant) required
+        // oauth required
         if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
+            let accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
+            headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-        // to determine the Accept header
-        let httpHeaderAccepts: string[] = [
-            'application/json'
-        ];
-        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
-        if (httpHeaderAcceptSelected != undefined) {
-            headers = headers.set('Accept', httpHeaderAcceptSelected);
+            
+        headers.set('Content-Type', 'application/json');
+
+        let requestOptions: RequestOptionsArgs = new RequestOptions({
+            method: RequestMethod.Post,
+            headers: headers,
+            body: progress == null ? '' : JSON.stringify(progress), // https://github.com/angular/angular/issues/10612
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
+        });
+        // https://github.com/swagger-api/swagger-codegen/issues/4037
+        if (extraHttpRequestParams) {
+            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
         }
 
-        // to determine the Content-Type header
-        const consumes: string[] = [
-            'application/json'
-        ];
-        const httpContentTypeSelected: string | undefined = this.configuration.selectHeaderContentType(consumes);
-        if (httpContentTypeSelected != undefined) {
-            headers = headers.set('Content-Type', httpContentTypeSelected);
-        }
-
-        return this.httpClient.post<UserAchievementGroupResource>(`${this.basePath}/users/${encodeURIComponent(String(userId))}/achievements/${encodeURIComponent(String(achievementName))}/progress`,
-            progress,
-            {
-                withCredentials: this.configuration.withCredentials,
-                headers: headers,
-                observe: observe,
-                reportProgress: reportProgress
-            }
-        );
+        return this.http.request(path, requestOptions);
     }
 
     /**
@@ -1037,65 +1373,63 @@ export class GamificationAchievementsService {
      * @param userId The user&#39;s id
      * @param achievementName The achievement&#39;s name
      * @param progress The new progress value
-     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-     * @param reportProgress flag to report request and response progress.
      */
-    public setAchievementProgress(userId: number, achievementName: string, progress?: IntWrapper, observe?: 'body', reportProgress?: boolean): Observable<UserAchievementGroupResource>;
-    public setAchievementProgress(userId: number, achievementName: string, progress?: IntWrapper, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<UserAchievementGroupResource>>;
-    public setAchievementProgress(userId: number, achievementName: string, progress?: IntWrapper, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<UserAchievementGroupResource>>;
-    public setAchievementProgress(userId: number, achievementName: string, progress?: IntWrapper, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public setAchievementProgressWithHttpInfo(userId: number, achievementName: string, progress?: IntWrapper, extraHttpRequestParams?: any): Observable<Response> {
+        const path = this.basePath + '/users/${user_id}/achievements/${achievement_name}/progress'
+                    .replace('${' + 'user_id' + '}', String(userId))
+                    .replace('${' + 'achievement_name' + '}', String(achievementName));
+
+        let queryParameters = new URLSearchParams();
+        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
+        // verify required parameter 'userId' is not null or undefined
         if (userId === null || userId === undefined) {
             throw new Error('Required parameter userId was null or undefined when calling setAchievementProgress.');
         }
+        // verify required parameter 'achievementName' is not null or undefined
         if (achievementName === null || achievementName === undefined) {
             throw new Error('Required parameter achievementName was null or undefined when calling setAchievementProgress.');
         }
 
-        let headers = this.defaultHeaders;
+        // to determine the Accept header
+        let produces: string[] = [
+            'application/json'
+        ];
 
         // authentication (oauth2_client_credentials_grant) required
+        // oauth required
         if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
+            let accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
+            headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
         // authentication (oauth2_password_grant) required
+        // oauth required
         if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
+            let accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
+            headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-        // to determine the Accept header
-        let httpHeaderAccepts: string[] = [
-            'application/json'
-        ];
-        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
-        if (httpHeaderAcceptSelected != undefined) {
-            headers = headers.set('Accept', httpHeaderAcceptSelected);
+            
+        headers.set('Content-Type', 'application/json');
+
+        let requestOptions: RequestOptionsArgs = new RequestOptions({
+            method: RequestMethod.Put,
+            headers: headers,
+            body: progress == null ? '' : JSON.stringify(progress), // https://github.com/angular/angular/issues/10612
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
+        });
+        // https://github.com/swagger-api/swagger-codegen/issues/4037
+        if (extraHttpRequestParams) {
+            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
         }
 
-        // to determine the Content-Type header
-        const consumes: string[] = [
-            'application/json'
-        ];
-        const httpContentTypeSelected: string | undefined = this.configuration.selectHeaderContentType(consumes);
-        if (httpContentTypeSelected != undefined) {
-            headers = headers.set('Content-Type', httpContentTypeSelected);
-        }
-
-        return this.httpClient.put<UserAchievementGroupResource>(`${this.basePath}/users/${encodeURIComponent(String(userId))}/achievements/${encodeURIComponent(String(achievementName))}/progress`,
-            progress,
-            {
-                withCredentials: this.configuration.withCredentials,
-                headers: headers,
-                observe: observe,
-                reportProgress: reportProgress
-            }
-        );
+        return this.http.request(path, requestOptions);
     }
 
     /**
@@ -1103,125 +1437,122 @@ export class GamificationAchievementsService {
      * The existing generated rule, if any, will be deleted. A new rule will be created if a trigger event name is specified in the new version. &lt;br&gt;&lt;br&gt;&lt;b&gt;Permissions Needed:&lt;/b&gt; ACHIEVEMENTS_ADMIN
      * @param name The name of the achievement
      * @param achievement The achievement definition
-     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-     * @param reportProgress flag to report request and response progress.
      */
-    public updateAchievement(name: string, achievement?: AchievementDefinitionResource, observe?: 'body', reportProgress?: boolean): Observable<AchievementDefinitionResource>;
-    public updateAchievement(name: string, achievement?: AchievementDefinitionResource, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<AchievementDefinitionResource>>;
-    public updateAchievement(name: string, achievement?: AchievementDefinitionResource, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<AchievementDefinitionResource>>;
-    public updateAchievement(name: string, achievement?: AchievementDefinitionResource, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public updateAchievementWithHttpInfo(name: string, achievement?: AchievementDefinitionResource, extraHttpRequestParams?: any): Observable<Response> {
+        const path = this.basePath + '/achievements/${name}'
+                    .replace('${' + 'name' + '}', String(name));
+
+        let queryParameters = new URLSearchParams();
+        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
+        // verify required parameter 'name' is not null or undefined
         if (name === null || name === undefined) {
             throw new Error('Required parameter name was null or undefined when calling updateAchievement.');
         }
 
-        let headers = this.defaultHeaders;
+        // to determine the Accept header
+        let produces: string[] = [
+            'application/json'
+        ];
 
         // authentication (oauth2_client_credentials_grant) required
+        // oauth required
         if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
+            let accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
+            headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
         // authentication (oauth2_password_grant) required
+        // oauth required
         if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
+            let accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
+            headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-        // to determine the Accept header
-        let httpHeaderAccepts: string[] = [
-            'application/json'
-        ];
-        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
-        if (httpHeaderAcceptSelected != undefined) {
-            headers = headers.set('Accept', httpHeaderAcceptSelected);
+            
+        headers.set('Content-Type', 'application/json');
+
+        let requestOptions: RequestOptionsArgs = new RequestOptions({
+            method: RequestMethod.Put,
+            headers: headers,
+            body: achievement == null ? '' : JSON.stringify(achievement), // https://github.com/angular/angular/issues/10612
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
+        });
+        // https://github.com/swagger-api/swagger-codegen/issues/4037
+        if (extraHttpRequestParams) {
+            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
         }
 
-        // to determine the Content-Type header
-        const consumes: string[] = [
-            'application/json'
-        ];
-        const httpContentTypeSelected: string | undefined = this.configuration.selectHeaderContentType(consumes);
-        if (httpContentTypeSelected != undefined) {
-            headers = headers.set('Content-Type', httpContentTypeSelected);
-        }
-
-        return this.httpClient.put<AchievementDefinitionResource>(`${this.basePath}/achievements/${encodeURIComponent(String(name))}`,
-            achievement,
-            {
-                withCredentials: this.configuration.withCredentials,
-                headers: headers,
-                observe: observe,
-                reportProgress: reportProgress
-            }
-        );
+        return this.http.request(path, requestOptions);
     }
 
     /**
      * Update an achievement template
-     * &lt;b&gt;Permissions Needed:&lt;/b&gt; TEMPLATE_ADMIN
+     * &lt;b&gt;Permissions Needed:&lt;/b&gt; PUT
      * @param id The id of the template
-     * @param template The updated template
-     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-     * @param reportProgress flag to report request and response progress.
+     * @param templatePatchResource The patch resource object
+     * @param testValidation If true, this will test validation but not submit the patch request
      */
-    public updateAchievementTemplate(id: string, template?: TemplateResource, observe?: 'body', reportProgress?: boolean): Observable<TemplateResource>;
-    public updateAchievementTemplate(id: string, template?: TemplateResource, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<TemplateResource>>;
-    public updateAchievementTemplate(id: string, template?: TemplateResource, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<TemplateResource>>;
-    public updateAchievementTemplate(id: string, template?: TemplateResource, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public updateAchievementTemplateWithHttpInfo(id: string, templatePatchResource?: PatchResource, testValidation?: boolean, extraHttpRequestParams?: any): Observable<Response> {
+        const path = this.basePath + '/achievements/templates/${id}'
+                    .replace('${' + 'id' + '}', String(id));
+
+        let queryParameters = new URLSearchParams();
+        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
+        // verify required parameter 'id' is not null or undefined
         if (id === null || id === undefined) {
             throw new Error('Required parameter id was null or undefined when calling updateAchievementTemplate.');
         }
+        if (testValidation !== undefined) {
+            queryParameters.set('test_validation', <any>testValidation);
+        }
 
-        let headers = this.defaultHeaders;
+
+        // to determine the Accept header
+        let produces: string[] = [
+            'application/json'
+        ];
 
         // authentication (oauth2_client_credentials_grant) required
+        // oauth required
         if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
+            let accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
+            headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
         // authentication (oauth2_password_grant) required
+        // oauth required
         if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
+            let accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
+            headers.set('Authorization', 'Bearer ' + accessToken);
         }
 
-        // to determine the Accept header
-        let httpHeaderAccepts: string[] = [
-            'application/json'
-        ];
-        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
-        if (httpHeaderAcceptSelected != undefined) {
-            headers = headers.set('Accept', httpHeaderAcceptSelected);
+            
+        headers.set('Content-Type', 'application/json');
+
+        let requestOptions: RequestOptionsArgs = new RequestOptions({
+            method: RequestMethod.Patch,
+            headers: headers,
+            body: templatePatchResource == null ? '' : JSON.stringify(templatePatchResource), // https://github.com/angular/angular/issues/10612
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
+        });
+        // https://github.com/swagger-api/swagger-codegen/issues/4037
+        if (extraHttpRequestParams) {
+            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
         }
 
-        // to determine the Content-Type header
-        const consumes: string[] = [
-            'application/json'
-        ];
-        const httpContentTypeSelected: string | undefined = this.configuration.selectHeaderContentType(consumes);
-        if (httpContentTypeSelected != undefined) {
-            headers = headers.set('Content-Type', httpContentTypeSelected);
-        }
-
-        return this.httpClient.put<TemplateResource>(`${this.basePath}/achievements/templates/${encodeURIComponent(String(id))}`,
-            template,
-            {
-                withCredentials: this.configuration.withCredentials,
-                headers: headers,
-                observe: observe,
-                reportProgress: reportProgress
-            }
-        );
+        return this.http.request(path, requestOptions);
     }
 
 }

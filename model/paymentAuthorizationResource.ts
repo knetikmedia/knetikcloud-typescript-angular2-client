@@ -9,32 +9,39 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
+
 import { SimpleReferenceResourceint } from './simpleReferenceResourceint';
 
 
-export interface PaymentAuthorizationResource { 
+export interface PaymentAuthorizationResource {
     /**
      * Whether this authorization has been captured
      */
-    readonly captured?: boolean;
+    captured?: boolean;
+
     /**
      * The date this authorization was received, unix timestamp in seconds
      */
-    readonly created?: number;
+    created?: number;
+
     /**
      * The details for this authorization. Format dependent on payment provider
      */
     details?: any;
+
     /**
      * The id of the authorization
      */
-    readonly id?: number;
+    id?: number;
+
     /**
      * The invoice this authorization is intended to pay
      */
     invoice?: number;
+
     /**
      * The payment type (which provider) this payment is through
      */
     paymentType: SimpleReferenceResourceint;
+
 }

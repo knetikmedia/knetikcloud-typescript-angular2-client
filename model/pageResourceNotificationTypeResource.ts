@@ -9,18 +9,25 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
+
 import { NotificationTypeResource } from './notificationTypeResource';
-import { Order } from './order';
 
 
-export interface PageResourceNotificationTypeResource { 
+export interface PageResourceNotificationTypeResource {
     content?: Array<NotificationTypeResource>;
+
     first?: boolean;
+
     last?: boolean;
+
     number?: number;
+
     numberOfElements?: number;
+
     size?: number;
-    sort?: Array<Order>;
+
     totalElements?: number;
+
     totalPages?: number;
+
 }

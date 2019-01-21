@@ -9,55 +9,62 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
+
 import { ActionVariableResource } from './actionVariableResource';
 
 
-export interface ActionResource { 
+export interface ActionResource {
     /**
      * The category the action is in. All customer specific actions are in the 'custom' category
      */
     category?: ActionResource.CategoryEnum;
+
     /**
      * The description of the action
      */
     description: string;
+
     /**
      * The name of the action. Used as the unique id for reference
      */
     name: string;
+
     /**
      * A list of tags for searching
      */
     tags?: Array<string>;
+
     /**
      * The variables required for the action
      */
     variables: Array<ActionVariableResource>;
+
 }
 export namespace ActionResource {
-    export type CategoryEnum = 'achievement' | 'behavior' | 'comment' | 'disposition' | 'device' | 'entitlement' | 'friends' | 'fulfillment' | 'gamification' | 'inventory' | 'invoice' | 'media' | 'scheduler' | 'store' | 'subscription' | 'user' | 'wallet' | 'custom' | 'challenge' | 'activity' | 'campaign' | 'event';
-    export const CategoryEnum = {
-        Achievement: 'achievement' as CategoryEnum,
-        Behavior: 'behavior' as CategoryEnum,
-        Comment: 'comment' as CategoryEnum,
-        Disposition: 'disposition' as CategoryEnum,
-        Device: 'device' as CategoryEnum,
-        Entitlement: 'entitlement' as CategoryEnum,
-        Friends: 'friends' as CategoryEnum,
-        Fulfillment: 'fulfillment' as CategoryEnum,
-        Gamification: 'gamification' as CategoryEnum,
-        Inventory: 'inventory' as CategoryEnum,
-        Invoice: 'invoice' as CategoryEnum,
-        Media: 'media' as CategoryEnum,
-        Scheduler: 'scheduler' as CategoryEnum,
-        Store: 'store' as CategoryEnum,
-        Subscription: 'subscription' as CategoryEnum,
-        User: 'user' as CategoryEnum,
-        Wallet: 'wallet' as CategoryEnum,
-        Custom: 'custom' as CategoryEnum,
-        Challenge: 'challenge' as CategoryEnum,
-        Activity: 'activity' as CategoryEnum,
-        Campaign: 'campaign' as CategoryEnum,
-        Event: 'event' as CategoryEnum
-    };
+    export enum CategoryEnum {
+        Achievement = <any> 'achievement',
+        Behavior = <any> 'behavior',
+        Comment = <any> 'comment',
+        Disposition = <any> 'disposition',
+        Device = <any> 'device',
+        Entitlement = <any> 'entitlement',
+        Friends = <any> 'friends',
+        Fulfillment = <any> 'fulfillment',
+        Gamification = <any> 'gamification',
+        Inventory = <any> 'inventory',
+        Invoice = <any> 'invoice',
+        Media = <any> 'media',
+        Scheduler = <any> 'scheduler',
+        Store = <any> 'store',
+        Subscription = <any> 'subscription',
+        User = <any> 'user',
+        Wallet = <any> 'wallet',
+        Custom = <any> 'custom',
+        Challenge = <any> 'challenge',
+        Activity = <any> 'activity',
+        Campaign = <any> 'campaign',
+        Event = <any> 'event',
+        Monitoring = <any> 'monitoring',
+        Verification = <any> 'verification'
+    }
 }

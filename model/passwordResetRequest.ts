@@ -11,20 +11,24 @@
  */
 
 
+
 /**
  * A request to reset a user's password by using a known user property
  */
-export interface PasswordResetRequest { 
+export interface PasswordResetRequest {
     /**
      * The user's email address
      */
     email?: string;
+
     /**
      * The user's mobile phone number
      */
     mobileNumber?: string;
+
     /**
      * The user's username
      */
     username?: string;
+
 }

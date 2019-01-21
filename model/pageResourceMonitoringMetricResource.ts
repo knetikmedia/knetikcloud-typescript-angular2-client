@@ -10,14 +10,24 @@
  * Do not edit the class manually.
  */
 
+import { MonitoringMetricResource } from './monitoringMetricResource';
 
-export interface GroupMemberStatusWrapper { 
-    value?: GroupMemberStatusWrapper.ValueEnum;
-}
-export namespace GroupMemberStatusWrapper {
-    export type ValueEnum = 'moderator' | 'member';
-    export const ValueEnum = {
-        Moderator: 'moderator' as ValueEnum,
-        Member: 'member' as ValueEnum
-    };
+
+export interface PageResourceMonitoringMetricResource {
+    content?: Array<MonitoringMetricResource>;
+
+    first?: boolean;
+
+    last?: boolean;
+
+    number?: number;
+
+    numberOfElements?: number;
+
+    size?: number;
+
+    totalElements?: number;
+
+    totalPages?: number;
+
 }

@@ -11,9 +11,14 @@
  */
 
 
-export interface RevenueProductReportResource { 
+
+export interface RevenueProductReportResource {
     itemId?: number;
+
     itemName?: string;
+
     revenue?: number;
+
     volume?: number;
+
 }

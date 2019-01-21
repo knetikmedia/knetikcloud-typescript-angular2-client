@@ -11,13 +11,16 @@
  */
 
 
-export interface SettingOption { 
+
+export interface SettingOption {
     /**
      * The textual name of the option: Ex: Hard (level 10)
      */
     name: string;
+
     /**
      * The value of the option. Ex: 10
      */
-    readonly value?: string;
+    value?: string;
+
 }

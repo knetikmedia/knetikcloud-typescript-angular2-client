@@ -11,21 +11,26 @@
  */
 
 
-export interface CountryTaxResource { 
+
+export interface CountryTaxResource {
     /**
      * The iso3 code of the country, cannot be changed
      */
     countryIso3: string;
+
     /**
      * The name of the tax
      */
     name: string;
+
     /**
      * The tax rate as a percentage to a maximum of two decimal places (1.5 means 1.5%)
      */
     rate: number;
+
     /**
      * Whether the tax applies to shipping costs
      */
     taxShipping: boolean;
+
 }

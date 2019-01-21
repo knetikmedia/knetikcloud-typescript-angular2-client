@@ -11,44 +11,60 @@
  */
 
 
-export interface ForwardLog { 
+
+export interface ForwardLog {
     /**
      * The end date of the forward log entry
      */
-    readonly endDate?: number;
+    endDate?: number;
+
     errorMsg?: string;
+
     eventId?: string;
+
     headers?: string;
+
     /**
      * The http status code the forward log entry
      */
-    readonly httpStatusCode?: number;
+    httpStatusCode?: number;
+
     /**
      * The id of the forward log entry
      */
-    readonly id?: string;
+    id?: string;
+
     method?: string;
+
     /**
      * The payload of the forward log entry
      */
-    readonly payload?: any;
+    payload?: any;
+
     /**
      * The response string of the forward log entry
      */
-    readonly response?: string;
+    response?: string;
+
     /**
      * The retry count of the forward log entry
      */
-    readonly retryCount?: number;
+    retryCount?: number;
+
     retryable?: boolean;
+
     ruleId?: string;
+
     /**
      * The start date of the forward log entry
      */
-    readonly startDate?: number;
+    startDate?: number;
+
     success?: boolean;
+
     /**
      * The endpoint url of the forward log entry
      */
-    readonly url?: string;
+    url?: string;
+
 }

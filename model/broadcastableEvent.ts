@@ -11,18 +11,29 @@
  */
 
 
-export interface BroadcastableEvent { 
+
+export interface BroadcastableEvent {
     client?: string;
+
     customer?: string;
+
     doNotBroadcast?: boolean;
+
     local?: boolean;
+
     section?: string;
+
     source?: any;
+
     specifics?: string;
+
     synchronous?: boolean;
+
     timestamp?: number;
+
     /**
      * The type of the event. Used for polymorphic type recognition and thus must match an expected type
      */
     type: string;
+
 }

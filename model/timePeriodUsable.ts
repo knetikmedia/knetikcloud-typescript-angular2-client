@@ -9,20 +9,24 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
+
 import { Behavior } from './behavior';
 
 
-export interface TimePeriodUsable extends Behavior { 
+export interface TimePeriodUsable extends Behavior {
     /**
      * The amount of times it can be used
      */
     maxUse?: number;
+
     /**
      * The length of time
      */
     timeLength?: number;
+
     /**
      * The unit of time
      */
     unitOfTime?: string;
+
 }

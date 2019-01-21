@@ -9,18 +9,25 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
+
 import { ForwardLog } from './forwardLog';
-import { Order } from './order';
 
 
-export interface PageResourceForwardLog { 
+export interface PageResourceForwardLog {
     content?: Array<ForwardLog>;
+
     first?: boolean;
+
     last?: boolean;
+
     number?: number;
+
     numberOfElements?: number;
+
     size?: number;
-    sort?: Array<Order>;
+
     totalElements?: number;
+
     totalPages?: number;
+
 }

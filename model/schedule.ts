@@ -11,35 +11,37 @@
  */
 
 
-export interface Schedule { 
+
+export interface Schedule {
     /**
      * The duration of the repeatable events
      */
     duration: number;
+
     /**
      * The unit of time for the duration field
      */
     durationUnit: Schedule.DurationUnitEnum;
+
     /**
      * How often the event is scheduled
      */
     repeat: Schedule.RepeatEnum;
+
 }
 export namespace Schedule {
-    export type DurationUnitEnum = 'millisecond' | 'second' | 'minute' | 'hour' | 'day' | 'week' | 'month' | 'year';
-    export const DurationUnitEnum = {
-        Millisecond: 'millisecond' as DurationUnitEnum,
-        Second: 'second' as DurationUnitEnum,
-        Minute: 'minute' as DurationUnitEnum,
-        Hour: 'hour' as DurationUnitEnum,
-        Day: 'day' as DurationUnitEnum,
-        Week: 'week' as DurationUnitEnum,
-        Month: 'month' as DurationUnitEnum,
-        Year: 'year' as DurationUnitEnum
-    };
-    export type RepeatEnum = 'DAILY' | 'WEEKLY';
-    export const RepeatEnum = {
-        DAILY: 'DAILY' as RepeatEnum,
-        WEEKLY: 'WEEKLY' as RepeatEnum
-    };
+    export enum DurationUnitEnum {
+        Millisecond = <any> 'millisecond',
+        Second = <any> 'second',
+        Minute = <any> 'minute',
+        Hour = <any> 'hour',
+        Day = <any> 'day',
+        Week = <any> 'week',
+        Month = <any> 'month',
+        Year = <any> 'year'
+    }
+    export enum RepeatEnum {
+        DAILY = <any> 'DAILY',
+        WEEKLY = <any> 'WEEKLY'
+    }
 }

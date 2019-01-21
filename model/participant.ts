@@ -9,30 +9,33 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
+
 import { IdRef } from './idRef';
 
 
-export interface Participant { 
+export interface Participant {
     /**
      * Whether this user is the 'host' of the occurrence and has increased access to settings/etc (default: false)
      */
     host?: boolean;
+
     /**
      * The current status of the user in the occurrence (default: present)
      */
     status?: Participant.StatusEnum;
+
     /**
      * The user
      */
     user: IdRef;
+
 }
 export namespace Participant {
-    export type StatusEnum = 'present' | 'ready' | 'left' | 'surrendered' | 'disconnected';
-    export const StatusEnum = {
-        Present: 'present' as StatusEnum,
-        Ready: 'ready' as StatusEnum,
-        Left: 'left' as StatusEnum,
-        Surrendered: 'surrendered' as StatusEnum,
-        Disconnected: 'disconnected' as StatusEnum
-    };
+    export enum StatusEnum {
+        Present = <any> 'present',
+        Ready = <any> 'ready',
+        Left = <any> 'left',
+        Surrendered = <any> 'surrendered',
+        Disconnected = <any> 'disconnected'
+    }
 }

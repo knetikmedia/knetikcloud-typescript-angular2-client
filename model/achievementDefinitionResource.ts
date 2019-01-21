@@ -9,52 +9,64 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
+
 import { Property } from './property';
 
 
-export interface AchievementDefinitionResource { 
+export interface AchievementDefinitionResource {
     /**
      * A map of additional properties, keyed on the property name.  Must match the names and types defined in the template for this resource type
      */
     additionalProperties?: { [key: string]: Property; };
+
     /**
      * The date/time this resource was created in seconds since unix epoch
      */
-    readonly createdDate?: number;
+    createdDate?: number;
+
     /**
      * The description of the achievement
      */
     description?: string;
+
     /**
      * Whether the achievement is hidden from the user
      */
     hidden: boolean;
+
     /**
      * The name of the achievement. Must be at least 6 characters in length. IMMUTABLE
      */
     name: string;
+
     /**
      * The required progress for the achievement definition
      */
     requiredProgress: number;
+
     /**
      * The id of the rule generated for this achievement
      */
-    readonly ruleId?: string;
+    ruleId?: string;
+
     /**
      * The tags for the achievement definition
      */
     tags?: Array<string>;
+
     /**
      * An achievement template this achievement is validated against (private). May be null and no validation of additional_properties will be done
      */
     template?: string;
+
     /**
      * The name of the trigger event associated with this achievement
      */
     triggerEventName?: string;
+
     /**
      * The date/time this resource was last updated in seconds since unix epoch
      */
-    readonly updatedDate?: number;
+    updatedDate?: number;
+
 }

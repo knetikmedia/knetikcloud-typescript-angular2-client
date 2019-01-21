@@ -11,25 +11,31 @@
  */
 
 
-export interface FinalizeBillingAgreementRequest { 
+
+export interface FinalizeBillingAgreementRequest {
     /**
      * The ID of the invoice being paid along with the creation of this agreement
      */
     invoiceId?: number;
+
     /**
      * Whether the new payment method created should be the user's default
      */
     newDefault?: boolean;
+
     /**
      * The payer ID from PayPal (passed as a parameter in the return URL). Only required if an invoice ID was included
      */
     payerId?: string;
+
     /**
      * The token from PayPal (passed as a parameter in the return URL)
      */
     token: string;
+
     /**
      * The ID of the user. Defaults to the logged in user
      */
     userId?: number;
+
 }

@@ -11,17 +11,18 @@
  */
 
 
-export interface ActivityOccurrenceStatusWrapper { 
+
+export interface ActivityOccurrenceStatusWrapper {
     value?: ActivityOccurrenceStatusWrapper.ValueEnum;
+
 }
 export namespace ActivityOccurrenceStatusWrapper {
-    export type ValueEnum = 'SETUP' | 'OPEN' | 'LAUNCHING' | 'PLAYING' | 'FINISHED' | 'ABANDONED';
-    export const ValueEnum = {
-        SETUP: 'SETUP' as ValueEnum,
-        OPEN: 'OPEN' as ValueEnum,
-        LAUNCHING: 'LAUNCHING' as ValueEnum,
-        PLAYING: 'PLAYING' as ValueEnum,
-        FINISHED: 'FINISHED' as ValueEnum,
-        ABANDONED: 'ABANDONED' as ValueEnum
-    };
+    export enum ValueEnum {
+        SETUP = <any> 'SETUP',
+        OPEN = <any> 'OPEN',
+        LAUNCHING = <any> 'LAUNCHING',
+        PLAYING = <any> 'PLAYING',
+        FINISHED = <any> 'FINISHED',
+        ABANDONED = <any> 'ABANDONED'
+    }
 }

@@ -9,12 +9,15 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
+
 import { BroadcastableEvent } from './broadcastableEvent';
 import { Topic } from './topic';
 import { TopicSubscriber } from './topicSubscriber';
 
 
-export interface WebsocketUnsubscribeEvent extends BroadcastableEvent { 
+export interface WebsocketUnsubscribeEvent extends BroadcastableEvent {
     topic?: Topic;
+
     topicSubscriber?: TopicSubscriber;
+
 }

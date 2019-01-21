@@ -11,7 +11,10 @@
  */
 
 
-export interface KeyValuePairstringstring { 
+
+export interface KeyValuePairstringstring {
     key?: string;
+
     value?: string;
+
 }

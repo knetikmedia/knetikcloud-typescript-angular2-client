@@ -11,17 +11,21 @@
  */
 
 
-export interface ErrorResource { 
+
+export interface ErrorResource {
     /**
      * Extra details about the error, if needed
      */
-    readonly details?: any;
+    details?: any;
+
     /**
      * The JSON key the message pertains to
      */
-    readonly field?: any;
+    field?: any;
+
     /**
      * The message explaining the error
      */
-    readonly message?: string;
+    message?: string;
+
 }

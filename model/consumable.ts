@@ -9,12 +9,14 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
+
 import { Behavior } from './behavior';
 
 
-export interface Consumable extends Behavior { 
+export interface Consumable extends Behavior {
     /**
      * The maximum number of times an item can be used
      */
     maxUse?: number;
+
 }

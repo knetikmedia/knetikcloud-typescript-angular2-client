@@ -9,18 +9,25 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
+
 import { BreGlobalResource } from './breGlobalResource';
-import { Order } from './order';
 
 
-export interface PageResourceBreGlobalResource { 
+export interface PageResourceBreGlobalResource {
     content?: Array<BreGlobalResource>;
+
     first?: boolean;
+
     last?: boolean;
+
     number?: number;
+
     numberOfElements?: number;
+
     size?: number;
-    sort?: Array<Order>;
+
     totalElements?: number;
+
     totalPages?: number;
+
 }

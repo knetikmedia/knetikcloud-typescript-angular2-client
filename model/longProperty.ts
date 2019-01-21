@@ -9,12 +9,14 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
+
 import { Property } from './property';
 
 
-export interface LongProperty extends Property { 
+export interface LongProperty extends Property {
     /**
      * The value
      */
     value?: number;
+
 }

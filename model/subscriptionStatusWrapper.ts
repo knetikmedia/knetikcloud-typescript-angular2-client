@@ -11,16 +11,17 @@
  */
 
 
-export interface SubscriptionStatusWrapper { 
+
+export interface SubscriptionStatusWrapper {
     value?: SubscriptionStatusWrapper.ValueEnum;
+
 }
 export namespace SubscriptionStatusWrapper {
-    export type ValueEnum = 'current' | 'canceled' | 'stopped' | 'payment_failed' | 'suspended';
-    export const ValueEnum = {
-        Current: 'current' as ValueEnum,
-        Canceled: 'canceled' as ValueEnum,
-        Stopped: 'stopped' as ValueEnum,
-        PaymentFailed: 'payment_failed' as ValueEnum,
-        Suspended: 'suspended' as ValueEnum
-    };
+    export enum ValueEnum {
+        Current = <any> 'current',
+        Canceled = <any> 'canceled',
+        Stopped = <any> 'stopped',
+        PaymentFailed = <any> 'payment_failed',
+        Suspended = <any> 'suspended'
+    }
 }

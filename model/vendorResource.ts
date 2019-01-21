@@ -9,72 +9,89 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
+
 import { Property } from './property';
 
 
-export interface VendorResource { 
+export interface VendorResource {
     /**
      * Whether the vendor is active.  Default = true
      */
     active?: boolean;
+
     /**
      * A map of additional properties, keyed on the property name (private). Must match the names and types defined in the template for this user type, or be an extra not from the template
      */
     additionalProperties?: { [key: string]: Property; };
+
     /**
      * The date the vendor was added. Unix timestamp in seconds
      */
-    readonly createDate?: number;
+    createDate?: number;
+
     /**
      * A description of the vendor
      */
     description?: string;
+
     /**
      * The id of the vendor
      */
-    readonly id?: number;
+    id?: number;
+
     /**
      * The url of an image for the vendor
      */
     imageUrl?: string;
+
     /**
      * Whether the vendor needs to manually approve invoices before they are paid.  A separate checkout flow is required in this case.  Default: false
      */
     manualApproval?: boolean;
+
     /**
      * The name of the vendor
      */
     name: string;
+
     /**
      * The primary email address for the vendor
      */
     primaryContactEmail?: string;
+
     /**
      * The name of the primary contact for the vendor
      */
     primaryContactName?: string;
+
     /**
      * The primary phone number for the vendor
      */
     primaryContactPhone?: string;
+
     /**
      * The email address for sale inquiries for the vendor
      */
     salesEmail?: string;
+
     /**
      * The email address for support inquiries for the vendor
      */
     supportEmail?: string;
+
     /**
      * A user template this user is validated against (private). May be null and no validation of properties will be done
      */
     template?: string;
+
     /**
      * The date the vendor was last updated. Unix timestamp in seconds
      */
-    readonly updateDate?: number;
+    updateDate?: number;
+
     /**
      * The url for the vendor's site
      */
     url?: string;
+
 }

@@ -9,18 +9,25 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
+
 import { BreEventLog } from './breEventLog';
-import { Order } from './order';
 
 
-export interface PageResourceBreEventLog { 
+export interface PageResourceBreEventLog {
     content?: Array<BreEventLog>;
+
     first?: boolean;
+
     last?: boolean;
+
     number?: number;
+
     numberOfElements?: number;
+
     size?: number;
-    sort?: Array<Order>;
+
     totalElements?: number;
+
     totalPages?: number;
+
 }

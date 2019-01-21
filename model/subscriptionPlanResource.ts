@@ -9,136 +9,161 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
+
 import { Property } from './property';
 
 
-export interface SubscriptionPlanResource { 
+export interface SubscriptionPlanResource {
     /**
      * A map of additional properties, keyed on the property name.  Must match the names and types defined in the template for this subscription
      */
     additionalProperties?: { [key: string]: Property; };
+
     /**
      * The length of the billing cycle in number of billing cycle unit
      */
     billingCycleLength: number;
+
     /**
      * The time period unit to apply to the length of billing cycles
      */
     billingCycleUnit: SubscriptionPlanResource.BillingCycleUnitEnum;
+
     /**
      * Whether this plan will be renewed on the consolidated billing cycle
      */
     consolidated: boolean;
+
     /**
      * The ISO3 currency code to use for the fees
      */
     currencyCode: string;
+
     /**
      * Used to schedule plan availability end date
      */
     endDate?: number;
+
     /**
      * Optional override for the length of the first billing cycle before the first recurring billing
      */
     firstBillingCycleLength?: number;
+
     /**
      * The time period unit to apply to the length of the first billing cycle. Required when first_billing_cycle_length is specified
      */
     firstBillingCycleUnit?: SubscriptionPlanResource.FirstBillingCycleUnitEnum;
+
     /**
      * The number of late payment days before a subscription is canceled
      */
     gracePeriod: number;
+
     /**
      * The id of the plan used to generate the SKUs
      */
     id?: string;
+
     /**
      * The fee charged when the subscription is purchased
      */
     initialFee: number;
+
     /**
      * The SKU to be used when purchasing the subscription through the cart
      */
-    readonly initialSku?: string;
+    initialSku?: string;
+
     /**
      * The fee to add to the bill when an invoice has gone unpaid passed the grace period
      */
     latePaymentFee: number;
+
     /**
      * The SKU that will show on the invoice when the subscription is delinquent
      */
-    readonly latePaymentSku?: string;
+    latePaymentSku?: string;
+
     /**
      * Whether this plan is locked because it has been purchased by at least one user.  When locked, a number of properties can no longer be changed
      */
-    readonly locked?: boolean;
+    locked?: boolean;
+
     /**
      * The number of charge attempts before the subscription becomes delinquent
      */
     maxBillAttempts: number;
+
     /**
      * Maximum number of renewals. If a migration plan is provided, the subscription will automatically switch to it when this limit is reached
      */
     maxCycles?: number;
+
     /**
      * Automatically migrate to the specified plan when the subscription is first renewed
      */
     migrateToPlan?: string;
+
     /**
      * The minimum number of renewals to charge for
      */
     minCycles?: number;
+
     /**
      * The name of the plan used to generate the SKUs
      */
     name: string;
+
     /**
      * Whether this plan is currently available
      */
     published: boolean;
+
     /**
      * The fee to charge when a suspended subscription is to be re-activated
      */
     reactivationFee: number;
+
     /**
      * The SKU that will show on the invoice when the subscription is re-activated after a suspension
      */
-    readonly reactivationSku?: string;
+    reactivationSku?: string;
+
     /**
      * The recurring fee to charge for each renewal
      */
     recurringFee: number;
+
     /**
      * The SKU that will show on the invoice when the subscription is activated
      */
-    readonly recurringSku?: string;
+    recurringSku?: string;
+
     /**
      * Used to schedule plan availability start date
      */
     startDate?: number;
+
 }
 export namespace SubscriptionPlanResource {
-    export type BillingCycleUnitEnum = 'millisecond' | 'second' | 'minute' | 'hour' | 'day' | 'week' | 'month' | 'year';
-    export const BillingCycleUnitEnum = {
-        Millisecond: 'millisecond' as BillingCycleUnitEnum,
-        Second: 'second' as BillingCycleUnitEnum,
-        Minute: 'minute' as BillingCycleUnitEnum,
-        Hour: 'hour' as BillingCycleUnitEnum,
-        Day: 'day' as BillingCycleUnitEnum,
-        Week: 'week' as BillingCycleUnitEnum,
-        Month: 'month' as BillingCycleUnitEnum,
-        Year: 'year' as BillingCycleUnitEnum
-    };
-    export type FirstBillingCycleUnitEnum = 'millisecond' | 'second' | 'minute' | 'hour' | 'day' | 'week' | 'month' | 'year';
-    export const FirstBillingCycleUnitEnum = {
-        Millisecond: 'millisecond' as FirstBillingCycleUnitEnum,
-        Second: 'second' as FirstBillingCycleUnitEnum,
-        Minute: 'minute' as FirstBillingCycleUnitEnum,
-        Hour: 'hour' as FirstBillingCycleUnitEnum,
-        Day: 'day' as FirstBillingCycleUnitEnum,
-        Week: 'week' as FirstBillingCycleUnitEnum,
-        Month: 'month' as FirstBillingCycleUnitEnum,
-        Year: 'year' as FirstBillingCycleUnitEnum
-    };
+    export enum BillingCycleUnitEnum {
+        Millisecond = <any> 'millisecond',
+        Second = <any> 'second',
+        Minute = <any> 'minute',
+        Hour = <any> 'hour',
+        Day = <any> 'day',
+        Week = <any> 'week',
+        Month = <any> 'month',
+        Year = <any> 'year'
+    }
+    export enum FirstBillingCycleUnitEnum {
+        Millisecond = <any> 'millisecond',
+        Second = <any> 'second',
+        Minute = <any> 'minute',
+        Hour = <any> 'hour',
+        Day = <any> 'day',
+        Week = <any> 'week',
+        Month = <any> 'month',
+        Year = <any> 'year'
+    }
 }

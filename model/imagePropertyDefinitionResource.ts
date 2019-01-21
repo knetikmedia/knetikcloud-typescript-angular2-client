@@ -9,29 +9,34 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
+
 import { PropertyDefinitionResource } from './propertyDefinitionResource';
-import { PropertyFieldListResource } from './propertyFieldListResource';
 
 
-export interface ImagePropertyDefinitionResource extends PropertyDefinitionResource { 
+export interface ImagePropertyDefinitionResource extends PropertyDefinitionResource {
     /**
      * If provided, a file type that the property must match
      */
     fileType?: string;
+
     /**
      * If provided, the maximum height of the image
      */
     maxHeight?: number;
+
     /**
      * If provided, the maximum width of the image
      */
     maxWidth?: number;
+
     /**
      * If provided, the minimum height of the image
      */
     minHeight?: number;
+
     /**
      * If provided, the minimum width of the image
      */
     minWidth?: number;
+
 }

@@ -9,10 +9,13 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
-import { BroadcastableEvent } from './broadcastableEvent';
-import { SearchObjectDefinition } from './searchObjectDefinition';
 
 
-export interface SearchDefinitionCreated extends BroadcastableEvent { 
-    definition?: SearchObjectDefinition;
+
+export interface MonitoringMetricRecordResource {
+    /**
+     * Dimensions giving context to the datapoint. Map of keys to values (example: {\"location\": \"USA\", \"user\": \"75\"}). Cannot include the | symbol
+     */
+    dimensions?: { [key: string]: string; };
+
 }

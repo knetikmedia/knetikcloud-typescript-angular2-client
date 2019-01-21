@@ -11,17 +11,21 @@
  */
 
 
-export interface UserActivityResultsResource { 
+
+export interface UserActivityResultsResource {
     /**
      * The raw score. Null means non-compete or disqualification
      */
     score?: number;
+
     /**
      * Any tags for the metric. Each unique tag will translate into a unique leaderboard. Maximum 5 tags and 50 characters each
      */
     tags?: Array<string>;
+
     /**
      * The id of the player
      */
     userId: number;
+
 }

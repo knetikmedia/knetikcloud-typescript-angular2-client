@@ -9,18 +9,25 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
-import { Order } from './order';
+
 import { UserItemLogResource } from './userItemLogResource';
 
 
-export interface PageResourceUserItemLogResource { 
+export interface PageResourceUserItemLogResource {
     content?: Array<UserItemLogResource>;
+
     first?: boolean;
+
     last?: boolean;
+
     number?: number;
+
     numberOfElements?: number;
+
     size?: number;
-    sort?: Array<Order>;
+
     totalElements?: number;
+
     totalPages?: number;
+
 }

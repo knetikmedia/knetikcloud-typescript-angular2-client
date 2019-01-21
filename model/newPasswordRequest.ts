@@ -11,13 +11,16 @@
  */
 
 
-export interface NewPasswordRequest { 
+
+export interface NewPasswordRequest {
     /**
      * The new password in plain text
      */
     password: string;
+
     /**
      * The secret provided after the password reset
      */
     secret: string;
+
 }

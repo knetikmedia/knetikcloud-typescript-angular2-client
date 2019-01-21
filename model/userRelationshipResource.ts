@@ -9,24 +9,29 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
+
 import { SimpleUserResource } from './simpleUserResource';
 
 
-export interface UserRelationshipResource { 
+export interface UserRelationshipResource {
     /**
      * The child in the relationship
      */
     child: SimpleUserResource;
+
     /**
      * Context about the relationship or its type
      */
     context?: string;
+
     /**
      * A generated unique id. Read-Only
      */
-    readonly id?: number;
+    id?: number;
+
     /**
      * The parent in the relationship
      */
     parent: SimpleUserResource;
+
 }

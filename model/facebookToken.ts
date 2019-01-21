@@ -11,9 +11,11 @@
  */
 
 
-export interface FacebookToken { 
+
+export interface FacebookToken {
     /**
      * A valid access token from facebook. See facebook documention for how to obtain one.
      */
     accessToken: string;
+
 }

@@ -11,17 +11,21 @@
  */
 
 
-export interface BreActionLog { 
+
+export interface BreActionLog {
     /**
      * The name of the action
      */
-    readonly name?: string;
+    name?: string;
+
     /**
      * The runtime of the action in milliseconds
      */
-    readonly runtime?: number;
+    runtime?: number;
+
     /**
      * The status of the action (ran, failed)
      */
-    readonly status?: string;
+    status?: string;
+
 }

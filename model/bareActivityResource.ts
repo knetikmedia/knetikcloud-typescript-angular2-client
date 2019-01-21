@@ -11,45 +11,56 @@
  */
 
 
-export interface BareActivityResource { 
+
+export interface BareActivityResource {
     /**
      * The date/time this resource was created in seconds since unix epoch
      */
-    readonly createdDate?: number;
+    createdDate?: number;
+
     /**
      * The unique ID for that resource
      */
-    readonly id?: number;
+    id?: number;
+
     /**
      * Details about how to launch the activity
      */
     launch?: string;
+
     /**
      * The user friendly name of that resource. Defaults to blank string
      */
     longDescription?: string;
+
     /**
      * The user friendly name of that resource
      */
     name: string;
+
     /**
      * The user friendly name of that resource. Defaults to blank string
      */
     shortDescription?: string;
+
     /**
      * Whether this activity is a template for other activities. Default: false
      */
     template?: boolean;
+
     /**
      * The type of the activity
      */
     type?: string;
+
     /**
      * The unique key (for static reference in code) of the activity
      */
     uniqueKey?: string;
+
     /**
      * The date/time this resource was last updated in seconds since unix epoch
      */
-    readonly updatedDate?: number;
+    updatedDate?: number;
+
 }

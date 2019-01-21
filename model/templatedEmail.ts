@@ -11,13 +11,16 @@
  */
 
 
-export interface TemplatedEmail { 
+
+export interface TemplatedEmail {
     /**
      * The external template ID used by the email provider
      */
     externalTemplateId?: string;
+
     /**
      * The map of data used by the template
      */
     templateData?: any;
+
 }

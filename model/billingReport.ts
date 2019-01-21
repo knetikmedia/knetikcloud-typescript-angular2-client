@@ -11,9 +11,14 @@
  */
 
 
-export interface BillingReport { 
+
+export interface BillingReport {
     created?: number;
+
     id?: string;
+
     lastKnownFailures?: Array<string>;
+
     statistics?: { [key: string]: number; };
+
 }

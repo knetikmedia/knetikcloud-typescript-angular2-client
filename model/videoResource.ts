@@ -9,6 +9,7 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
+
 import { CommentResource } from './commentResource';
 import { ContributionResource } from './contributionResource';
 import { Property } from './property';
@@ -17,133 +18,162 @@ import { SimpleReferenceResourcestring } from './simpleReferenceResourcestring';
 import { SimpleUserResource } from './simpleUserResource';
 
 
-export interface VideoResource { 
+export interface VideoResource {
     /**
      * Whether the video is available, based on various factors
      */
-    readonly active?: boolean;
+    active?: boolean;
+
     /**
      * A map of additional properties, keyed on the property name.  Must match the names and types defined in the template for this item type
      */
     additionalProperties?: { [key: string]: Property; };
+
     /**
      * The original artist of the media
      */
     author?: SimpleReferenceResourcelong;
+
     /**
      * The date the media was created as a unix timestamp in seconds
      */
     authored?: number;
+
     /**
      * Whether the video has been banned or not
      */
-    readonly banned?: boolean;
+    banned?: boolean;
+
     /**
      * The category of the video
      */
     category: SimpleReferenceResourcestring;
+
     /**
      * The comments of the video
      */
-    readonly comments?: Array<CommentResource>;
+    comments?: Array<CommentResource>;
+
     /**
      * Artists that contributed to the creation. See separate endpoint to add to list
      */
-    readonly contributors?: Array<ContributionResource>;
+    contributors?: Array<ContributionResource>;
+
     /**
      * The date/time this resource was created in seconds since unix epoch
      */
-    readonly createdDate?: number;
+    createdDate?: number;
+
     /**
      * The country of an embedable version
      */
     embed?: string;
+
     /**
      * The file extension of the media file. 1-5 characters
      */
     extension: string;
+
     /**
      * The height of the video in px
      */
     height: number;
+
     /**
      * The unique ID for that resource
      */
-    readonly id?: number;
+    id?: number;
+
     /**
      * The length of the video in seconds
      */
     length: number;
+
     /**
      * The country of the media. Typically a url. Cannot be blank
      */
     location: string;
+
     /**
      * The user friendly name of that resource. Defaults to blank string
      */
     longDescription?: string;
+
     /**
      * The mime-type of the media
      */
     mimeType?: string;
+
     /**
      * The user friendly name of that resource
      */
     name: string;
+
     /**
      * The sort order of the video. default: 100
      */
     priority?: number;
+
     /**
      * The privacy setting. default: private
      */
     privacy?: VideoResource.PrivacyEnum;
+
     /**
      * Whether the video has been made public. Default true
      */
     published?: boolean;
+
     /**
      * The user friendly name of that resource. Defaults to blank string
      */
     shortDescription?: string;
+
     /**
      * The size of the media. Minimum 0 if supplied
      */
     size?: number;
+
     /**
      * The tags for the video
      */
     tags?: Array<string>;
+
     /**
      * A video template this video is validated against (private). May be null and no validation of additional_properties will be done
      */
     template?: string;
+
     /**
      * The country of a thumbnail version. Typically a url
      */
     thumbnail?: string;
+
     /**
      * The date/time this resource was last updated in seconds since unix epoch
      */
-    readonly updatedDate?: number;
+    updatedDate?: number;
+
     /**
      * The user the media was uploaded by. May be null for system uploaded media. May only be set to a user other than the current caller if VIDEOS_ADMIN permission. Null will mean the caller is the uploader unless the caller has VIDEOS_ADMIN permission, in which case it will be set to null
      */
     uploader?: SimpleUserResource;
+
     /**
      * The view count of the video
      */
-    readonly views?: number;
+    views?: number;
+
     /**
      * The width of the video in px
      */
     width: number;
+
 }
 export namespace VideoResource {
-    export type PrivacyEnum = 'private' | 'friends' | 'public';
-    export const PrivacyEnum = {
-        Private: 'private' as PrivacyEnum,
-        Friends: 'friends' as PrivacyEnum,
-        Public: 'public' as PrivacyEnum
-    };
+    export enum PrivacyEnum {
+        Private = <any> 'private',
+        Friends = <any> 'friends',
+        Public = <any> 'public'
+    }
 }

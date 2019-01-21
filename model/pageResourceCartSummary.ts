@@ -9,18 +9,25 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
+
 import { CartSummary } from './cartSummary';
-import { Order } from './order';
 
 
-export interface PageResourceCartSummary { 
+export interface PageResourceCartSummary {
     content?: Array<CartSummary>;
+
     first?: boolean;
+
     last?: boolean;
+
     number?: number;
+
     numberOfElements?: number;
+
     size?: number;
-    sort?: Array<Order>;
+
     totalElements?: number;
+
     totalPages?: number;
+
 }

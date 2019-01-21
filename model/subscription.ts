@@ -9,6 +9,7 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
+
 import { Behavior } from './behavior';
 import { Property } from './property';
 import { Sku } from './sku';
@@ -16,15 +17,17 @@ import { StoreItem } from './storeItem';
 import { SubscriptionPlan } from './subscriptionPlan';
 
 
-export interface Subscription extends StoreItem { 
+export interface Subscription extends StoreItem {
     availability?: Subscription.AvailabilityEnum;
+
     consolidationDayOfMonth?: number;
+
     subscriptionPlans?: Array<SubscriptionPlan>;
+
 }
 export namespace Subscription {
-    export type AvailabilityEnum = 'all' | 'new_subscribers';
-    export const AvailabilityEnum = {
-        All: 'all' as AvailabilityEnum,
-        NewSubscribers: 'new_subscribers' as AvailabilityEnum
-    };
+    export enum AvailabilityEnum {
+        All = <any> 'all',
+        NewSubscribers = <any> 'new_subscribers'
+    }
 }

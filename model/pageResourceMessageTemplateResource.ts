@@ -9,18 +9,25 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
+
 import { MessageTemplateResource } from './messageTemplateResource';
-import { Order } from './order';
 
 
-export interface PageResourceMessageTemplateResource { 
+export interface PageResourceMessageTemplateResource {
     content?: Array<MessageTemplateResource>;
+
     first?: boolean;
+
     last?: boolean;
+
     number?: number;
+
     numberOfElements?: number;
+
     size?: number;
-    sort?: Array<Order>;
+
     totalElements?: number;
+
     totalPages?: number;
+
 }

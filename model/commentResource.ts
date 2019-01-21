@@ -9,40 +9,49 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
+
 import { SimpleUserResource } from './simpleUserResource';
 
 
-export interface CommentResource { 
+export interface CommentResource {
     /**
      * The comment content of that resource
      */
     content: string;
+
     /**
      * The type of object this comment applies to (ex: video, article, etc). Required when passed to /comments
      */
     context?: string;
+
     /**
      * The id of the object this comment applies to.  Required when passed to /comments
      */
     contextId?: number;
+
     /**
      * The date/time this resource was created in seconds since epoch
      */
-    readonly createdDate?: number;
+    createdDate?: number;
+
     /**
      * The unique ID for that resource
      */
-    readonly id?: number;
+    id?: number;
+
     /**
      * The summary of that resource
      */
-    readonly summary?: string;
+    summary?: string;
+
     /**
      * The date/time this resource was last updated in seconds since epoch
      */
-    readonly updatedDate?: number;
+    updatedDate?: number;
+
     /**
      * The user who created the comment
      */
-    readonly user?: SimpleUserResource;
+    user?: SimpleUserResource;
+
 }
