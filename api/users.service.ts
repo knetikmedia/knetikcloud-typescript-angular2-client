@@ -254,10 +254,11 @@ export class UsersService {
      * Finish resetting a user's password using the secret provided from the password-reset endpoint.  Password should be in plain text and will be encrypted on receipt. Use SSL for security. <br><br><b>Permissions Needed:</b> ANY<br /><b>Permissions Needed:</b> NONE
      * @summary Choose a new password after a reset
      * @param id The id of the user
+     * @param test If true, test for valid code without changing password or burning code
      * @param newPasswordRequest The new password request object
      */
-    public passwordReset(id: number, newPasswordRequest?: NewPasswordRequest, extraHttpRequestParams?: any): Observable<{}> {
-        return this.passwordResetWithHttpInfo(id, newPasswordRequest, extraHttpRequestParams)
+    public passwordReset(id: number, test?: boolean, newPasswordRequest?: NewPasswordRequest, extraHttpRequestParams?: any): Observable<{}> {
+        return this.passwordResetWithHttpInfo(id, test, newPasswordRequest, extraHttpRequestParams)
             .map((response: Response) => {
                 if (response.status === 204) {
                     return undefined;
@@ -1010,9 +1011,10 @@ export class UsersService {
      * Choose a new password after a reset
      * Finish resetting a user&#39;s password using the secret provided from the password-reset endpoint.  Password should be in plain text and will be encrypted on receipt. Use SSL for security. &lt;br&gt;&lt;br&gt;&lt;b&gt;Permissions Needed:&lt;/b&gt; ANY&lt;br /&gt;&lt;b&gt;Permissions Needed:&lt;/b&gt; NONE
      * @param id The id of the user
+     * @param test If true, test for valid code without changing password or burning code
      * @param newPasswordRequest The new password request object
      */
-    public passwordResetWithHttpInfo(id: number, newPasswordRequest?: NewPasswordRequest, extraHttpRequestParams?: any): Observable<Response> {
+    public passwordResetWithHttpInfo(id: number, test?: boolean, newPasswordRequest?: NewPasswordRequest, extraHttpRequestParams?: any): Observable<Response> {
         const path = this.basePath + '/users/${id}/password-reset'
                     .replace('${' + 'id' + '}', String(id));
 
@@ -1023,6 +1025,10 @@ export class UsersService {
         if (id === null || id === undefined) {
             throw new Error('Required parameter id was null or undefined when calling passwordReset.');
         }
+        if (test !== undefined) {
+            queryParameters.set('test', <any>test);
+        }
+
 
         // to determine the Accept header
         let produces: string[] = [

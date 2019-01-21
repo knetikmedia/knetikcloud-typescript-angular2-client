@@ -34,6 +34,7 @@ import { Result } from '../model/result';
 import { StringWrapper } from '../model/stringWrapper';
 import { TemplateResource } from '../model/templateResource';
 import { ValueWrapperboolean } from '../model/valueWrapperboolean';
+import { VerificationRequest } from '../model/verificationRequest';
 
 import { BASE_PATH, COLLECTION_FORMATS }                     from '../variables';
 import { Configuration }                                     from '../configuration';
@@ -402,6 +403,23 @@ export class UsersGroupsService {
      */
     public getGroupsForUser(userId: number, size?: number, page?: number, filterChildren?: boolean, extraHttpRequestParams?: any): Observable<PageResourcestring> {
         return this.getGroupsForUserWithHttpInfo(userId, size, page, filterChildren, extraHttpRequestParams)
+            .map((response: Response) => {
+                if (response.status === 204) {
+                    return undefined;
+                } else {
+                    return response.json() || {};
+                }
+            });
+    }
+
+    /**
+     * This will create a verification for joining the group which uses the 'group_invite' template and sets the additional_property 'group' with the unique name
+     * @summary Invite to group
+     * @param uniqueName The group unique name
+     * @param request The id of the user to invite
+     */
+    public inviteToGroup(uniqueName: string, request?: VerificationRequest, extraHttpRequestParams?: any): Observable<VerificationRequest> {
+        return this.inviteToGroupWithHttpInfo(uniqueName, request, extraHttpRequestParams)
             .map((response: Response) => {
                 if (response.status === 204) {
                     return undefined;
@@ -1724,6 +1742,65 @@ export class UsersGroupsService {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Get,
             headers: headers,
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
+        });
+        // https://github.com/swagger-api/swagger-codegen/issues/4037
+        if (extraHttpRequestParams) {
+            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
+        }
+
+        return this.http.request(path, requestOptions);
+    }
+
+    /**
+     * Invite to group
+     * This will create a verification for joining the group which uses the &#39;group_invite&#39; template and sets the additional_property &#39;group&#39; with the unique name
+     * @param uniqueName The group unique name
+     * @param request The id of the user to invite
+     */
+    public inviteToGroupWithHttpInfo(uniqueName: string, request?: VerificationRequest, extraHttpRequestParams?: any): Observable<Response> {
+        const path = this.basePath + '/users/groups/${unique_name}/invite'
+                    .replace('${' + 'unique_name' + '}', String(uniqueName));
+
+        let queryParameters = new URLSearchParams();
+        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
+        // verify required parameter 'uniqueName' is not null or undefined
+        if (uniqueName === null || uniqueName === undefined) {
+            throw new Error('Required parameter uniqueName was null or undefined when calling inviteToGroup.');
+        }
+
+        // to determine the Accept header
+        let produces: string[] = [
+            'application/json'
+        ];
+
+        // authentication (oauth2_client_credentials_grant) required
+        // oauth required
+        if (this.configuration.accessToken) {
+            let accessToken = typeof this.configuration.accessToken === 'function'
+                ? this.configuration.accessToken()
+                : this.configuration.accessToken;
+            headers.set('Authorization', 'Bearer ' + accessToken);
+        }
+
+        // authentication (oauth2_password_grant) required
+        // oauth required
+        if (this.configuration.accessToken) {
+            let accessToken = typeof this.configuration.accessToken === 'function'
+                ? this.configuration.accessToken()
+                : this.configuration.accessToken;
+            headers.set('Authorization', 'Bearer ' + accessToken);
+        }
+
+            
+        headers.set('Content-Type', 'application/json');
+
+        let requestOptions: RequestOptionsArgs = new RequestOptions({
+            method: RequestMethod.Post,
+            headers: headers,
+            body: request == null ? '' : JSON.stringify(request), // https://github.com/angular/angular/issues/10612
             search: queryParameters,
             withCredentials:this.configuration.withCredentials
         });

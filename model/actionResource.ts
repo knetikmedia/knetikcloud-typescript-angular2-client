@@ -65,6 +65,7 @@ export namespace ActionResource {
         Campaign = <any> 'campaign',
         Event = <any> 'event',
         Monitoring = <any> 'monitoring',
-        Verification = <any> 'verification'
+        Verification = <any> 'verification',
+        Group = <any> 'group'
     }
 }
