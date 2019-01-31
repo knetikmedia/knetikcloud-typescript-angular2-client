@@ -19,6 +19,11 @@ export interface MonitoringMetricDatapointResource {
     dimensions?: { [key: string]: string; };
 
     /**
+     * The id of the metric. Required for batch endpoint
+     */
+    id?: string;
+
+    /**
      * The unix timestamp in seconds the datapoint occurred, default: now
      */
     timestamp?: number;

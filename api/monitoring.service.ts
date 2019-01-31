@@ -284,6 +284,22 @@ export class MonitoringService {
     }
 
     /**
+     * Only works with counter and gauge metrics. Re-submit the entire batch in case of failure. <br><br><b>Permissions Needed:</b> RECORD<br /><b>Permissions Needed:</b> POST
+     * @summary Post a metric datapoint batch
+     * @param batch The metric datapoints
+     */
+    public postBatch(batch?: Array<MonitoringMetricDatapointResource>, extraHttpRequestParams?: any): Observable<{}> {
+        return this.postBatchWithHttpInfo(batch, extraHttpRequestParams)
+            .map((response: Response) => {
+                if (response.status === 204) {
+                    return undefined;
+                } else {
+                    return response.json() || {};
+                }
+            });
+    }
+
+    /**
      * Only works with counter and gauge metrics. <br><br><b>Permissions Needed:</b> RECORD<br /><b>Permissions Needed:</b> RECORD
      * @summary Post a metric datapoint
      * @param id The metric id
@@ -1072,6 +1088,59 @@ export class MonitoringService {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Get,
             headers: headers,
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
+        });
+        // https://github.com/swagger-api/swagger-codegen/issues/4037
+        if (extraHttpRequestParams) {
+            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
+        }
+
+        return this.http.request(path, requestOptions);
+    }
+
+    /**
+     * Post a metric datapoint batch
+     * Only works with counter and gauge metrics. Re-submit the entire batch in case of failure. &lt;br&gt;&lt;br&gt;&lt;b&gt;Permissions Needed:&lt;/b&gt; RECORD&lt;br /&gt;&lt;b&gt;Permissions Needed:&lt;/b&gt; POST
+     * @param batch The metric datapoints
+     */
+    public postBatchWithHttpInfo(batch?: Array<MonitoringMetricDatapointResource>, extraHttpRequestParams?: any): Observable<Response> {
+        const path = this.basePath + '/monitoring/metrics/datapoints';
+
+        let queryParameters = new URLSearchParams();
+        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
+
+        // to determine the Accept header
+        let produces: string[] = [
+            'application/json'
+        ];
+
+        // authentication (oauth2_client_credentials_grant) required
+        // oauth required
+        if (this.configuration.accessToken) {
+            let accessToken = typeof this.configuration.accessToken === 'function'
+                ? this.configuration.accessToken()
+                : this.configuration.accessToken;
+            headers.set('Authorization', 'Bearer ' + accessToken);
+        }
+
+        // authentication (oauth2_password_grant) required
+        // oauth required
+        if (this.configuration.accessToken) {
+            let accessToken = typeof this.configuration.accessToken === 'function'
+                ? this.configuration.accessToken()
+                : this.configuration.accessToken;
+            headers.set('Authorization', 'Bearer ' + accessToken);
+        }
+
+            
+        headers.set('Content-Type', 'application/json');
+
+        let requestOptions: RequestOptionsArgs = new RequestOptions({
+            method: RequestMethod.Post,
+            headers: headers,
+            body: batch == null ? '' : JSON.stringify(batch), // https://github.com/angular/angular/issues/10612
             search: queryParameters,
             withCredentials:this.configuration.withCredentials
         });

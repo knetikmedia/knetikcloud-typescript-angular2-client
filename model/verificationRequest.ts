@@ -46,6 +46,11 @@ export interface VerificationRequest {
     includeNumbers?: boolean;
 
     /**
+     * The originating user of the request, filled at 
+     */
+    originator?: SimpleUserResource;
+
+    /**
      * An optional user that is expected to respond
      */
     targetUser?: SimpleUserResource;

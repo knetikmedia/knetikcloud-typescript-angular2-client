@@ -13,6 +13,8 @@
 
 
 export interface ArgumentResource {
+    forceSoftness?: boolean;
+
     name?: string;
 
     type?: string;
