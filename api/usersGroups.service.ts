@@ -413,7 +413,7 @@ export class UsersGroupsService {
     }
 
     /**
-     * This will create a verification for joining the group which uses the 'group_invite' template and sets the additional_property 'group' with the unique name
+     * This will create a verification for joining the group which uses the 'group_invite' template and sets the additional_property 'group' with the unique name<br /><b>Permissions Needed:</b> INVITE
      * @summary Invite to group
      * @param uniqueName The group unique name
      * @param request The id of the user to invite
@@ -1755,7 +1755,7 @@ export class UsersGroupsService {
 
     /**
      * Invite to group
-     * This will create a verification for joining the group which uses the &#39;group_invite&#39; template and sets the additional_property &#39;group&#39; with the unique name
+     * This will create a verification for joining the group which uses the &#39;group_invite&#39; template and sets the additional_property &#39;group&#39; with the unique name&lt;br /&gt;&lt;b&gt;Permissions Needed:&lt;/b&gt; INVITE
      * @param uniqueName The group unique name
      * @param request The id of the user to invite
      */

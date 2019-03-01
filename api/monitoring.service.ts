@@ -131,6 +131,23 @@ export class MonitoringService {
     }
 
     /**
+     * Only works for counter and guage type. <b>Permissions Needed:</b> RECORD<br /><b>Permissions Needed:</b> RECORD
+     * @summary Delete a metric datapoint
+     * @param id The metric id
+     * @param dimensions The dimensions of the specific datapoint to delete, in the form key1:value1,key2:val2
+     */
+    public deleteDatapoint(id: string, dimensions?: string, extraHttpRequestParams?: any): Observable<{}> {
+        return this.deleteDatapointWithHttpInfo(id, dimensions, extraHttpRequestParams)
+            .map((response: Response) => {
+                if (response.status === 204) {
+                    return undefined;
+                } else {
+                    return response.json() || {};
+                }
+            });
+    }
+
+    /**
      * Does not delete the incident, but marks it as resolved by setting the end date.<b>Permissions Needed:</b> DELETE<br /><b>Permissions Needed:</b> DELETE
      * @summary End an existing incident
      * @param id The incident id
@@ -284,7 +301,7 @@ export class MonitoringService {
     }
 
     /**
-     * Only works with counter and gauge metrics. Re-submit the entire batch in case of failure. <br><br><b>Permissions Needed:</b> RECORD<br /><b>Permissions Needed:</b> POST
+     * Only works with counter and gauge metrics. Re-submit the entire batch in case of failure. <br><br><b>Permissions Needed:</b> RECORD<br /><b>Permissions Needed:</b> NONE
      * @summary Post a metric datapoint batch
      * @param batch The metric datapoints
      */
@@ -523,6 +540,66 @@ export class MonitoringService {
         if (id === null || id === undefined) {
             throw new Error('Required parameter id was null or undefined when calling deleteAlert.');
         }
+
+        // to determine the Accept header
+        let produces: string[] = [
+            'application/json'
+        ];
+
+        // authentication (oauth2_client_credentials_grant) required
+        // oauth required
+        if (this.configuration.accessToken) {
+            let accessToken = typeof this.configuration.accessToken === 'function'
+                ? this.configuration.accessToken()
+                : this.configuration.accessToken;
+            headers.set('Authorization', 'Bearer ' + accessToken);
+        }
+
+        // authentication (oauth2_password_grant) required
+        // oauth required
+        if (this.configuration.accessToken) {
+            let accessToken = typeof this.configuration.accessToken === 'function'
+                ? this.configuration.accessToken()
+                : this.configuration.accessToken;
+            headers.set('Authorization', 'Bearer ' + accessToken);
+        }
+
+            
+        let requestOptions: RequestOptionsArgs = new RequestOptions({
+            method: RequestMethod.Delete,
+            headers: headers,
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
+        });
+        // https://github.com/swagger-api/swagger-codegen/issues/4037
+        if (extraHttpRequestParams) {
+            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
+        }
+
+        return this.http.request(path, requestOptions);
+    }
+
+    /**
+     * Delete a metric datapoint
+     * Only works for counter and guage type. &lt;b&gt;Permissions Needed:&lt;/b&gt; RECORD&lt;br /&gt;&lt;b&gt;Permissions Needed:&lt;/b&gt; RECORD
+     * @param id The metric id
+     * @param dimensions The dimensions of the specific datapoint to delete, in the form key1:value1,key2:val2
+     */
+    public deleteDatapointWithHttpInfo(id: string, dimensions?: string, extraHttpRequestParams?: any): Observable<Response> {
+        const path = this.basePath + '/monitoring/metrics/${id}/datapoints'
+                    .replace('${' + 'id' + '}', String(id));
+
+        let queryParameters = new URLSearchParams();
+        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
+        // verify required parameter 'id' is not null or undefined
+        if (id === null || id === undefined) {
+            throw new Error('Required parameter id was null or undefined when calling deleteDatapoint.');
+        }
+        if (dimensions !== undefined) {
+            queryParameters.set('dimensions', <any>dimensions);
+        }
+
 
         // to determine the Accept header
         let produces: string[] = [
@@ -1101,7 +1178,7 @@ export class MonitoringService {
 
     /**
      * Post a metric datapoint batch
-     * Only works with counter and gauge metrics. Re-submit the entire batch in case of failure. &lt;br&gt;&lt;br&gt;&lt;b&gt;Permissions Needed:&lt;/b&gt; RECORD&lt;br /&gt;&lt;b&gt;Permissions Needed:&lt;/b&gt; POST
+     * Only works with counter and gauge metrics. Re-submit the entire batch in case of failure. &lt;br&gt;&lt;br&gt;&lt;b&gt;Permissions Needed:&lt;/b&gt; RECORD&lt;br /&gt;&lt;b&gt;Permissions Needed:&lt;/b&gt; NONE
      * @param batch The metric datapoints
      */
     public postBatchWithHttpInfo(batch?: Array<MonitoringMetricDatapointResource>, extraHttpRequestParams?: any): Observable<Response> {

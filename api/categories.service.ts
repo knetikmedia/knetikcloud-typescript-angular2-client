@@ -148,12 +148,13 @@ export class CategoriesService {
      * @summary List and search categories with optional filters
      * @param filterSearch Filter for categories whose names begin with provided string
      * @param filterActive Filter for categories that are specifically active or inactive
+     * @param filterTemplate Filter for categories with a specific template
      * @param size The number of objects returned per page
      * @param page The number of the page returned, starting with 1
      * @param order A comma separated list of sorting requirements in priority order, each entry matching PROPERTY_NAME:[ASC|DESC]
      */
-    public getCategories(filterSearch?: string, filterActive?: boolean, size?: number, page?: number, order?: string, extraHttpRequestParams?: any): Observable<PageResourceCategoryResource> {
-        return this.getCategoriesWithHttpInfo(filterSearch, filterActive, size, page, order, extraHttpRequestParams)
+    public getCategories(filterSearch?: string, filterActive?: boolean, filterTemplate?: string, size?: number, page?: number, order?: string, extraHttpRequestParams?: any): Observable<PageResourceCategoryResource> {
+        return this.getCategoriesWithHttpInfo(filterSearch, filterActive, filterTemplate, size, page, order, extraHttpRequestParams)
             .map((response: Response) => {
                 if (response.status === 204) {
                     return undefined;
@@ -492,11 +493,12 @@ export class CategoriesService {
      * &lt;b&gt;Permissions Needed:&lt;/b&gt; ANY
      * @param filterSearch Filter for categories whose names begin with provided string
      * @param filterActive Filter for categories that are specifically active or inactive
+     * @param filterTemplate Filter for categories with a specific template
      * @param size The number of objects returned per page
      * @param page The number of the page returned, starting with 1
      * @param order A comma separated list of sorting requirements in priority order, each entry matching PROPERTY_NAME:[ASC|DESC]
      */
-    public getCategoriesWithHttpInfo(filterSearch?: string, filterActive?: boolean, size?: number, page?: number, order?: string, extraHttpRequestParams?: any): Observable<Response> {
+    public getCategoriesWithHttpInfo(filterSearch?: string, filterActive?: boolean, filterTemplate?: string, size?: number, page?: number, order?: string, extraHttpRequestParams?: any): Observable<Response> {
         const path = this.basePath + '/categories';
 
         let queryParameters = new URLSearchParams();
@@ -508,6 +510,10 @@ export class CategoriesService {
 
         if (filterActive !== undefined) {
             queryParameters.set('filter_active', <any>filterActive);
+        }
+
+        if (filterTemplate !== undefined) {
+            queryParameters.set('filter_template', <any>filterTemplate);
         }
 
         if (size !== undefined) {

@@ -76,6 +76,7 @@ export namespace BreTriggerResource {
         Event = <any> 'event',
         Monitoring = <any> 'monitoring',
         Verification = <any> 'verification',
-        Group = <any> 'group'
+        Group = <any> 'group',
+        Access = <any> 'access'
     }
 }
