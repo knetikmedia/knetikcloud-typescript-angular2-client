@@ -49,6 +49,11 @@ export interface NotificationTypeResource {
     smsTemplateId?: string;
 
     /**
+     * The id of a message template to resolve the basic message (for user retrieval). If null, message wil be blank
+     */
+    templateId?: string;
+
+    /**
      * The date the type was last updated, as a unix timestamp in seconds
      */
     updatedDate?: number;

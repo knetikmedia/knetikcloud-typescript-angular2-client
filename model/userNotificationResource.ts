@@ -19,6 +19,11 @@ export interface UserNotificationResource {
     data?: any;
 
     /**
+     * The resolved message, if template provided in the notification ype
+     */
+    message?: string;
+
+    /**
      * The id of the notification
      */
     notificationId: string;

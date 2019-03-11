@@ -19,6 +19,11 @@ export interface NotificationResource {
     data?: any;
 
     /**
+     * The resolved message template, if configured on the notification type
+     */
+    message?: string;
+
+    /**
      * The id of this individual notification. Default: random
      */
     notificationId?: string;
