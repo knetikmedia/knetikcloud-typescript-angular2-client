@@ -20,6 +20,8 @@ export interface InvoiceItemResource {
 
     discount?: Discount;
 
+    giftTarget?: number;
+
     id?: number;
 
     invoiceId?: number;
@@ -27,6 +29,8 @@ export interface InvoiceItemResource {
     itemId?: number;
 
     itemName?: string;
+
+    notes?: string;
 
     originalTotalPrice?: number;
 

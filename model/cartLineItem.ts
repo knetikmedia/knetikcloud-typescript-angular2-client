@@ -20,9 +20,13 @@ export interface CartLineItem {
 
     discount?: Discount;
 
+    giftTarget?: number;
+
     lineTotal?: number;
 
     name?: string;
+
+    notes?: string;
 
     originalLineTotal?: number;
 

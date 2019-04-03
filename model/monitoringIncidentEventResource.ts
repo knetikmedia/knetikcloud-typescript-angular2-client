@@ -43,11 +43,6 @@ export interface MonitoringIncidentEventResource {
      */
     status: MonitoringIncidentEventResource.StatusEnum;
 
-    /**
-     * The value that triggered the alarm
-     */
-    triggerValue?: string;
-
 }
 export namespace MonitoringIncidentEventResource {
     export enum StatusEnum {

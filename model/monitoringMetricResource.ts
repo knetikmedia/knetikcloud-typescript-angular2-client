@@ -42,8 +42,6 @@ export interface MonitoringMetricResource {
 export namespace MonitoringMetricResource {
     export enum MetricTypeEnum {
         Counter = <any> 'counter',
-        Delta = <any> 'delta',
-        Gauge = <any> 'gauge',
-        Timer = <any> 'timer'
+        Gauge = <any> 'gauge'
     }
 }

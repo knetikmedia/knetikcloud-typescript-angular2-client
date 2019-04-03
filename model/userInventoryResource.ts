@@ -55,6 +55,11 @@ export interface UserInventoryResource {
     itemTypeHint?: string;
 
     /**
+     * Optional notes about the item
+     */
+    notes?: string;
+
+    /**
      * The status of the inventory. Pending inventory is not yet ready for use. Inactive inventory has expired or been used up
      */
     status?: UserInventoryResource.StatusEnum;

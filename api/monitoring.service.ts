@@ -24,7 +24,6 @@ import { MonitoringAlertResource } from '../model/monitoringAlertResource';
 import { MonitoringIncidentEventResource } from '../model/monitoringIncidentEventResource';
 import { MonitoringIncidentResource } from '../model/monitoringIncidentResource';
 import { MonitoringMetricDatapointResource } from '../model/monitoringMetricDatapointResource';
-import { MonitoringMetricRecordResource } from '../model/monitoringMetricRecordResource';
 import { MonitoringMetricResource } from '../model/monitoringMetricResource';
 import { PageResourceMonitoringAlertResource } from '../model/pageResourceMonitoringAlertResource';
 import { PageResourceMonitoringIncidentEventResource } from '../model/pageResourceMonitoringIncidentEventResource';
@@ -340,40 +339,6 @@ export class MonitoringService {
      */
     public receiveEvent(incidentResource?: MonitoringIncidentEventResource, extraHttpRequestParams?: any): Observable<MonitoringIncidentResource> {
         return this.receiveEventWithHttpInfo(incidentResource, extraHttpRequestParams)
-            .map((response: Response) => {
-                if (response.status === 204) {
-                    return undefined;
-                } else {
-                    return response.json() || {};
-                }
-            });
-    }
-
-    /**
-     * Only works with delta and timer metrics. <br><br><b>Permissions Needed:</b> RECORD<br /><b>Permissions Needed:</b> RECORD
-     * @summary Start recording a metric
-     * @param id The metric id
-     * @param metricRecord The metric record
-     */
-    public startRecordMetric(id: string, metricRecord?: MonitoringMetricRecordResource, extraHttpRequestParams?: any): Observable<{}> {
-        return this.startRecordMetricWithHttpInfo(id, metricRecord, extraHttpRequestParams)
-            .map((response: Response) => {
-                if (response.status === 204) {
-                    return undefined;
-                } else {
-                    return response.json() || {};
-                }
-            });
-    }
-
-    /**
-     * Only works with delta and timer metrics. <br><br><b>Permissions Needed:</b> RECORD<br /><b>Permissions Needed:</b> RECORD
-     * @summary Stop recording a metric
-     * @param id The metric id
-     * @param metricRecord The metric record
-     */
-    public stopRecordMetric(id: string, metricRecord?: MonitoringMetricRecordResource, extraHttpRequestParams?: any): Observable<{}> {
-        return this.stopRecordMetricWithHttpInfo(id, metricRecord, extraHttpRequestParams)
             .map((response: Response) => {
                 if (response.status === 204) {
                     return undefined;
@@ -1330,124 +1295,6 @@ export class MonitoringService {
             method: RequestMethod.Post,
             headers: headers,
             body: incidentResource == null ? '' : JSON.stringify(incidentResource), // https://github.com/angular/angular/issues/10612
-            search: queryParameters,
-            withCredentials:this.configuration.withCredentials
-        });
-        // https://github.com/swagger-api/swagger-codegen/issues/4037
-        if (extraHttpRequestParams) {
-            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
-        }
-
-        return this.http.request(path, requestOptions);
-    }
-
-    /**
-     * Start recording a metric
-     * Only works with delta and timer metrics. &lt;br&gt;&lt;br&gt;&lt;b&gt;Permissions Needed:&lt;/b&gt; RECORD&lt;br /&gt;&lt;b&gt;Permissions Needed:&lt;/b&gt; RECORD
-     * @param id The metric id
-     * @param metricRecord The metric record
-     */
-    public startRecordMetricWithHttpInfo(id: string, metricRecord?: MonitoringMetricRecordResource, extraHttpRequestParams?: any): Observable<Response> {
-        const path = this.basePath + '/monitoring/metrics/${id}/start'
-                    .replace('${' + 'id' + '}', String(id));
-
-        let queryParameters = new URLSearchParams();
-        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
-
-        // verify required parameter 'id' is not null or undefined
-        if (id === null || id === undefined) {
-            throw new Error('Required parameter id was null or undefined when calling startRecordMetric.');
-        }
-
-        // to determine the Accept header
-        let produces: string[] = [
-            'application/json'
-        ];
-
-        // authentication (oauth2_client_credentials_grant) required
-        // oauth required
-        if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
-                ? this.configuration.accessToken()
-                : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
-        }
-
-        // authentication (oauth2_password_grant) required
-        // oauth required
-        if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
-                ? this.configuration.accessToken()
-                : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
-        }
-
-            
-        headers.set('Content-Type', 'application/json');
-
-        let requestOptions: RequestOptionsArgs = new RequestOptions({
-            method: RequestMethod.Post,
-            headers: headers,
-            body: metricRecord == null ? '' : JSON.stringify(metricRecord), // https://github.com/angular/angular/issues/10612
-            search: queryParameters,
-            withCredentials:this.configuration.withCredentials
-        });
-        // https://github.com/swagger-api/swagger-codegen/issues/4037
-        if (extraHttpRequestParams) {
-            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
-        }
-
-        return this.http.request(path, requestOptions);
-    }
-
-    /**
-     * Stop recording a metric
-     * Only works with delta and timer metrics. &lt;br&gt;&lt;br&gt;&lt;b&gt;Permissions Needed:&lt;/b&gt; RECORD&lt;br /&gt;&lt;b&gt;Permissions Needed:&lt;/b&gt; RECORD
-     * @param id The metric id
-     * @param metricRecord The metric record
-     */
-    public stopRecordMetricWithHttpInfo(id: string, metricRecord?: MonitoringMetricRecordResource, extraHttpRequestParams?: any): Observable<Response> {
-        const path = this.basePath + '/monitoring/metrics/${id}/stop'
-                    .replace('${' + 'id' + '}', String(id));
-
-        let queryParameters = new URLSearchParams();
-        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
-
-        // verify required parameter 'id' is not null or undefined
-        if (id === null || id === undefined) {
-            throw new Error('Required parameter id was null or undefined when calling stopRecordMetric.');
-        }
-
-        // to determine the Accept header
-        let produces: string[] = [
-            'application/json'
-        ];
-
-        // authentication (oauth2_client_credentials_grant) required
-        // oauth required
-        if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
-                ? this.configuration.accessToken()
-                : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
-        }
-
-        // authentication (oauth2_password_grant) required
-        // oauth required
-        if (this.configuration.accessToken) {
-            let accessToken = typeof this.configuration.accessToken === 'function'
-                ? this.configuration.accessToken()
-                : this.configuration.accessToken;
-            headers.set('Authorization', 'Bearer ' + accessToken);
-        }
-
-            
-        headers.set('Content-Type', 'application/json');
-
-        let requestOptions: RequestOptionsArgs = new RequestOptions({
-            method: RequestMethod.Post,
-            headers: headers,
-            body: metricRecord == null ? '' : JSON.stringify(metricRecord), // https://github.com/angular/angular/issues/10612
             search: queryParameters,
             withCredentials:this.configuration.withCredentials
         });

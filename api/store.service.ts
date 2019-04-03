@@ -26,6 +26,7 @@ import { PageResourceStoreItem } from '../model/pageResourceStoreItem';
 import { PageResourceStoreItemTemplateResource } from '../model/pageResourceStoreItemTemplateResource';
 import { PatchResource } from '../model/patchResource';
 import { QuickBuyRequest } from '../model/quickBuyRequest';
+import { QuickPaidRequest } from '../model/quickPaidRequest';
 import { Result } from '../model/result';
 import { StoreItem } from '../model/storeItem';
 import { StoreItemTemplateResource } from '../model/storeItemTemplateResource';
@@ -252,6 +253,22 @@ export class StoreService {
      */
     public quickBuy(quickBuyRequest?: QuickBuyRequest, extraHttpRequestParams?: any): Observable<InvoiceResource> {
         return this.quickBuyWithHttpInfo(quickBuyRequest, extraHttpRequestParams)
+            .map((response: Response) => {
+                if (response.status === 204) {
+                    return undefined;
+                } else {
+                    return response.json() || {};
+                }
+            });
+    }
+
+    /**
+     * Used to create and automatically mark paid an invoice. Must not be an item that requires shipping. PAYMENTS_ADMIN permission is required if user ID is specified and is not the ID of the currently logged in user. <br><br><b>Permissions Needed:</b> PAYMENTS_USER and owner, or PAYMENTS_ADMIN
+     * @summary One-step purchase when already paid
+     * @param quickPaidRequest Quick buy details
+     */
+    public quickPaid(quickPaidRequest?: QuickPaidRequest, extraHttpRequestParams?: any): Observable<InvoiceResource> {
+        return this.quickPaidWithHttpInfo(quickPaidRequest, extraHttpRequestParams)
             .map((response: Response) => {
                 if (response.status === 204) {
                     return undefined;
@@ -933,6 +950,59 @@ export class StoreService {
             method: RequestMethod.Post,
             headers: headers,
             body: quickBuyRequest == null ? '' : JSON.stringify(quickBuyRequest), // https://github.com/angular/angular/issues/10612
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
+        });
+        // https://github.com/swagger-api/swagger-codegen/issues/4037
+        if (extraHttpRequestParams) {
+            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
+        }
+
+        return this.http.request(path, requestOptions);
+    }
+
+    /**
+     * One-step purchase when already paid
+     * Used to create and automatically mark paid an invoice. Must not be an item that requires shipping. PAYMENTS_ADMIN permission is required if user ID is specified and is not the ID of the currently logged in user. &lt;br&gt;&lt;br&gt;&lt;b&gt;Permissions Needed:&lt;/b&gt; PAYMENTS_USER and owner, or PAYMENTS_ADMIN
+     * @param quickPaidRequest Quick buy details
+     */
+    public quickPaidWithHttpInfo(quickPaidRequest?: QuickPaidRequest, extraHttpRequestParams?: any): Observable<Response> {
+        const path = this.basePath + '/store/quick-paid';
+
+        let queryParameters = new URLSearchParams();
+        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
+
+        // to determine the Accept header
+        let produces: string[] = [
+            'application/json'
+        ];
+
+        // authentication (oauth2_client_credentials_grant) required
+        // oauth required
+        if (this.configuration.accessToken) {
+            let accessToken = typeof this.configuration.accessToken === 'function'
+                ? this.configuration.accessToken()
+                : this.configuration.accessToken;
+            headers.set('Authorization', 'Bearer ' + accessToken);
+        }
+
+        // authentication (oauth2_password_grant) required
+        // oauth required
+        if (this.configuration.accessToken) {
+            let accessToken = typeof this.configuration.accessToken === 'function'
+                ? this.configuration.accessToken()
+                : this.configuration.accessToken;
+            headers.set('Authorization', 'Bearer ' + accessToken);
+        }
+
+            
+        headers.set('Content-Type', 'application/json');
+
+        let requestOptions: RequestOptionsArgs = new RequestOptions({
+            method: RequestMethod.Post,
+            headers: headers,
+            body: quickPaidRequest == null ? '' : JSON.stringify(quickPaidRequest), // https://github.com/angular/angular/issues/10612
             search: queryParameters,
             withCredentials:this.configuration.withCredentials
         });

@@ -50,9 +50,4 @@ export interface MonitoringIncidentResource {
      */
     startDate?: number;
 
-    /**
-     * The value that triggered the incident
-     */
-    triggerValue: string;
-
 }
