@@ -10,9 +10,15 @@
  * Do not edit the class manually.
  */
 
+import { Property } from './property';
 
 
 export interface QuickPaidRequest {
+    /**
+     * A map of additional properties, keyed on the property name (private). Must match the names and types defined in the template for this invoice type, or be an extra not from the template
+     */
+    additionalProperties?: { [key: string]: Property; };
+
     /**
      * An optional target user to give the item to as a gift
      */
@@ -37,6 +43,11 @@ export interface QuickPaidRequest {
      * SKU of item being purchased
      */
     sku: string;
+
+    /**
+     * An invoice template this invoice is validated against (private). May be null and no validation of properties will be done
+     */
+    template?: string;
 
     /**
      * Transaction details

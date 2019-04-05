@@ -27,6 +27,7 @@ import { PageResourceChatMessageResource } from '../model/pageResourceChatMessag
 import { PageResourceTemplateResource } from '../model/pageResourceTemplateResource';
 import { PageResourceUserBaseResource } from '../model/pageResourceUserBaseResource';
 import { PageResourcestring } from '../model/pageResourcestring';
+import { PasswordChangeRequest } from '../model/passwordChangeRequest';
 import { PasswordResetRequest } from '../model/passwordResetRequest';
 import { PatchResource } from '../model/patchResource';
 import { Result } from '../model/result';
@@ -319,13 +320,13 @@ export class UsersService {
     }
 
     /**
-     * Password should be in plain text and will be encrypted on receipt. Use SSL for security. <br><br><b>Permissions Needed:</b> PUT<br /><b>Permissions Needed:</b> PUT
+     * Password should be in plain text and will be encrypted on receipt. Use SSL for security. If not USERS_ADMIN, the correct current password must be supplied as wellPUT<br /><b>Permissions Needed:</b> PUT
      * @summary Set a user's password
      * @param id The id of the user
-     * @param password The new plain text password
+     * @param passwordRequest request body for password change
      */
-    public setPassword(id: number, password?: StringWrapper, extraHttpRequestParams?: any): Observable<{}> {
-        return this.setPasswordWithHttpInfo(id, password, extraHttpRequestParams)
+    public setPassword(id: number, passwordRequest?: PasswordChangeRequest, extraHttpRequestParams?: any): Observable<{}> {
+        return this.setPasswordWithHttpInfo(id, passwordRequest, extraHttpRequestParams)
             .map((response: Response) => {
                 if (response.status === 204) {
                     return undefined;
@@ -1246,11 +1247,11 @@ export class UsersService {
 
     /**
      * Set a user&#39;s password
-     * Password should be in plain text and will be encrypted on receipt. Use SSL for security. &lt;br&gt;&lt;br&gt;&lt;b&gt;Permissions Needed:&lt;/b&gt; PUT&lt;br /&gt;&lt;b&gt;Permissions Needed:&lt;/b&gt; PUT
+     * Password should be in plain text and will be encrypted on receipt. Use SSL for security. If not USERS_ADMIN, the correct current password must be supplied as wellPUT&lt;br /&gt;&lt;b&gt;Permissions Needed:&lt;/b&gt; PUT
      * @param id The id of the user
-     * @param password The new plain text password
+     * @param passwordRequest request body for password change
      */
-    public setPasswordWithHttpInfo(id: number, password?: StringWrapper, extraHttpRequestParams?: any): Observable<Response> {
+    public setPasswordWithHttpInfo(id: number, passwordRequest?: PasswordChangeRequest, extraHttpRequestParams?: any): Observable<Response> {
         const path = this.basePath + '/users/${id}/password'
                     .replace('${' + 'id' + '}', String(id));
 
@@ -1291,7 +1292,7 @@ export class UsersService {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Put,
             headers: headers,
-            body: password == null ? '' : JSON.stringify(password), // https://github.com/angular/angular/issues/10612
+            body: passwordRequest == null ? '' : JSON.stringify(passwordRequest), // https://github.com/angular/angular/issues/10612
             search: queryParameters,
             withCredentials:this.configuration.withCredentials
         });

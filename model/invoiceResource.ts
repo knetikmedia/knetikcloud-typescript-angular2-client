@@ -11,10 +11,16 @@
  */
 
 import { InvoiceItemResource } from './invoiceItemResource';
+import { Property } from './property';
 import { SimpleUserResource } from './simpleUserResource';
 
 
 export interface InvoiceResource {
+    /**
+     * A map of additional properties, keyed on the property name (private). Must match the names and types defined in the template for this invoice type, or be an extra not from the template
+     */
+    additionalProperties?: { [key: string]: Property; };
+
     /**
      * Line one of the customer's billing address
      */
@@ -204,6 +210,11 @@ export interface InvoiceResource {
      * The sum price of all items before shipping, coupons and tax
      */
     subtotal?: number;
+
+    /**
+     * An invoice template this invoice is validated against (private). May be null and no validation of properties will be done
+     */
+    template?: string;
 
     /**
      * The date the invoice was last updated, unix timestamp in seconds

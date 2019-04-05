@@ -280,6 +280,7 @@ export * from './pageResourceWalletTransactionResource';
 export * from './pageResourcestring';
 export * from './parameterResource';
 export * from './participant';
+export * from './passwordChangeRequest';
 export * from './passwordResetRequest';
 export * from './patchActionResource';
 export * from './patchResource';
