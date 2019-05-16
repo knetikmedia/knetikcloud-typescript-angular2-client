@@ -39,6 +39,11 @@ export interface MonitoringIncidentEventResource {
     levelName: string;
 
     /**
+     * The value of the label from the alert that incidents are merged on
+     */
+    mergeValue?: string;
+
+    /**
      * The new status of the alert level
      */
     status: MonitoringIncidentEventResource.StatusEnum;

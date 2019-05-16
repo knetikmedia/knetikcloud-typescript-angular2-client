@@ -11,7 +11,6 @@
  */
 
 import { Property } from './property';
-import { UserRelationshipReferenceResource } from './userRelationshipReferenceResource';
 
 
 export interface UserResource {
@@ -36,24 +35,9 @@ export interface UserResource {
     avatarUrl?: string;
 
     /**
-     * Relationships where this user is the parent. Read-Only, manage through separate endpoints
-     */
-    children?: Array<UserRelationshipReferenceResource>;
-
-    /**
      * The user's city (private)
      */
     city?: string;
-
-    /**
-     * The ISO3 code for the country from the user's address (private). Will be filled in based on GeoIP country at registration if not provided.
-     */
-    countryCode?: string;
-
-    /**
-     * The code for the user's real money currency (private)
-     */
-    currencyCode?: string;
 
     /**
      * The user's date of birth (private) as a unix timestamp
@@ -96,11 +80,6 @@ export interface UserResource {
     id?: number;
 
     /**
-     * The ISO3 code for the user's currency (private)
-     */
-    languageCode?: string;
-
-    /**
      * The date the user last interacted with the API (private)
      */
     lastActivity?: number;
@@ -126,11 +105,6 @@ export interface UserResource {
     mobileNumber?: string;
 
     /**
-     * Relationships where this user is the child. Read-Only, manage through separate endpoints
-     */
-    parents?: Array<UserRelationshipReferenceResource>;
-
-    /**
      * The plain text password for the new user account. Required for registration; ignored on profile update.  Use password specific endpoints for editing
      */
     password?: string;
@@ -154,11 +128,6 @@ export interface UserResource {
      * A user template this user is validated against (private). May be null and no validation of properties will be done
      */
     template?: string;
-
-    /**
-     * The code for the user's timezone (private)
-     */
-    timezoneCode?: string;
 
     /**
      * The login username for the user (private). May be set to match email if system does not require usernames separately.

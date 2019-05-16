@@ -46,6 +46,11 @@ export interface MonitoringIncidentResource {
     levels: Array<MonitoringIncidentLevelResource>;
 
     /**
+     * The value of the merge_label from the alert
+     */
+    mergeValue?: string;
+
+    /**
      * The startDate as a unix timestamp in seconds the incident first started
      */
     startDate?: number;

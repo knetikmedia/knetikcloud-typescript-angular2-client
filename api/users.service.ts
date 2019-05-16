@@ -303,6 +303,22 @@ export class UsersService {
     }
 
     /**
+     * Password should be in plain text and will be encrypted on receipt. Use SSL for security.<br /><b>Permissions Needed:</b> NONE
+     * @summary Register a new cuentas user
+     * @param userResource The user resource object
+     */
+    public registerUserCuentas(userResource?: UserResource, extraHttpRequestParams?: any): Observable<UserResource> {
+        return this.registerUserCuentasWithHttpInfo(userResource, extraHttpRequestParams)
+            .map((response: Response) => {
+                if (response.status === 204) {
+                    return undefined;
+                } else {
+                    return response.json() || {};
+                }
+            });
+    }
+
+    /**
      * <b>Permissions Needed:</b> USERS_ADMIN
      * @summary Remove a tag from a user
      * @param userId The id of the user
@@ -1138,6 +1154,59 @@ export class UsersService {
      */
     public registerUserWithHttpInfo(userResource?: UserResource, extraHttpRequestParams?: any): Observable<Response> {
         const path = this.basePath + '/users';
+
+        let queryParameters = new URLSearchParams();
+        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
+
+        // to determine the Accept header
+        let produces: string[] = [
+            'application/json'
+        ];
+
+        // authentication (oauth2_client_credentials_grant) required
+        // oauth required
+        if (this.configuration.accessToken) {
+            let accessToken = typeof this.configuration.accessToken === 'function'
+                ? this.configuration.accessToken()
+                : this.configuration.accessToken;
+            headers.set('Authorization', 'Bearer ' + accessToken);
+        }
+
+        // authentication (oauth2_password_grant) required
+        // oauth required
+        if (this.configuration.accessToken) {
+            let accessToken = typeof this.configuration.accessToken === 'function'
+                ? this.configuration.accessToken()
+                : this.configuration.accessToken;
+            headers.set('Authorization', 'Bearer ' + accessToken);
+        }
+
+            
+        headers.set('Content-Type', 'application/json');
+
+        let requestOptions: RequestOptionsArgs = new RequestOptions({
+            method: RequestMethod.Post,
+            headers: headers,
+            body: userResource == null ? '' : JSON.stringify(userResource), // https://github.com/angular/angular/issues/10612
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
+        });
+        // https://github.com/swagger-api/swagger-codegen/issues/4037
+        if (extraHttpRequestParams) {
+            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
+        }
+
+        return this.http.request(path, requestOptions);
+    }
+
+    /**
+     * Register a new cuentas user
+     * Password should be in plain text and will be encrypted on receipt. Use SSL for security.&lt;br /&gt;&lt;b&gt;Permissions Needed:&lt;/b&gt; NONE
+     * @param userResource The user resource object
+     */
+    public registerUserCuentasWithHttpInfo(userResource?: UserResource, extraHttpRequestParams?: any): Observable<Response> {
+        const path = this.basePath + '/users/cuentas';
 
         let queryParameters = new URLSearchParams();
         let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845

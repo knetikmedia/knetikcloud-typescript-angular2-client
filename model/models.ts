@@ -377,7 +377,6 @@ export * from './userItemLogResource';
 export * from './userLevelingResource';
 export * from './userNotificationResource';
 export * from './userNotificationStatusWrapper';
-export * from './userRelationshipReferenceResource';
 export * from './userRelationshipResource';
 export * from './userResource';
 export * from './userSidResource';

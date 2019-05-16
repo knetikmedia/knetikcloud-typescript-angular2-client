@@ -31,9 +31,14 @@ export interface MonitoringAlertResource {
     levels: Array<MonitoringAlertLevel>;
 
     /**
+     * The name of a label returned in the alert query that is used to merge multiple incidents when they match
+     */
+    mergeLabel?: string;
+
+    /**
      * The id of the metric the alert is monitoring
      */
-    metric: SimpleReferenceResourcestring;
+    metric?: SimpleReferenceResourcestring;
 
     /**
      * The name of the alert, for display purposes
