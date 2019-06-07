@@ -97,9 +97,10 @@ export class VerificationService {
      * Verification requests ask for a user to respond and confirm something, like their email address of an invitation to join a group.<br /><b>Permissions Needed:</b> POST
      * @summary Create a new request
      * @param verificationRequest The request
+     * @param originator Optional originator id, admin only
      */
-    public createVerificationRequest(verificationRequest?: VerificationRequest, extraHttpRequestParams?: any): Observable<VerificationRequest> {
-        return this.createVerificationRequestWithHttpInfo(verificationRequest, extraHttpRequestParams)
+    public createVerificationRequest(verificationRequest?: VerificationRequest, originator?: number, extraHttpRequestParams?: any): Observable<VerificationRequest> {
+        return this.createVerificationRequestWithHttpInfo(verificationRequest, originator, extraHttpRequestParams)
             .map((response: Response) => {
                 if (response.status === 204) {
                     return undefined;
@@ -319,8 +320,9 @@ export class VerificationService {
      * Create a new request
      * Verification requests ask for a user to respond and confirm something, like their email address of an invitation to join a group.&lt;br /&gt;&lt;b&gt;Permissions Needed:&lt;/b&gt; POST
      * @param verificationRequest The request
+     * @param originator Optional originator id, admin only
      */
-    public createVerificationRequestWithHttpInfo(verificationRequest?: VerificationRequest, extraHttpRequestParams?: any): Observable<Response> {
+    public createVerificationRequestWithHttpInfo(verificationRequest?: VerificationRequest, originator?: number, extraHttpRequestParams?: any): Observable<Response> {
         const path = this.basePath + '/verification/requests';
 
         let queryParameters = new URLSearchParams();
@@ -356,7 +358,7 @@ export class VerificationService {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Post,
             headers: headers,
-            body: verificationRequest == null ? '' : JSON.stringify(verificationRequest), // https://github.com/angular/angular/issues/10612
+            body: originator == null ? '' : JSON.stringify(originator), // https://github.com/angular/angular/issues/10612
             search: queryParameters,
             withCredentials:this.configuration.withCredentials
         });

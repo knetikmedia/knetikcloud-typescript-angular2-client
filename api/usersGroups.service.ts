@@ -417,9 +417,10 @@ export class UsersGroupsService {
      * @summary Invite to group
      * @param uniqueName The group unique name
      * @param request The id of the user to invite
+     * @param originator Optional originator id, admin only
      */
-    public inviteToGroup(uniqueName: string, request?: VerificationRequest, extraHttpRequestParams?: any): Observable<VerificationRequest> {
-        return this.inviteToGroupWithHttpInfo(uniqueName, request, extraHttpRequestParams)
+    public inviteToGroup(uniqueName: string, request?: VerificationRequest, originator?: number, extraHttpRequestParams?: any): Observable<VerificationRequest> {
+        return this.inviteToGroupWithHttpInfo(uniqueName, request, originator, extraHttpRequestParams)
             .map((response: Response) => {
                 if (response.status === 204) {
                     return undefined;
@@ -1758,8 +1759,9 @@ export class UsersGroupsService {
      * This will create a verification for joining the group which uses the &#39;group_invite&#39; template and sets the additional_property &#39;group&#39; with the unique name&lt;br /&gt;&lt;b&gt;Permissions Needed:&lt;/b&gt; INVITE
      * @param uniqueName The group unique name
      * @param request The id of the user to invite
+     * @param originator Optional originator id, admin only
      */
-    public inviteToGroupWithHttpInfo(uniqueName: string, request?: VerificationRequest, extraHttpRequestParams?: any): Observable<Response> {
+    public inviteToGroupWithHttpInfo(uniqueName: string, request?: VerificationRequest, originator?: number, extraHttpRequestParams?: any): Observable<Response> {
         const path = this.basePath + '/users/groups/${unique_name}/invite'
                     .replace('${' + 'unique_name' + '}', String(uniqueName));
 
@@ -1800,7 +1802,7 @@ export class UsersGroupsService {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Post,
             headers: headers,
-            body: request == null ? '' : JSON.stringify(request), // https://github.com/angular/angular/issues/10612
+            body: originator == null ? '' : JSON.stringify(originator), // https://github.com/angular/angular/issues/10612
             search: queryParameters,
             withCredentials:this.configuration.withCredentials
         });
