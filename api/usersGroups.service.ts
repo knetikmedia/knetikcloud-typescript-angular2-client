@@ -1772,6 +1772,10 @@ export class UsersGroupsService {
         if (uniqueName === null || uniqueName === undefined) {
             throw new Error('Required parameter uniqueName was null or undefined when calling inviteToGroup.');
         }
+        if (originator !== undefined) {
+            queryParameters.set('originator', <any>originator);
+        }
+
 
         // to determine the Accept header
         let produces: string[] = [
@@ -1802,7 +1806,7 @@ export class UsersGroupsService {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Post,
             headers: headers,
-            body: originator == null ? '' : JSON.stringify(originator), // https://github.com/angular/angular/issues/10612
+            body: request == null ? '' : JSON.stringify(request), // https://github.com/angular/angular/issues/10612
             search: queryParameters,
             withCredentials:this.configuration.withCredentials
         });

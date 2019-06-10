@@ -328,6 +328,10 @@ export class VerificationService {
         let queryParameters = new URLSearchParams();
         let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
 
+        if (originator !== undefined) {
+            queryParameters.set('originator', <any>originator);
+        }
+
 
         // to determine the Accept header
         let produces: string[] = [
@@ -358,7 +362,7 @@ export class VerificationService {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Post,
             headers: headers,
-            body: originator == null ? '' : JSON.stringify(originator), // https://github.com/angular/angular/issues/10612
+            body: verificationRequest == null ? '' : JSON.stringify(verificationRequest), // https://github.com/angular/angular/issues/10612
             search: queryParameters,
             withCredentials:this.configuration.withCredentials
         });
