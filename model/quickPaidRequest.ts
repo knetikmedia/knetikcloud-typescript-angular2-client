@@ -20,6 +20,11 @@ export interface QuickPaidRequest {
     additionalProperties?: { [key: string]: Property; };
 
     /**
+     * The amount of federal tax to add (increases final price of invoice even if using price override). Minimum 0
+     */
+    federalTax?: number;
+
+    /**
      * An optional target user to give the item to as a gift
      */
     giftTarget: number;
@@ -30,9 +35,9 @@ export interface QuickPaidRequest {
     itemNotes?: string;
 
     /**
-     * The amount already paid. Must match final price to complete purchase. Minimum 0
+     * The amount already paid. Must match final price to complete purchase. Ignored for non-paid endpoints. Minimum 0
      */
-    paidAmount: number;
+    paidAmount?: number;
 
     /**
      * Override the price of an item, if the behavior configuration permits it. Do not send if taking standard pricing. Minimum 0
@@ -43,6 +48,11 @@ export interface QuickPaidRequest {
      * SKU of item being purchased
      */
     sku: string;
+
+    /**
+     * The amount of state tax to add (increases final price of invoice even if using price override). Minimum 0
+     */
+    stateTax?: number;
 
     /**
      * An invoice template this invoice is validated against (private). May be null and no validation of properties will be done

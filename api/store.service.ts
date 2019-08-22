@@ -98,7 +98,7 @@ export class StoreService {
     }
 
     /**
-     * SKUs have to be unique in the entire store. If a duplicate SKU is found, a 400 error is generated and the response will have a \"parameters\" field that is a list of duplicates. A duplicate is an object like {item_id, offending_sku_list}. Ex:<br /> {..., parameters: [[{item: 1, skus: [\"SKU-1\"]}]]}<br /> If an item is brand new and has duplicate SKUs within itself, the item ID will be 0.  Item subclasses are not allowed here, you will have to use their respective endpoints. <br><br><b>Permissions Needed:</b> STORE_ADMIN
+     * SKUs have to be unique in the entire store. If a duplicate SKU is found, a 400 error is generated and the response will have a \"parameters\" field that is a list of duplicates. A duplicate is an object like {item_id, offending_sku_list}. Ex:<br /> {..., parameters: [[{item: 1, skus: [\"SKU-1\"]}]]}<br /> If an item is brand new and has duplicate SKUs within itself, the item ID will be 0.  Item subclasses are not allowed here, you will have to use their respective endpoints. <br><br><b>Permissions Needed:</b> STORE_ADMIN<br /><b>Permissions Needed:</b> NONE
      * @summary Create a store item
      * @param cascade Whether to cascade group changes, such as in the limited gettable behavior. A 400 error will return otherwise if the group is already in use with different values.
      * @param storeItem The store item object
@@ -132,7 +132,7 @@ export class StoreService {
     }
 
     /**
-     * <b>Permissions Needed:</b> STORE_ADMIN
+     * <b>Permissions Needed:</b> STORE_ADMIN<br /><b>Permissions Needed:</b> NONE
      * @summary Delete a store item
      * @param id The id of the item
      */
@@ -148,7 +148,7 @@ export class StoreService {
     }
 
     /**
-     * <b>Permissions Needed:</b> ANY
+     * <b>Permissions Needed:</b> ANY<br /><b>Permissions Needed:</b> NONE
      * @summary List available item behaviors
      * @param size The number of objects returned per page
      * @param page The number of the page returned, starting with 1
@@ -199,7 +199,7 @@ export class StoreService {
     }
 
     /**
-     * <b>Permissions Needed:</b> ANY
+     * <b>Permissions Needed:</b> ANY<br /><b>Permissions Needed:</b> NONE
      * @summary Get a single store item
      * @param id The id of the item
      */
@@ -215,7 +215,7 @@ export class StoreService {
     }
 
     /**
-     * If called without permission STORE_ADMIN the only items marked displayable, whose start and end date are null or appropriate to the current date, and whose geo policy allows the caller's country will be returned. Similarly skus will be filtered, possibly resulting in an item returned with no skus the user can purchase. br><br><b>Permissions Needed:</b> ANY
+     * If called without permission STORE_ADMIN the only items marked displayable, whose start and end date are null or appropriate to the current date, and whose geo policy allows the caller's country will be returned. Similarly skus will be filtered, possibly resulting in an item returned with no skus the user can purchase. br><br><b>Permissions Needed:</b> ANY<br /><b>Permissions Needed:</b> NONE
      * @summary List and search store items
      * @param filterNameSearch Filter for items whose name starts with a given string.
      * @param filterUniqueKey Filter for items whose unique_key is a given string.
@@ -279,6 +279,22 @@ export class StoreService {
     }
 
     /**
+     * Used to create and automatically mark processing an invoice. Must not be an item that requires shipping. PAYMENTS_ADMIN permission is required if user ID is specified and is not the ID of the currently logged in user. <br><br><b>Permissions Needed:</b> PAYMENTS_USER and owner, or PAYMENTS_ADMIN
+     * @summary One-step invoice creation when already processing
+     * @param quickProcessingRequest Quick processing details
+     */
+    public quickProcessing(quickProcessingRequest?: QuickPaidRequest, extraHttpRequestParams?: any): Observable<InvoiceResource> {
+        return this.quickProcessingWithHttpInfo(quickProcessingRequest, extraHttpRequestParams)
+            .map((response: Response) => {
+                if (response.status === 204) {
+                    return undefined;
+                } else {
+                    return response.json() || {};
+                }
+            });
+    }
+
+    /**
      * <b>Permissions Needed:</b> TEMPLATE_ADMIN<br /><b>Permissions Needed:</b> PUT
      * @summary Update an item template
      * @param id The id of the template
@@ -297,7 +313,7 @@ export class StoreService {
     }
 
     /**
-     * <b>Permissions Needed:</b> STORE_ADMIN
+     * <b>Permissions Needed:</b> STORE_ADMIN<br /><b>Permissions Needed:</b> NONE
      * @summary Update a store item
      * @param id The id of the item
      * @param cascade Whether to cascade group changes, such as in the limited gettable behavior. A 400 error will return otherwise if the group is already in use with different values.
@@ -370,7 +386,7 @@ export class StoreService {
 
     /**
      * Create a store item
-     * SKUs have to be unique in the entire store. If a duplicate SKU is found, a 400 error is generated and the response will have a \&quot;parameters\&quot; field that is a list of duplicates. A duplicate is an object like {item_id, offending_sku_list}. Ex:&lt;br /&gt; {..., parameters: [[{item: 1, skus: [\&quot;SKU-1\&quot;]}]]}&lt;br /&gt; If an item is brand new and has duplicate SKUs within itself, the item ID will be 0.  Item subclasses are not allowed here, you will have to use their respective endpoints. &lt;br&gt;&lt;br&gt;&lt;b&gt;Permissions Needed:&lt;/b&gt; STORE_ADMIN
+     * SKUs have to be unique in the entire store. If a duplicate SKU is found, a 400 error is generated and the response will have a \&quot;parameters\&quot; field that is a list of duplicates. A duplicate is an object like {item_id, offending_sku_list}. Ex:&lt;br /&gt; {..., parameters: [[{item: 1, skus: [\&quot;SKU-1\&quot;]}]]}&lt;br /&gt; If an item is brand new and has duplicate SKUs within itself, the item ID will be 0.  Item subclasses are not allowed here, you will have to use their respective endpoints. &lt;br&gt;&lt;br&gt;&lt;b&gt;Permissions Needed:&lt;/b&gt; STORE_ADMIN&lt;br /&gt;&lt;b&gt;Permissions Needed:&lt;/b&gt; NONE
      * @param cascade Whether to cascade group changes, such as in the limited gettable behavior. A 400 error will return otherwise if the group is already in use with different values.
      * @param storeItem The store item object
      */
@@ -488,7 +504,7 @@ export class StoreService {
 
     /**
      * Delete a store item
-     * &lt;b&gt;Permissions Needed:&lt;/b&gt; STORE_ADMIN
+     * &lt;b&gt;Permissions Needed:&lt;/b&gt; STORE_ADMIN&lt;br /&gt;&lt;b&gt;Permissions Needed:&lt;/b&gt; NONE
      * @param id The id of the item
      */
     public deleteStoreItemWithHttpInfo(id: number, extraHttpRequestParams?: any): Observable<Response> {
@@ -543,7 +559,7 @@ export class StoreService {
 
     /**
      * List available item behaviors
-     * &lt;b&gt;Permissions Needed:&lt;/b&gt; ANY
+     * &lt;b&gt;Permissions Needed:&lt;/b&gt; ANY&lt;br /&gt;&lt;b&gt;Permissions Needed:&lt;/b&gt; NONE
      * @param size The number of objects returned per page
      * @param page The number of the page returned, starting with 1
      */
@@ -721,7 +737,7 @@ export class StoreService {
 
     /**
      * Get a single store item
-     * &lt;b&gt;Permissions Needed:&lt;/b&gt; ANY
+     * &lt;b&gt;Permissions Needed:&lt;/b&gt; ANY&lt;br /&gt;&lt;b&gt;Permissions Needed:&lt;/b&gt; NONE
      * @param id The id of the item
      */
     public getStoreItemWithHttpInfo(id: number, extraHttpRequestParams?: any): Observable<Response> {
@@ -776,7 +792,7 @@ export class StoreService {
 
     /**
      * List and search store items
-     * If called without permission STORE_ADMIN the only items marked displayable, whose start and end date are null or appropriate to the current date, and whose geo policy allows the caller&#39;s country will be returned. Similarly skus will be filtered, possibly resulting in an item returned with no skus the user can purchase. br&gt;&lt;br&gt;&lt;b&gt;Permissions Needed:&lt;/b&gt; ANY
+     * If called without permission STORE_ADMIN the only items marked displayable, whose start and end date are null or appropriate to the current date, and whose geo policy allows the caller&#39;s country will be returned. Similarly skus will be filtered, possibly resulting in an item returned with no skus the user can purchase. br&gt;&lt;br&gt;&lt;b&gt;Permissions Needed:&lt;/b&gt; ANY&lt;br /&gt;&lt;b&gt;Permissions Needed:&lt;/b&gt; NONE
      * @param filterNameSearch Filter for items whose name starts with a given string.
      * @param filterUniqueKey Filter for items whose unique_key is a given string.
      * @param filterPublished Filter for skus that have been published.
@@ -1015,6 +1031,59 @@ export class StoreService {
     }
 
     /**
+     * One-step invoice creation when already processing
+     * Used to create and automatically mark processing an invoice. Must not be an item that requires shipping. PAYMENTS_ADMIN permission is required if user ID is specified and is not the ID of the currently logged in user. &lt;br&gt;&lt;br&gt;&lt;b&gt;Permissions Needed:&lt;/b&gt; PAYMENTS_USER and owner, or PAYMENTS_ADMIN
+     * @param quickProcessingRequest Quick processing details
+     */
+    public quickProcessingWithHttpInfo(quickProcessingRequest?: QuickPaidRequest, extraHttpRequestParams?: any): Observable<Response> {
+        const path = this.basePath + '/store/quick-processing';
+
+        let queryParameters = new URLSearchParams();
+        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
+
+        // to determine the Accept header
+        let produces: string[] = [
+            'application/json'
+        ];
+
+        // authentication (oauth2_client_credentials_grant) required
+        // oauth required
+        if (this.configuration.accessToken) {
+            let accessToken = typeof this.configuration.accessToken === 'function'
+                ? this.configuration.accessToken()
+                : this.configuration.accessToken;
+            headers.set('Authorization', 'Bearer ' + accessToken);
+        }
+
+        // authentication (oauth2_password_grant) required
+        // oauth required
+        if (this.configuration.accessToken) {
+            let accessToken = typeof this.configuration.accessToken === 'function'
+                ? this.configuration.accessToken()
+                : this.configuration.accessToken;
+            headers.set('Authorization', 'Bearer ' + accessToken);
+        }
+
+            
+        headers.set('Content-Type', 'application/json');
+
+        let requestOptions: RequestOptionsArgs = new RequestOptions({
+            method: RequestMethod.Post,
+            headers: headers,
+            body: quickProcessingRequest == null ? '' : JSON.stringify(quickProcessingRequest), // https://github.com/angular/angular/issues/10612
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
+        });
+        // https://github.com/swagger-api/swagger-codegen/issues/4037
+        if (extraHttpRequestParams) {
+            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
+        }
+
+        return this.http.request(path, requestOptions);
+    }
+
+    /**
      * Update an item template
      * &lt;b&gt;Permissions Needed:&lt;/b&gt; TEMPLATE_ADMIN&lt;br /&gt;&lt;b&gt;Permissions Needed:&lt;/b&gt; PUT
      * @param id The id of the template
@@ -1080,7 +1149,7 @@ export class StoreService {
 
     /**
      * Update a store item
-     * &lt;b&gt;Permissions Needed:&lt;/b&gt; STORE_ADMIN
+     * &lt;b&gt;Permissions Needed:&lt;/b&gt; STORE_ADMIN&lt;br /&gt;&lt;b&gt;Permissions Needed:&lt;/b&gt; NONE
      * @param id The id of the item
      * @param cascade Whether to cascade group changes, such as in the limited gettable behavior. A 400 error will return otherwise if the group is already in use with different values.
      * @param storeItem The store item object
