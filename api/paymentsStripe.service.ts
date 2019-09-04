@@ -22,6 +22,7 @@ import '../rxjs-operators';
 
 import { PaymentMethodResource } from '../model/paymentMethodResource';
 import { Result } from '../model/result';
+import { StringWrapper } from '../model/stringWrapper';
 import { StripeCreatePaymentMethod } from '../model/stripeCreatePaymentMethod';
 import { StripePaymentRequest } from '../model/stripePaymentRequest';
 
@@ -92,11 +93,11 @@ export class PaymentsStripeService {
     }
 
     /**
-     * Obtain a token from Stripe, following their examples and documentation. Pays an invoice without creating a payment method. Ensure that Stripe itself has been configured with the webhook so that invoices are marked paid. <br><br><b>Permissions Needed:</b> ANY
+     * Obtain a token from Stripe, following their examples and documentation. Pays an invoice without creating a payment method. Ensure that Stripe itself has been configured with the webhook so that invoices are marked paid. A 200 status code indicates sucess with a return value of \"succeeded\". \"pending\" status is also a 200 and otherwise a non-200 will be sent for failures. <br><br><b>Permissions Needed:</b> ANY
      * @summary Pay with a single use token
      * @param request The request to pay an invoice
      */
-    public payStripeInvoice(request?: StripePaymentRequest, extraHttpRequestParams?: any): Observable<{}> {
+    public payStripeInvoice(request?: StripePaymentRequest, extraHttpRequestParams?: any): Observable<StringWrapper> {
         return this.payStripeInvoiceWithHttpInfo(request, extraHttpRequestParams)
             .map((response: Response) => {
                 if (response.status === 204) {
@@ -163,7 +164,7 @@ export class PaymentsStripeService {
 
     /**
      * Pay with a single use token
-     * Obtain a token from Stripe, following their examples and documentation. Pays an invoice without creating a payment method. Ensure that Stripe itself has been configured with the webhook so that invoices are marked paid. &lt;br&gt;&lt;br&gt;&lt;b&gt;Permissions Needed:&lt;/b&gt; ANY
+     * Obtain a token from Stripe, following their examples and documentation. Pays an invoice without creating a payment method. Ensure that Stripe itself has been configured with the webhook so that invoices are marked paid. A 200 status code indicates sucess with a return value of \&quot;succeeded\&quot;. \&quot;pending\&quot; status is also a 200 and otherwise a non-200 will be sent for failures. &lt;br&gt;&lt;br&gt;&lt;b&gt;Permissions Needed:&lt;/b&gt; ANY
      * @param request The request to pay an invoice
      */
     public payStripeInvoiceWithHttpInfo(request?: StripePaymentRequest, extraHttpRequestParams?: any): Observable<Response> {
