@@ -273,7 +273,7 @@ export class InvoicesService {
      * @param id The id of the invoice
      * @param request The payment method details. Will default to the appropriate user&#39;s wallet in the invoice currency if ommited.
      */
-    public payInvoice(id: number, request?: PayBySavedMethodRequest, extraHttpRequestParams?: any): Observable<{}> {
+    public payInvoice(id: number, request?: PayBySavedMethodRequest, extraHttpRequestParams?: any): Observable<StringWrapper> {
         return this.payInvoiceWithHttpInfo(id, request, extraHttpRequestParams)
             .map((response: Response) => {
                 if (response.status === 204) {
