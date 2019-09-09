@@ -14,6 +14,11 @@
 
 export interface UserInventoryAddRequest {
     /**
+     * An invoice id to link the inventory to (skip_invoice should be true)
+     */
+    invoiceId?: number;
+
+    /**
      * A note to be passed to the invoice or transaction
      */
     note: string;
