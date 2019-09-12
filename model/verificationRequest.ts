@@ -41,6 +41,11 @@ export interface VerificationRequest {
     expirationDate?: number;
 
     /**
+     * Whether to include letters, if the code is auto-generated. Default: true
+     */
+    includeLetters?: boolean;
+
+    /**
      * Whether to include numbers, if the code is auto-generated. Default: true
      */
     includeNumbers?: boolean;
