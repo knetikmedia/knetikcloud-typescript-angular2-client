@@ -235,12 +235,13 @@ export class InvoicesService {
      * @param filterShipping Filters invoices by shipping price. Multiple values possible for range search. Format: filter_shipping&#x3D;OP,ts&amp;... where OP in (GT, LT, GOE, LOE, EQ). Ex: filter_shipping&#x3D;GT,14.58,LT,15.54
      * @param filterVendorName Filters invoices by vendor name starting with given string
      * @param filterSku Filters invoices by item sku
+     * @param filterNotSku Filters for invoices that do not have an item sku
      * @param size The number of objects returned per page
      * @param page The number of the page returned, starting with 1
      * @param order A comma separated list of sorting requirements in priority order, each entry matching PROPERTY_NAME:[ASC|DESC]
      */
-    public getInvoices(filterUser?: number, filterEmail?: string, filterFulfillmentStatus?: string, filterPaymentStatus?: string, filterItemName?: string, filterExternalRef?: string, filterCreatedDate?: string, filterVendorIds?: string, filterCurrency?: string, filterShippingStateName?: string, filterShippingCountryName?: string, filterShipping?: string, filterVendorName?: string, filterSku?: string, size?: number, page?: number, order?: string, extraHttpRequestParams?: any): Observable<PageResourceInvoiceResource> {
-        return this.getInvoicesWithHttpInfo(filterUser, filterEmail, filterFulfillmentStatus, filterPaymentStatus, filterItemName, filterExternalRef, filterCreatedDate, filterVendorIds, filterCurrency, filterShippingStateName, filterShippingCountryName, filterShipping, filterVendorName, filterSku, size, page, order, extraHttpRequestParams)
+    public getInvoices(filterUser?: number, filterEmail?: string, filterFulfillmentStatus?: string, filterPaymentStatus?: string, filterItemName?: string, filterExternalRef?: string, filterCreatedDate?: string, filterVendorIds?: string, filterCurrency?: string, filterShippingStateName?: string, filterShippingCountryName?: string, filterShipping?: string, filterVendorName?: string, filterSku?: string, filterNotSku?: string, size?: number, page?: number, order?: string, extraHttpRequestParams?: any): Observable<PageResourceInvoiceResource> {
+        return this.getInvoicesWithHttpInfo(filterUser, filterEmail, filterFulfillmentStatus, filterPaymentStatus, filterItemName, filterExternalRef, filterCreatedDate, filterVendorIds, filterCurrency, filterShippingStateName, filterShippingCountryName, filterShipping, filterVendorName, filterSku, filterNotSku, size, page, order, extraHttpRequestParams)
             .map((response: Response) => {
                 if (response.status === 204) {
                     return undefined;
@@ -889,11 +890,12 @@ export class InvoicesService {
      * @param filterShipping Filters invoices by shipping price. Multiple values possible for range search. Format: filter_shipping&#x3D;OP,ts&amp;... where OP in (GT, LT, GOE, LOE, EQ). Ex: filter_shipping&#x3D;GT,14.58,LT,15.54
      * @param filterVendorName Filters invoices by vendor name starting with given string
      * @param filterSku Filters invoices by item sku
+     * @param filterNotSku Filters for invoices that do not have an item sku
      * @param size The number of objects returned per page
      * @param page The number of the page returned, starting with 1
      * @param order A comma separated list of sorting requirements in priority order, each entry matching PROPERTY_NAME:[ASC|DESC]
      */
-    public getInvoicesWithHttpInfo(filterUser?: number, filterEmail?: string, filterFulfillmentStatus?: string, filterPaymentStatus?: string, filterItemName?: string, filterExternalRef?: string, filterCreatedDate?: string, filterVendorIds?: string, filterCurrency?: string, filterShippingStateName?: string, filterShippingCountryName?: string, filterShipping?: string, filterVendorName?: string, filterSku?: string, size?: number, page?: number, order?: string, extraHttpRequestParams?: any): Observable<Response> {
+    public getInvoicesWithHttpInfo(filterUser?: number, filterEmail?: string, filterFulfillmentStatus?: string, filterPaymentStatus?: string, filterItemName?: string, filterExternalRef?: string, filterCreatedDate?: string, filterVendorIds?: string, filterCurrency?: string, filterShippingStateName?: string, filterShippingCountryName?: string, filterShipping?: string, filterVendorName?: string, filterSku?: string, filterNotSku?: string, size?: number, page?: number, order?: string, extraHttpRequestParams?: any): Observable<Response> {
         const path = this.basePath + '/invoices';
 
         let queryParameters = new URLSearchParams();
@@ -953,6 +955,10 @@ export class InvoicesService {
 
         if (filterSku !== undefined) {
             queryParameters.set('filter_sku', <any>filterSku);
+        }
+
+        if (filterNotSku !== undefined) {
+            queryParameters.set('filter_not_sku', <any>filterNotSku);
         }
 
         if (size !== undefined) {
