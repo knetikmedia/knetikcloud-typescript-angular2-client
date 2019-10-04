@@ -196,12 +196,15 @@ export class VerificationService {
     /**
      * Get a list of verification requests.<br /><b>Permissions Needed:</b> LIST
      * @summary List requests
+     * @param filterTemplate Filter for verifications with specified template
+     * @param filterTarget Filter for verifications with specified user id as the target
+     * @param filterOriginator Filter for verifications with specified user id as the originator
      * @param size The number of objects returned per page
      * @param page The number of the page returned
      * @param order A comma separated list of sorting requirements in priority order, each entry matching PROPERTY_NAME:[ASC|DESC]
      */
-    public getVerificationRequests(size?: number, page?: number, order?: string, extraHttpRequestParams?: any): Observable<PageResourceVerificationRequest> {
-        return this.getVerificationRequestsWithHttpInfo(size, page, order, extraHttpRequestParams)
+    public getVerificationRequests(filterTemplate?: string, filterTarget?: string, filterOriginator?: string, size?: number, page?: number, order?: string, extraHttpRequestParams?: any): Observable<PageResourceVerificationRequest> {
+        return this.getVerificationRequestsWithHttpInfo(filterTemplate, filterTarget, filterOriginator, size, page, order, extraHttpRequestParams)
             .map((response: Response) => {
                 if (response.status === 204) {
                     return undefined;
@@ -666,15 +669,30 @@ export class VerificationService {
     /**
      * List requests
      * Get a list of verification requests.&lt;br /&gt;&lt;b&gt;Permissions Needed:&lt;/b&gt; LIST
+     * @param filterTemplate Filter for verifications with specified template
+     * @param filterTarget Filter for verifications with specified user id as the target
+     * @param filterOriginator Filter for verifications with specified user id as the originator
      * @param size The number of objects returned per page
      * @param page The number of the page returned
      * @param order A comma separated list of sorting requirements in priority order, each entry matching PROPERTY_NAME:[ASC|DESC]
      */
-    public getVerificationRequestsWithHttpInfo(size?: number, page?: number, order?: string, extraHttpRequestParams?: any): Observable<Response> {
+    public getVerificationRequestsWithHttpInfo(filterTemplate?: string, filterTarget?: string, filterOriginator?: string, size?: number, page?: number, order?: string, extraHttpRequestParams?: any): Observable<Response> {
         const path = this.basePath + '/verification/requests';
 
         let queryParameters = new URLSearchParams();
         let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
+        if (filterTemplate !== undefined) {
+            queryParameters.set('filter_template', <any>filterTemplate);
+        }
+
+        if (filterTarget !== undefined) {
+            queryParameters.set('filter_target', <any>filterTarget);
+        }
+
+        if (filterOriginator !== undefined) {
+            queryParameters.set('filter_originator', <any>filterOriginator);
+        }
 
         if (size !== undefined) {
             queryParameters.set('size', <any>size);
