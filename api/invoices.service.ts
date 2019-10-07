@@ -286,6 +286,23 @@ export class InvoicesService {
     }
 
     /**
+     * <b>Permissions Needed:</b> INVOICES_ADMIN
+     * @summary Set the additional properties of an invoice
+     * @param id The id of the invoice
+     * @param properties The new properties for the membership
+     */
+    public setAdditionalProperties(id: number, properties: any, extraHttpRequestParams?: any): Observable<{}> {
+        return this.setAdditionalPropertiesWithHttpInfo(id, properties, extraHttpRequestParams)
+            .map((response: Response) => {
+                if (response.status === 204) {
+                    return undefined;
+                } else {
+                    return response.json() || {};
+                }
+            });
+    }
+
+    /**
      * This allows external fulfillment systems to report success or failure. Fulfillment status changes are restricted by a specific flow determining which status can lead to which. <br><br><b>Permissions Needed:</b> INVOICES_ADMIN
      * @summary Set the fulfillment status of a bundled invoice item
      * @param id The id of the invoice
@@ -1119,6 +1136,69 @@ export class InvoicesService {
             method: RequestMethod.Post,
             headers: headers,
             body: request == null ? '' : JSON.stringify(request), // https://github.com/angular/angular/issues/10612
+            search: queryParameters,
+            withCredentials:this.configuration.withCredentials
+        });
+        // https://github.com/swagger-api/swagger-codegen/issues/4037
+        if (extraHttpRequestParams) {
+            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
+        }
+
+        return this.http.request(path, requestOptions);
+    }
+
+    /**
+     * Set the additional properties of an invoice
+     * &lt;b&gt;Permissions Needed:&lt;/b&gt; INVOICES_ADMIN
+     * @param id The id of the invoice
+     * @param properties The new properties for the membership
+     */
+    public setAdditionalPropertiesWithHttpInfo(id: number, properties: any, extraHttpRequestParams?: any): Observable<Response> {
+        const path = this.basePath + '/invoices/${id}/properties'
+                    .replace('${' + 'id' + '}', String(id));
+
+        let queryParameters = new URLSearchParams();
+        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
+        // verify required parameter 'id' is not null or undefined
+        if (id === null || id === undefined) {
+            throw new Error('Required parameter id was null or undefined when calling setAdditionalProperties.');
+        }
+        // verify required parameter 'properties' is not null or undefined
+        if (properties === null || properties === undefined) {
+            throw new Error('Required parameter properties was null or undefined when calling setAdditionalProperties.');
+        }
+
+        // to determine the Accept header
+        let produces: string[] = [
+            'application/json'
+        ];
+
+        // authentication (oauth2_client_credentials_grant) required
+        // oauth required
+        if (this.configuration.accessToken) {
+            let accessToken = typeof this.configuration.accessToken === 'function'
+                ? this.configuration.accessToken()
+                : this.configuration.accessToken;
+            headers.set('Authorization', 'Bearer ' + accessToken);
+        }
+
+        // authentication (oauth2_password_grant) required
+        // oauth required
+        if (this.configuration.accessToken) {
+            let accessToken = typeof this.configuration.accessToken === 'function'
+                ? this.configuration.accessToken()
+                : this.configuration.accessToken;
+            headers.set('Authorization', 'Bearer ' + accessToken);
+        }
+
+            
+        headers.set('Content-Type', 'application/json');
+
+        let requestOptions: RequestOptionsArgs = new RequestOptions({
+            method: RequestMethod.Put,
+            headers: headers,
+            body: properties == null ? '' : JSON.stringify(properties), // https://github.com/angular/angular/issues/10612
             search: queryParameters,
             withCredentials:this.configuration.withCredentials
         });
