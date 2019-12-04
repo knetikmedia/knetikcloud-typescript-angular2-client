@@ -14,9 +14,84 @@
 
 export interface QuickBuyRequest {
     /**
+     * Line one of the customer's shipping address
+     */
+    address1?: string;
+
+    /**
+     * Line two of the customer's shipping address
+     */
+    address2?: string;
+
+    /**
+     * Line one of the customer's billing address
+     */
+    billingAddress1?: string;
+
+    /**
+     * Line two of the customer's billing address
+     */
+    billingAddress2?: string;
+
+    /**
+     * The city for the customer's billing address
+     */
+    billingCityName?: string;
+
+    /**
+     * The country for the customer's billing address
+     */
+    billingCountryName?: string;
+
+    /**
+     * The customer's name for the billing address
+     */
+    billingFullName?: string;
+
+    /**
+     * The postal code for the customer's billing address
+     */
+    billingPostalCode?: string;
+
+    /**
+     * The state for the customer's billing address
+     */
+    billingStateName?: string;
+
+    /**
+     * The city for the customer's shipping address
+     */
+    cityName?: string;
+
+    /**
+     * The country for the customer's shipping address
+     */
+    countryName?: string;
+
+    /**
+     * The customer's email address
+     */
+    email?: string;
+
+    /**
+     * The customer's name prefix
+     */
+    namePrefix?: string;
+
+    /**
+     * The postal code for the customer's shipping address
+     */
+    postalCode?: string;
+
+    /**
      * SKU of item being purchased
      */
     sku: string;
+
+    /**
+     * The state for the customer's shipping address
+     */
+    stateName?: string;
 
     /**
      * ID of the user making the purchase. If null, currently logged in user will be used.

@@ -20,6 +20,66 @@ export interface QuickPaidRequest {
     additionalProperties?: { [key: string]: Property; };
 
     /**
+     * Line one of the customer's shipping address
+     */
+    address1?: string;
+
+    /**
+     * Line two of the customer's shipping address
+     */
+    address2?: string;
+
+    /**
+     * Line one of the customer's billing address
+     */
+    billingAddress1?: string;
+
+    /**
+     * Line two of the customer's billing address
+     */
+    billingAddress2?: string;
+
+    /**
+     * The city for the customer's billing address
+     */
+    billingCityName?: string;
+
+    /**
+     * The country for the customer's billing address
+     */
+    billingCountryName?: string;
+
+    /**
+     * The customer's name for the billing address
+     */
+    billingFullName?: string;
+
+    /**
+     * The postal code for the customer's billing address
+     */
+    billingPostalCode?: string;
+
+    /**
+     * The state for the customer's billing address
+     */
+    billingStateName?: string;
+
+    /**
+     * The city for the customer's shipping address
+     */
+    cityName?: string;
+
+    /**
+     * The country for the customer's shipping address
+     */
+    countryName?: string;
+
+    /**
+     * The customer's email address
+     */
+    email?: string;
+
+    /**
      * The amount of federal tax to add (increases final price of invoice even if using price override). Minimum 0
      */
     federalTax?: number;
@@ -35,9 +95,19 @@ export interface QuickPaidRequest {
     itemNotes?: string;
 
     /**
+     * The customer's name prefix
+     */
+    namePrefix?: string;
+
+    /**
      * The amount already paid. Must match final price to complete purchase. Ignored for non-paid endpoints. Minimum 0
      */
     paidAmount?: number;
+
+    /**
+     * The postal code for the customer's shipping address
+     */
+    postalCode?: string;
 
     /**
      * Override the price of an item, if the behavior configuration permits it. Do not send if taking standard pricing. Minimum 0
@@ -48,6 +118,11 @@ export interface QuickPaidRequest {
      * SKU of item being purchased
      */
     sku: string;
+
+    /**
+     * The state for the customer's shipping address
+     */
+    stateName?: string;
 
     /**
      * The amount of state tax to add (increases final price of invoice even if using price override). Minimum 0
