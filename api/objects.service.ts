@@ -166,12 +166,13 @@ export class ObjectsService {
      * <b>Permissions Needed:</b> ANY
      * @summary List and search objects
      * @param templateId The id of the template to get objects for
+     * @param filterNameSearch Filter for items whose name starts with a given string.
      * @param size The number of objects returned per page
      * @param page The number of the page returned, starting with 1
      * @param order A comma separated list of sorting requirements in priority order, each entry matching PROPERTY_NAME:[ASC|DESC]
      */
-    public getObjectItems(templateId: string, size?: number, page?: number, order?: string, extraHttpRequestParams?: any): Observable<PageResourceObjectResource> {
-        return this.getObjectItemsWithHttpInfo(templateId, size, page, order, extraHttpRequestParams)
+    public getObjectItems(templateId: string, filterNameSearch?: string, size?: number, page?: number, order?: string, extraHttpRequestParams?: any): Observable<PageResourceObjectResource> {
+        return this.getObjectItemsWithHttpInfo(templateId, filterNameSearch, size, page, order, extraHttpRequestParams)
             .map((response: Response) => {
                 if (response.status === 204) {
                     return undefined;
@@ -556,11 +557,12 @@ export class ObjectsService {
      * List and search objects
      * &lt;b&gt;Permissions Needed:&lt;/b&gt; ANY
      * @param templateId The id of the template to get objects for
+     * @param filterNameSearch Filter for items whose name starts with a given string.
      * @param size The number of objects returned per page
      * @param page The number of the page returned, starting with 1
      * @param order A comma separated list of sorting requirements in priority order, each entry matching PROPERTY_NAME:[ASC|DESC]
      */
-    public getObjectItemsWithHttpInfo(templateId: string, size?: number, page?: number, order?: string, extraHttpRequestParams?: any): Observable<Response> {
+    public getObjectItemsWithHttpInfo(templateId: string, filterNameSearch?: string, size?: number, page?: number, order?: string, extraHttpRequestParams?: any): Observable<Response> {
         const path = this.basePath + '/objects/${template_id}'
                     .replace('${' + 'template_id' + '}', String(templateId));
 
@@ -571,6 +573,10 @@ export class ObjectsService {
         if (templateId === null || templateId === undefined) {
             throw new Error('Required parameter templateId was null or undefined when calling getObjectItems.');
         }
+        if (filterNameSearch !== undefined) {
+            queryParameters.set('filter_name_search', <any>filterNameSearch);
+        }
+
         if (size !== undefined) {
             queryParameters.set('size', <any>size);
         }

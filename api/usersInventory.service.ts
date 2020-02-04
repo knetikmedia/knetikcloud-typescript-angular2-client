@@ -205,12 +205,13 @@ export class UsersInventoryService {
      * <b>Permissions Needed:</b> ANY
      * @summary List and search entitlement items
      * @param filterTemplate Filter for entitlements using a specified template
+     * @param filterNameSearch Filter for items whose name starts with a given string.
      * @param size The number of objects returned per page
      * @param page The number of the page returned, starting with 1
      * @param order A comma separated list of sorting requirements in priority order, each entry matching PROPERTY_NAME:[ASC|DESC]
      */
-    public getEntitlementItems(filterTemplate?: string, size?: number, page?: number, order?: string, extraHttpRequestParams?: any): Observable<PageResourceEntitlementItem> {
-        return this.getEntitlementItemsWithHttpInfo(filterTemplate, size, page, order, extraHttpRequestParams)
+    public getEntitlementItems(filterTemplate?: string, filterNameSearch?: string, size?: number, page?: number, order?: string, extraHttpRequestParams?: any): Observable<PageResourceEntitlementItem> {
+        return this.getEntitlementItemsWithHttpInfo(filterTemplate, filterNameSearch, size, page, order, extraHttpRequestParams)
             .map((response: Response) => {
                 if (response.status === 204) {
                     return undefined;
@@ -874,11 +875,12 @@ export class UsersInventoryService {
      * List and search entitlement items
      * &lt;b&gt;Permissions Needed:&lt;/b&gt; ANY
      * @param filterTemplate Filter for entitlements using a specified template
+     * @param filterNameSearch Filter for items whose name starts with a given string.
      * @param size The number of objects returned per page
      * @param page The number of the page returned, starting with 1
      * @param order A comma separated list of sorting requirements in priority order, each entry matching PROPERTY_NAME:[ASC|DESC]
      */
-    public getEntitlementItemsWithHttpInfo(filterTemplate?: string, size?: number, page?: number, order?: string, extraHttpRequestParams?: any): Observable<Response> {
+    public getEntitlementItemsWithHttpInfo(filterTemplate?: string, filterNameSearch?: string, size?: number, page?: number, order?: string, extraHttpRequestParams?: any): Observable<Response> {
         const path = this.basePath + '/entitlements';
 
         let queryParameters = new URLSearchParams();
@@ -886,6 +888,10 @@ export class UsersInventoryService {
 
         if (filterTemplate !== undefined) {
             queryParameters.set('filter_template', <any>filterTemplate);
+        }
+
+        if (filterNameSearch !== undefined) {
+            queryParameters.set('filter_name_search', <any>filterNameSearch);
         }
 
         if (size !== undefined) {
